@@ -41,9 +41,17 @@ public class ProductController {
     }
 
     @GetMapping("/findProductById/{id}")
-    public ResponseEntity<ProductDTO> findById(@PathVariable Integer id) {
-        ProductDTO productDto = productApplicationService.findProductById(id);
-        return ResponseEntity.ok(productDto);
+    public ResponseEntity<ProductDTO> findById(@PathVariable(value = "id") final Integer id) {
+        try {
+            ProductDTO productDto = productApplicationService.findProductById(id);
+            if (productDto == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return ResponseEntity.ok(productDto);
+        } catch (Exception e) {
+            e.printStackTrace();  // Para ver detalles del error en la consola
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

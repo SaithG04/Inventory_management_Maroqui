@@ -33,6 +33,10 @@ public class ProductApplicationService {
 
     public ProductDTO findProductById(Integer id) {
         Product product = productService.findProductById(id);
+        if (product == null) {
+            // Manejar el caso en que el producto no se encuentra, por ejemplo lanzando una excepción custom
+            throw new RuntimeException("El producto con id " + id + " no existe");
+        }
         return convertToDto(product);
     }
 
