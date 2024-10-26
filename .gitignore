@@ -1,0 +1,15 @@
+# Ignorar archivos .env
+*.env
+
+# Ignorar los archivos y carpetas generados por Docker en cada servicio
+**/Dockerfile
+
+# Ignorar logs
+*.log
+
+# Ignorar archivos temporales del sistema
+*.tmp
+*.swp
+*.bak
+.DS_Store
+Thumbs.db
