@@ -12,10 +12,12 @@
 	<artifactId>order_service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>order_service</name>
-	<description>Módulo para la gestión de pedidos en app_inventory</description>
+	<description>Módulo para la gestión de orders en app_inventory</description>
 
 	<properties>
 		<java.version>21</java.version>
+		<sonar.organization>saithg04</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 
 	<dependencies>
@@ -92,7 +94,7 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<scope>test</scope>
+			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>

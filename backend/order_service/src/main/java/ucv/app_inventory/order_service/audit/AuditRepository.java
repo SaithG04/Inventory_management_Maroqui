@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
  * Repositorio de auditoría encargado de la persistencia de los eventos de auditoría en la base de datos.
  */
 @Repository
-public interface AuditoriaRepository extends JpaRepository<Auditoria, Long> {
+public interface AuditRepository extends JpaRepository<Audit, Long> {
 
 }

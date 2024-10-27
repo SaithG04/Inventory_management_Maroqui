@@ -16,14 +16,14 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor  // Constructor sin argumentos requerido por JPA
 @AllArgsConstructor  // Constructor con todos los campos
-public class Auditoria {
+public class Audit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "entidad", nullable = false)
-    private String entidad;  // Ejemplo: Pedido, Cliente, etc.
+    private String entidad;  // Ejemplo: Order, Cliente, etc.
 
     @Column(name = "tipo_accion", nullable = false)
     private String tipoAccion;  // Ejemplo: CREAR, ACTUALIZAR, ELIMINAR
@@ -38,13 +38,13 @@ public class Auditoria {
     private String detalle;  // Detalles adicionales sobre el cambio
 
     /**
-     * Constructor adicional para facilitar la creación de objetos Auditoria con los campos clave.
-     * @param entidad La entidad afectada por la acción (Ej. Pedido, Cliente)
+     * Constructor adicional para facilitar la creación de objetos Audit con los campos clave.
+     * @param entidad La entidad afectada por la acción (Ej. Order, Cliente)
      * @param tipoAccion El tipo de acción que se realizó (Ej. CREAR, ACTUALIZAR, ELIMINAR)
      * @param usuario El nombre del usuario que realizó la acción
      * @param detalle Detalles adicionales del evento (opcional)
      */
-    public Auditoria(String entidad, String tipoAccion, String usuario, String detalle) {
+    public Audit(String entidad, String tipoAccion, String usuario, String detalle) {
         this.entidad = entidad;
         this.tipoAccion = tipoAccion;
         this.usuario = usuario;

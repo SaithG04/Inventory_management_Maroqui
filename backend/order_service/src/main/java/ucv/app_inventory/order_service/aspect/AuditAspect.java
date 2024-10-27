@@ -2,7 +2,6 @@ package ucv.app_inventory.order_service.aspect;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -10,17 +9,16 @@ import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import ucv.app_inventory.order_service.audit.AuditoriaServiceImpl;
-import ucv.app_inventory.order_service.domain.Pedido;
+import ucv.app_inventory.order_service.audit.AuditServiceImpl;
 
 @Aspect
 @Component
-public class AuditoriaAspect {
+public class AuditAspect {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuditoriaAspect.class);
-    private final AuditoriaServiceImpl auditoriaServiceImpl;
+    private static final Logger logger = LoggerFactory.getLogger(AuditAspect.class);
+    private final AuditServiceImpl auditoriaServiceImpl;
 
-    public AuditoriaAspect(AuditoriaServiceImpl auditoriaServiceImpl) {
+    public AuditAspect(AuditServiceImpl auditoriaServiceImpl) {
         this.auditoriaServiceImpl = auditoriaServiceImpl;
     }
 

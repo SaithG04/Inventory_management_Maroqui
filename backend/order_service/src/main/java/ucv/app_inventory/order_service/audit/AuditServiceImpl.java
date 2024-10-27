@@ -9,26 +9,26 @@ import java.util.Optional;
  * Servicio encargado de gestionar las operaciones de auditoría.
  */
 @Service
-public class AuditoriaServiceImpl implements AuditoriaService {
+public class AuditServiceImpl implements AuditService {
 
-    private final AuditoriaRepository auditoriaRepository;
+    private final AuditRepository auditRepository;
 
     @Autowired
-    public AuditoriaServiceImpl(AuditoriaRepository auditoriaRepository) {
-        this.auditoriaRepository = auditoriaRepository;
+    public AuditServiceImpl(AuditRepository auditRepository) {
+        this.auditRepository = auditRepository;
     }
 
     /**
      * Registra un nuevo evento de auditoría en la base de datos.
      *
-     * @param entidad La entidad afectada (Ej: Pedido, Cliente)
+     * @param entidad La entidad afectada (Ej: Order, Cliente)
      * @param accion La acción realizada (Ej: CREAR, ACTUALIZAR, ELIMINAR)
      * @param usuario El nombre del usuario que realizó la acción
      * @param detalle Detalles adicionales del evento de auditoría
      */
     public void registrarAuditoria(String entidad, String accion, String usuario, String detalle) {
-        Auditoria auditoria = new Auditoria(entidad, accion, usuario, detalle);
-        auditoriaRepository.save(auditoria); // Persistir el evento de auditoría
+        Audit audit = new Audit(entidad, accion, usuario, detalle);
+        auditRepository.save(audit); // Persistir el evento de auditoría
     }
 
     /**
@@ -37,7 +37,7 @@ public class AuditoriaServiceImpl implements AuditoriaService {
      * @param id El ID de la auditoría.
      * @return Un Optional con la auditoría si se encuentra, o un Optional vacío si no.
      */
-    public Optional<Auditoria> buscarPorId(Long id) {
-        return auditoriaRepository.findById(id);
+    public Optional<Audit> buscarPorId(Long id) {
+        return auditRepository.findById(id);
     }
 }

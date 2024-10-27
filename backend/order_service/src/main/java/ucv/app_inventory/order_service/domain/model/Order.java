@@ -1,4 +1,4 @@
-package ucv.app_inventory.order_service.domain;
+package ucv.app_inventory.order_service.domain.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -10,7 +10,7 @@ import java.util.List;
 @Entity
 @Table(name = "pedidos")
 @Data
-public class Pedido {
+public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,11 +26,11 @@ public class Pedido {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false)
-    private EstadoPedido estado;
+    private OrderState estado;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "pedido_id")
-    private List<DetallePedido> detallePedidos;
+    private List<OrderDetail> orderDetails;
 
     @Column(name = "total", nullable = false)
     private Double total;

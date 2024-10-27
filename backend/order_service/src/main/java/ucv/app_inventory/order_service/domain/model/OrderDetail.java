@@ -1,4 +1,4 @@
-package ucv.app_inventory.order_service.domain;
+package ucv.app_inventory.order_service.domain.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.Data;
 @Entity
 @Table(name = "detalle_pedidos")
 @Data
-public class DetallePedido {
+public class OrderDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

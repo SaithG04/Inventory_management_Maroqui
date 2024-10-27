@@ -11,13 +11,13 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-public class AuditoriaServiceTest {
+public class AuditServiceTest {
 
     @Mock
-    private AuditoriaRepository auditoriaRepository;
+    private AuditRepository auditRepository;
 
     @InjectMocks
-    private AuditoriaServiceImpl auditoriaServiceImpl;
+    private AuditServiceImpl auditoriaServiceImpl;
 
     @BeforeEach
     public void setUp() {
@@ -28,33 +28,33 @@ public class AuditoriaServiceTest {
     @Test
     public void registrarAuditoria_deberiaGuardarEnRepositorio() {
         // Configurar datos de prueba
-        String entidad = "Pedido";
+        String entidad = "Order";
         String accion = "CREAR";
         String usuario = "defaultUser";
-        String detalle = "Pedido creado";
+        String detalle = "Order creado";
 
         // Invocar el método de servicio
         auditoriaServiceImpl.registrarAuditoria(entidad, accion, usuario, detalle);
 
         // Verificar que el repositorio ha guardado el evento de auditoría
-        verify(auditoriaRepository, times(1)).save(any(Auditoria.class));
+        verify(auditRepository, times(1)).save(any(Audit.class));
     }
 
     @Test
     public void buscarPorId_deberiaRetornarAuditoria() {
         // Datos de prueba
-        Auditoria auditoria = new Auditoria("Pedido", "CREAR", "defaultUser", "Pedido creado");
-        when(auditoriaRepository.findById(1L)).thenReturn(Optional.of(auditoria));
+        Audit audit = new Audit("Order", "CREAR", "defaultUser", "Order creado");
+        when(auditRepository.findById(1L)).thenReturn(Optional.of(audit));
 
         // Invocar el método de servicio
-        Optional<Auditoria> resultado = auditoriaServiceImpl.buscarPorId(1L);
+        Optional<Audit> resultado = auditoriaServiceImpl.buscarPorId(1L);
 
         // Verificar que el valor retornado es correcto
         assertThat(resultado).isPresent();
-        assertThat(resultado.get().getEntidad()).isEqualTo("Pedido");
+        assertThat(resultado.get().getEntidad()).isEqualTo("Order");
         assertThat(resultado.get().getTipoAccion()).isEqualTo("CREAR");
 
         // Verificar que se ha invocado el método findById del repositorio
-        verify(auditoriaRepository, times(1)).findById(1L);
+        verify(auditRepository, times(1)).findById(1L);
     }
 }

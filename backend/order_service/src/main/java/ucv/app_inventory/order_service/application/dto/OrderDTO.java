@@ -6,12 +6,12 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
-public class PedidoDTO {
+public class OrderDTO {
 
     private Long id;
     private String cliente;
     private LocalDate fecha;
     private String estado;
-    private List<DetallePedidoDTO> detallePedidos;
+    private List<OrderDetailDTO> detallePedidos;
 
 }
