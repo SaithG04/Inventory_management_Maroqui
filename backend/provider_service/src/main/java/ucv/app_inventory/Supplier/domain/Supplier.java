@@ -1,4 +1,4 @@
-package ucv.app_inventory.proveedores.domain;
+package ucv.app_inventory.Supplier.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,19 +10,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Entity
-public class Proveedor {
+public class Supplier {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idProveedor;
-    private Long Idcategoria;
-    private String nombre;
-    private String contacto;
-    private String telefono;
-    private String correo;
-    private String direccion;
-
-    private String condiciones;
+    private Long supplierId;
+    private Long categoryId;
+    private String name;
+    private String contact;
+    private String phone;
+    private String email;
+    private String address;
+    private String conditions;
 
 
 }
