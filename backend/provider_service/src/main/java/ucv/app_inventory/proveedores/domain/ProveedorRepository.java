@@ -8,7 +8,7 @@ import java.util.List;
 @Repository
 public interface ProveedorRepository extends JpaRepository<Proveedor, Long> {
 
-    // Métodos de búsqueda por cada criterio y combinaciones de ellos
+
     List<Proveedor> findByNombre(String nombre);
 
     List<Proveedor> findByContacto(String contacto);
