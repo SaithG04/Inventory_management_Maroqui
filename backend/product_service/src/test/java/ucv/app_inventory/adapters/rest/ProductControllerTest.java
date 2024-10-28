@@ -10,7 +10,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ucv.app_inventory.application.DTO.ProductDTO;
 import ucv.app_inventory.application.services.ProductApplicationService;
+import ucv.app_inventory.domain.entities.Product;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -36,18 +38,20 @@ class ProductControllerTest {
 
     @Test
     void testListProduct() throws Exception {
-        ProductDTO productDto = new ProductDTO(1, "Producto 1", "C001", "Descripción", 10.0, "unidad", "100", 1, 1);
-        when(productApplicationService.listProducts()).thenReturn(List.of(productDto));
+        ProductDTO productDto = new ProductDTO(1L, "Producto 1", "C001", "Descripción", "unidad", 100, 1L, Product.Status.ACTIVE);
+        when(productApplicationService.listProducts(0, 15)).thenReturn(Arrays.asList(productDto));
 
-        mockMvc.perform(get("/api/product/listProducts"))
+        mockMvc.perform(get("/api/product/listProducts?page=0&size=15"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].nombre").value("Producto 1"));
     }
 
+
+
     @Test
     void testSaveProduct() throws Exception {
-        ProductDTO productDto = new ProductDTO(null, "Nuevo Producto", "C002", "Descripción nueva", 20.0, "unidad", "50", 1, 2);
-        ProductDTO savedProductDto = new ProductDTO(2, "Nuevo Producto", "C002", "Descripción nueva", 20.0, "unidad", "50", 1, 2);
+        ProductDTO productDto = new ProductDTO(null, "Nuevo Producto", "C002", "Descripción nueva", "unidad", 50, 1L, Product.Status.ACTIVE);
+        ProductDTO savedProductDto = new ProductDTO(2L, "Nuevo Producto", "C002", "Descripción nueva", "unidad", 50, 1L, Product.Status.ACTIVE);
 
         when(productApplicationService.saveProduct(productDto)).thenReturn(savedProductDto);
 
@@ -61,12 +65,12 @@ class ProductControllerTest {
     // Test de eliminación de producto
     @Test
     void testDeleteProduct() throws Exception {
-        doNothing().when(productApplicationService).deleteProduct(1);
+        doNothing().when(productApplicationService).deleteProduct(1L);
 
         mockMvc.perform(delete("/api/product/deleteProduct/1"))
                 .andExpect(status().isNoContent());
 
-        verify(productApplicationService, times(1)).deleteProduct(1);
+        verify(productApplicationService, times(1)).deleteProduct(1L);
     }
 }
 

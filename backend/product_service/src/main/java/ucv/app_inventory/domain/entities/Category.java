@@ -9,12 +9,12 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
+@NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "products")
-public class Product implements Serializable {
+@Table(name = "Categories")
+public class Category implements Serializable {
 
     @NotNull
     @Id
@@ -25,27 +25,14 @@ public class Product implements Serializable {
     private String name;
 
     @Column
-    private String code;
-
-    @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column
-    private String unitMeasurement;
-
-    @Column
-    private Integer stock;
-
-    @Column
-    private Long categoryId;
-
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('ACTIVE', 'DISCONTINUED', 'OUT_OF_STOCK') DEFAULT 'ACTIVE'")
+    @Column(columnDefinition = "ENUM('ACTIVE', 'INACTIVE') DEFAULT 'ACTIVE'")
     private Status status;
 
     public enum Status {
         ACTIVE,
-        DISCONTINUED,
-        OUT_OF_STOCK
+        INACTIVE
     }
 }

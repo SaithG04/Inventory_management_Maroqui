@@ -1,24 +1,30 @@
 package ucv.app_inventory.application.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ucv.app_inventory.application.DTO.ProductDTO;
 import ucv.app_inventory.domain.entities.Product;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Component
 public class ProductApplicationService {
     private final ProductService productService;
+    private static final Logger logger = LoggerFactory.getLogger(ProductApplicationService.class);
 
     public ProductApplicationService(ProductService productService) {
         this.productService = productService;
     }
 
-    public List<ProductDTO> listProducts() {
-        List<Product> products = productService.listProducts();
-        return products.stream().map(this::convertToDto).toList();
+    public List<ProductDTO> listProducts(int page, int size) {
+
+        Page<Product> productsPage = productService.listProducts(page, size);
+        return productsPage.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
     public ProductDTO saveProduct(ProductDTO productDto) {
@@ -27,11 +33,11 @@ public class ProductApplicationService {
         return convertToDto(savedProduct);
     }
 
-    public void deleteProduct(Integer id) {
+    public void deleteProduct(Long id) {
         productService.deleteProduct(id);
     }
 
-    public ProductDTO findProductById(Integer id) {
+    public ProductDTO findProductById(Long id) {
         Product product = productService.findProductById(id);
         if (product == null) {
             // Manejar el caso en que el producto no se encuentra, por ejemplo lanzando una excepción custom
@@ -43,35 +49,49 @@ public class ProductApplicationService {
     private ProductDTO convertToDto(Product product) {
         return new ProductDTO(
                 product.getId(), product.getName(), product.getCode(), product.getDescription(),
-                product.getCostPrice(), product.getUnitMeasurement(), product.getStock()
-                , product.getCategoryId(), product.getSupplierId()
+                product.getUnitMeasurement(), product.getStock()
+                , product.getCategoryId(), product.getStatus()
         );
     }
 
     private Product convertToEntity(ProductDTO productDto) {
         return new Product(
                 productDto.getId(), productDto.getName(), productDto.getCode(), productDto.getDescription(),
-                productDto.getCostPrice(), productDto.getUnitMeasurement(), productDto.getStock()
-                , productDto.getCategoryId(), productDto.getSupplierId()
+                productDto.getUnitMeasurement(), productDto.getStock()
+                , productDto.getCategoryId(), productDto.getStatus()
         );
     }
 
-    public ProductDTO updateProduct(Integer id, ProductDTO productDto) {
+    public ProductDTO updateProduct(Long id, ProductDTO productDto) {
         Product existingProduct = productService.findProductById(id);
 
 
         existingProduct.setName(productDto.getName());
         existingProduct.setCode(productDto.getCode());
         existingProduct.setDescription(productDto.getDescription());
-        existingProduct.setCostPrice(productDto.getCostPrice());
         existingProduct.setUnitMeasurement(productDto.getUnitMeasurement());
         existingProduct.setStock(productDto.getStock());
         existingProduct.setCategoryId(productDto.getCategoryId());
-        existingProduct.setSupplierId(productDto.getSupplierId());
+        existingProduct.setStatus(productDto.getStatus());
 
 
         Product updatedProduct = productService.saveProduct(existingProduct);
         return convertToDto(updatedProduct);
+    }
+
+    public List<ProductDTO> findProductsByName(String name) {
+        List<Product> products = productService.findProductsByName(name);
+        return products.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    public List<ProductDTO> findProductsByStatus(Product.Status status) {
+        List<Product> products = productService.findProductsByStatus(status);
+        return products.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    public List<ProductDTO> findProductsByCategoryName(String categoryName) {
+        List<Product> products = productService.findProductsByCategoryName(categoryName);
+        return products.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
 }

@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.3</version>
+		<version>3.3.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>ucv</groupId>
-	<artifactId>app_inventory</artifactId>
+	<groupId>ucv.app_inventory</groupId>
+	<artifactId>product_service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>app_inventory</name>
-	<description>Apliación Web para el curso de Calidad de software</description>
+	<name>product_service</name>
+	<description>Modulo para la gestion de productos</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -28,6 +28,8 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
+		<sonar.organization>saithg04</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io/</sonar.host.url>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -68,41 +70,43 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jdbc</artifactId>
 		</dependency>
+		<!--
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
+		-->
 		<dependency>
 			<groupId>io.github.cdimascio</groupId>
 			<artifactId>java-dotenv</artifactId>
 			<version>5.2.2</version>
 		</dependency>
-                <dependency>
-                        <groupId>jakarta.validation</groupId>
-                        <artifactId>jakarta.validation-api</artifactId>
-                        <version>3.0.0</version>
-                </dependency>
-                <dependency>
-                        <groupId>io.jsonwebtoken</groupId>
-                        <artifactId>jjwt-api</artifactId>
-                        <version>0.11.5</version>
-                </dependency>
-                <dependency>
-                        <groupId>io.jsonwebtoken</groupId>
-                        <artifactId>jjwt-impl</artifactId>
-                        <version>0.11.5</version>
-                        <scope>runtime</scope>
-                </dependency>
-                <dependency>
-                        <groupId>io.jsonwebtoken</groupId>
-                        <artifactId>jjwt-jackson</artifactId>
-                        <version>0.11.5</version>
-                        <scope>runtime</scope>
-                </dependency>
-                <dependency>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-starter-security</artifactId>
-                </dependency>
+		<dependency>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>0.11.5</version>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>0.11.5</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>0.11.5</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -120,5 +124,27 @@
 			</plugin>
 		</plugins>
 	</build>
-
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>2023.0.2</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	<repositories>
+		<repository>
+			<id>spring-releases</id>
+			<name>Spring Releases</name>
+			<url>https://repo.spring.io/release</url>
+		</repository>
+		<repository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/milestone</url>
+		</repository>
+	</repositories>
 </project>
