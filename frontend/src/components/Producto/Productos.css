@@ -1,0 +1,432 @@
+/* ============================
+   Estilos Generales
+============================ */
+/* src/Productos.css */
+
+.productos-container {
+    max-width: 1050px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Sin overflow-y ni max-height aquí */
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+
+
+/* ============================
+   Estilos de la Sección de Búsqueda
+============================ */
+/* General de la sección de búsqueda */
+.search-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    background-color: #f0f4f8;
+    border-radius: 6px;
+}
+
+.p-dropdown {
+    width: 200px;
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    border: 1px solid #000000;
+    transition: border-color 0.2s ease-in-out;
+}
+
+
+/* Lista de opciones del dropdown */
+.p-dropdown-panel {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Opciones del dropdown */
+.p-dropdown-item {
+    padding: 8px 12px;
+    font-size: 14px;
+    background-color: #ffffff;
+    transition: background-color 0.3s ease-in-out;
+}
+
+/* Hover para las opciones del dropdown */
+.p-dropdown-item:hover {
+    background-color: #f2f2f2;
+    color: #e00a0a;
+}
+
+/* Estilo de Input */
+.search-input {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    width: 250px;
+}
+
+/* Botones de búsqueda y limpieza */
+.search-button,
+.clear-button {
+    padding: 8px 12px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.clear-button {
+    background-color: #d9534f;
+}
+
+.search-button:hover {
+    background-color: #45a049;
+}
+
+.clear-button:hover {
+    background-color: #c9302c;
+}
+
+.checkbox-group {
+    display: flex;
+    gap: 16px; /* Espacio entre cada checkbox-item */
+    align-items: center;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 4px; /* Espacio entre el checkbox y su label */
+}
+
+/* Oculta el icono de selección adicional */
+.p-checkbox-box .p-checkbox-icon {
+    display: none;
+}
+
+
+/* 2. Caja de texto para búsqueda */
+.search-input {
+    width: 300px; /* Tamaño adecuado para que se pueda ver el texto ingresado */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #ffffff; /* Fondo blanco para evitar transparencia */
+}
+
+/* 3. Botones de Buscar y Limpiar */
+.search-button {
+    padding: 10px 15px;
+    border-radius: 4px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    background-color: #668a67; /* Verde para el botón de buscar */
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.search-button:hover {
+    background-color: #355537; /* Verde más oscuro al pasar el mouse */
+}
+
+.clear-button {
+    padding: 10px 15px;
+    border-radius: 4px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    background-color: #9b6a67; /* Rojo para el botón de limpiar */
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.clear-button:hover {
+    background-color: #7f3736; /* Rojo más oscuro al pasar el mouse */
+}
+
+/* ================================================================
+   Estilos para el boton ocultar el formulario de Crear Producto
+=================================================================== */
+
+/* Estilos para el botón de alternar el formulario */
+.toggle-button {
+    padding: 8px 20px; /* Espaciado interno (12px arriba/abajo y 20px izquierda/derecha) */
+    border: none; /* Sin borde */
+    border-radius: 5px; /* Bordes redondeados */
+    cursor: pointer; /* Cambia el cursor al pasar el mouse */
+    width: 25%; /* Ancho del botón */
+    font-size: 16px; /* Tamaño de letra */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Transiciones suaves para color y transformación */
+    margin: 20px auto; /* Centrar el botón y añadir margen superior e inferior */
+    display: inline-block; /* Permitir que el botón se alinee a la izquierda */
+}
+
+/* Estilo cuando el formulario está visible (Cancelar) */
+.toggle-button.cancel {
+    background-color: #9b6a67; /* Color para cancelar */
+    color: white; /* Texto en blanco */
+}
+
+/* Estilo cuando el formulario está oculto (Crear Producto) */
+.toggle-button.create {
+    background-color: #668a67; /* Color para crear */
+    color: white; /* Texto en blanco */
+}
+
+/* Efecto de hover */
+.toggle-button.cancel:hover {
+    background-color: #7f3736; /* Color más oscuro al pasar el mouse */
+}
+
+/* Efecto de hover */
+.toggle-button.create:hover {
+    background-color: #355537; /* Color más oscuro al pasar el mouse */
+}
+
+/* Efecto de foco */
+.toggle-button.cancel:focus {
+    outline: none; /* Eliminar el contorno por defecto */
+    box-shadow: 0 0 0 3px rgba(49, 4, 4, 0.5); /* Sombra azul al enfocar */
+}
+
+.toggle-button.create:focus {
+    outline: none; /* Eliminar el contorno por defecto */
+    box-shadow: 0 0 0 3px rgba(4, 49, 26, 0.5); /* Sombra azul al enfocar */
+}
+
+
+
+/* ============================================
+   Estilos para el formulario Crear Producto
+=============================================== */
+/* Estilos generales para el formulario de agregar/editar producto */
+.add-product-form {
+    background-color: #fff; /* Fondo blanco */
+    padding: 25px; /* Aumento del espaciado interno */
+    border-radius: 10px; /* Bordes más redondeados */
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
+    margin: 0 auto 20px; /* Centrar el formulario y margen inferior */
+    max-width: 800px; /* Ancho máximo del formulario */
+    font-family: Arial, sans-serif; /* Fuente más legible */
+}
+
+/* Títulos del formulario */
+.add-product-form h3 {
+    font-size: 24px; /* Tamaño de letra más grande */
+    color: #444; /* Color de texto un poco más oscuro */
+    margin-bottom: 20px; /* Mayor espacio debajo del título */
+    text-align: left; /* Alinear el título a la izquierda */
+}
+
+/* Contenedor para los campos de entrada */
+.form-row {
+    display: flex; /* Usar flexbox */
+    justify-content: space-between; /* Espacio entre los campos */
+    align-items: center; /* Centrar verticalmente los campos */
+    margin-bottom: 20px; /* Espacio entre filas */
+}
+
+/* Estilos para los campos de entrada */
+.add-product-form input,
+.category-dropdown,
+.status-dropdown {
+    padding: 12px; /* Espaciado interno aumentado */
+    border: 1px solid #ddd; /* Borde gris claro */
+    border-radius: 5px; /* Bordes redondeados */
+    font-size: 15px; /* Tamaño de letra aumentado */
+    transition: border-color 0.3s ease-in-out; /* Transición más suave */
+}
+
+/* Estilos para el campo de entrada 'Nombre' */
+.input-name {
+    width: 72%; /* Ancho específico para el campo 'Nombre' */
+}
+
+/* Estilos para el campo de entrada 'Unidad de medida' */
+.input-unit-measurement {
+    width: 20%; /* Ancho específico para el campo 'Unidad de medida' */
+}
+
+/* Estilos para el campo de entrada 'Descripción' */
+.input-description {
+    width: 60%; /* Ancho específico para el campo 'Descripción' */
+}
+
+/* Estilos para el dropdown de categoría */
+.category-dropdown {
+    width: 35%; /* Ancho específico para el dropdown */
+}
+
+/* Estilos para el dropdown de estado */
+.status-dropdown {
+    width: 35%; /* Ancho específico para el dropdown */
+}
+
+/* Efecto de enfoque en los campos de entrada */
+.add-product-form input:focus,
+.category-dropdown:focus,
+.status-dropdown:focus {
+    border-color: #007bff; /* Color de borde al enfocar */
+    outline: none; /* Eliminar contorno por defecto */
+}
+
+/* Estilos para las etiquetas */
+.add-product-form label {
+    font-size: 15px; /* Tamaño de letra ajustado */
+    color: #333; /* Color del texto */
+    display: block; /* Que ocupen toda la línea */
+}
+
+/* ============================================================
+   Estilos del Boton Crear Producto y Actualizar Producto
+=============================================================== */
+
+/* Contenedor para el botón de agregar/actualizar */
+.add-product-section {
+    margin-top: 20px; /* Margen superior para separación del contenido anterior */
+    margin-bottom: 20px; /* Margen inferior para separación adicional */
+    text-align: center; /* Centrar el botón dentro del contenedor */
+}
+
+/* Estilos generales para el botón */
+.add-button {
+    padding: 12px 20px; /* Espaciado interno */
+    border: none; /* Sin borde */
+    border-radius: 5px; /* Bordes redondeados */
+    cursor: pointer; /* Cambia el cursor al pasar el mouse */
+    width: 100%; /* Ancho completo del contenedor */
+    max-width: 250px; /* Ancho máximo del botón */
+    font-size: 16px; /* Tamaño de letra */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Transición suave para el color y la escala */
+    box-shadow: 0px 4px 8px 
+    rgba(0, 0, 0, 0.2); /* Sombra del botón */
+}
+
+/* Estilos para el botón de agregar producto */
+.add-button.add {
+    background-color: #668a67; /* Verde para el botón de agregar */
+    color: white; /* Texto en blanco */
+}
+
+.add-button.add:hover {
+    background-color: #355537; /* Color más oscuro al pasar el mouse */
+}
+
+/* Estilos para el botón de actualizar producto */
+.add-button.update {
+    background-color: #9b6a67; /* Azul para el botón de actualizar */
+    color: white; /* Texto en blanco */
+}
+
+.add-button.update:hover {
+    background-color: #7f3736; /* Color más oscuro al pasar el mouse */
+}
+
+/* Mensaje de retroalimentación */
+.feedback-message {
+    margin-top: 15px; /* Espacio encima del mensaje */
+    padding: 10px; /* Espaciado interno */
+    background-color: #f8d7da; /* Fondo rojo claro */
+    border: 1px solid #f5c6cb; /* Borde más pronunciado */
+    border-radius: 5px; /* Bordes redondeados */
+    text-align: center; /* Centrar el mensaje */
+    font-size: 14px; /* Tamaño de letra del mensaje */
+}
+
+.feedback-success {
+    background-color: #d4edda; /* Fondo verde claro */
+    color: #155724; /* Texto verde oscuro */
+    border: 1px solid #c3e6cb;
+  }
+  
+  .feedback-error {
+    background-color: #f8d7da; /* Fondo rojo claro */
+    color: #721c24; /* Texto rojo oscuro */
+    border: 1px solid #f5c6cb;
+  }
+
+/* ============================
+   Estilos de la Tabla
+============================ */
+.product-table {
+    max-height: 400px; /* Considera aumentar esta altura si hay muchos productos */
+    overflow-y: auto; /* Esto asegura que la tabla pueda desplazarse */
+    /* Puedes ajustar la altura máxima o eliminarla si no es necesaria */
+}
+
+
+.product-table .p-datatable-thead {
+    background-color: #f7f7f7; /* Fondo del encabezado */
+    color: #333; /* Color del texto del encabezado */
+    font-weight: bold; /* Negrita para el texto del encabezado */
+    text-align: center; /* Centrar texto en el encabezado */
+}
+
+.product-table .p-datatable-thead th {
+    padding: 1rem; /* Espaciado en el encabezado */
+    border-bottom: 2px solid #ddd; /* Borde inferior para separar del cuerpo de la tabla */
+}
+
+.product-table .p-datatable-tbody {
+    background-color: #ffffff; /* Fondo blanco para los elementos de la tabla */
+}
+
+.product-table .p-datatable-tbody td {
+    text-align: center; /* Centrar texto en las celdas del cuerpo */
+    padding: 0.75rem; /* Espaciado en las celdas del cuerpo */
+    border-bottom: 1px solid #ddd; /* Borde inferior para las filas del cuerpo */
+}
+
+.product-table .p-datatable-tbody tr:hover {
+    background-color: #f1f1f1; /* Fondo al pasar el ratón por las filas */
+}
+
+
+/* ======================================
+   Estilos de la Tabla para los botones
+========================================= */
+
+/* Estilos para los botones en la tabla */
+.product-table button {
+    margin-right: 0.5rem; /* Espacio entre botones */
+    padding: 0.5rem 1rem; /* Espaciado interno */
+    border: none; /* Sin borde */
+    border-radius: 4px; /* Bordes redondeados */
+    cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+    font-weight: bold; /* Hacer el texto más destacado */
+    transition: background-color 0.3s; /* Transición suave para el fondo */
+}
+
+.product-table button.edit-button {
+    background-color: #668a67; /* Color de fondo para editar */
+    color: white; /* Color de texto */
+}
+
+.product-table button.edit-button:hover {
+    background-color: #5a7a5a; /* Color de fondo al pasar el ratón para editar */
+}
+
+.product-table button.delete-button {
+    background-color: #9b6a67; /* Color de fondo para eliminar */
+    color: white; /* Color de texto */
+}
+
+.product-table button.delete-button:hover {
+    background-color: #8a5858; /* Color de fondo al pasar el ratón para eliminar */
+}

@@ -1,0 +1,151 @@
+/* ============================ Contenedor Principal (Employee Management) ============================ */
+.employee-management {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9; /* Fondo claro */
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+.employee-management h2 {
+  text-align: center;
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* ============================ Formulario de Empleados ============================ */
+
+.employee-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.employee-form input {
+  width: calc(50% - 10px);
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.employee-form input[type="date"] {
+  padding: 8px;
+}
+
+/* Contenedor de Botones del Formulario */
+.employee-form-buttons {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Botón Registrar Empleado */
+.employee-register-button {
+  background-color: #000000; /* Azul claro */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.employee-register-button:hover {
+  background-color: #6699c1; /* Azul más oscuro al pasar el cursor */
+}
+
+/* Botón Limpiar */
+.employee-clear-button {
+  background-color: #f44336; /* Rojo para el botón de limpiar */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.employee-clear-button:hover {
+  background-color: #e53935; /* Rojo más oscuro */
+}
+
+/* ============================ Mensajes de Error ============================ */
+
+.employee-error-message {
+  color: red;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* ============================ Tabla de Empleados ============================ */
+
+.employee-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.employee-table th,
+.employee-table td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+  font-size: 1rem;
+}
+
+.employee-table th {
+  background-color: #eef1bf; /* Tono que combina con el esquema */
+  color: #333;
+}
+
+.employee-table td {
+  color: #555;
+}
+
+/* Botones de Acciones en la Tabla (Editar/Eliminar) */
+.employee-table td .employee-edit-button,
+.employee-table td .employee-delete-button {
+  background-color: #4CAF50; /* Verde para los botones de acciones */
+  margin-right: 10px;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.employee-table td .employee-edit-button:hover {
+  background-color: #45a049; /* Verde más oscuro al pasar el cursor */
+}
+
+.employee-table td .employee-delete-button {
+  background-color: #f44336; /* Rojo para el botón de eliminar */
+}
+
+.employee-table td .employee-delete-button:hover {
+  background-color: #d32f2f; /* Rojo más oscuro */
+}
+
+/* ============================ Ajustes de Media Queries ============================ */
+
+
+@media (max-width: 600px) {
+  .employee-form input {
+      width: 100%; /* Ajuste para pantallas pequeñas */
+  }
+
+  .employee-table th,
+  .employee-table td {
+      font-size: 0.9rem;
+      padding: 10px;
+  }
+}

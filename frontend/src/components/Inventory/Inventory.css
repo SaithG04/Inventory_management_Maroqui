@@ -1,0 +1,190 @@
+@import url('https://fonts.googleapis.com/css2?family=Rock+Salt&display=swap');
+
+/* Contenedor principal del inventario */
+.inventory-container {
+    padding: 20px; /* Espaciado interno del contenedor */
+    background-color: #f9f9f9; /* Color de fondo claro */
+    font-family: 'Roboto', sans-serif; /* Establecer la fuente */
+}
+
+/* Barra de búsqueda */
+.search-bar {
+    margin-bottom: 20px; /* Separación inferior para el campo de búsqueda */
+    display: flex; /* Para centrar y alinear el campo de búsqueda */
+    justify-content: center; /* Centrar horizontalmente */
+}
+
+.search-bar input {
+    width: 100%; /* Ocupar todo el ancho disponible */
+    max-width: 500px; /* Máximo ancho del campo */
+    padding: 12px; /* Espaciado interno */
+    border: 1px solid #ccc; /* Borde gris claro */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    transition: box-shadow 0.3s; /* Transición suave */
+}
+
+.search-bar input:focus {
+    outline: none; /* Eliminar borde de enfoque predeterminado */
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.5); /* Sombra azul al enfocar */
+}
+
+/* Formulario de agregar producto */
+.add-product-form {
+    margin-bottom: 20px; /* Separación inferior del formulario */
+    padding: 20px; /* Espaciado interno */
+    background-color: #8ab0d9; /* Fondo azul claro */
+    border-radius: 12px; /* Bordes más redondeados */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Sombra para darle más profundidad */
+}
+
+/* Título del formulario */
+.add-product-form h3 {
+    margin-bottom: 15px; /* Margen inferior para el título del formulario */
+    font-size: 20px; /* Tamaño de fuente más grande */
+    color: #333; /* Color del texto */
+}
+
+/* Input del formulario */
+.add-product-form input {
+    display: block; /* Cada campo se mostrará en una nueva línea */
+    width: calc(100% - 24px); /* Ajusta el ancho para compensar el padding y los bordes */
+    padding: 10px; /* Espaciado interno */
+    margin: 10px 0; /* Margen superior e inferior entre los campos */
+    border: 1px solid #ccc; /* Borde gris claro */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+/* Contenedor de los botones en el formulario */
+.form-buttons {
+    display: flex; /* Organizar los botones en una fila */
+    gap: 10px; /* Espacio entre los botones */
+}
+
+/* Estilo para los botones en el formulario */
+.add-product-form button {
+    padding: 12px 20px; /* Espaciado interno */
+    background-color: #4a90e2; /* Color de fondo azul para el botón */
+    color: white; /* Texto blanco */
+    border: none; /* Sin borde */
+    border-radius: 8px; /* Bordes redondeados */
+    cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+    transition: background-color 0.3s, box-shadow 0.3s; /* Transición suave para el cambio de color */
+    flex: 1; /* Cada botón ocupará el mismo espacio */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para darle profundidad */
+}
+
+/* Efecto hover para los botones */
+.add-product-form button:hover {
+    background-color: #357abd; /* Color más oscuro al pasar el mouse */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Aumentar la sombra al pasar el mouse */
+}
+
+/* Estilo específico para el botón "Limpiar" */
+.clear-button {
+    background-color: #4a90e2; /* Fondo azul claro para el botón "Limpiar" */
+}
+
+.clear-button:hover {
+    background-color: #357abd; /* Fondo más oscuro al pasar el mouse */
+}
+
+/* Tabla de inventario */
+.inventory-table {
+    width: 100%; /* La tabla ocupa todo el ancho */
+    border-collapse: collapse; /* Eliminar el espacio entre bordes */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra alrededor de la tabla */
+}
+
+.inventory-table th,
+.inventory-table td {
+    border: 1px solid #ddd; /* Borde gris claro para celdas */
+    padding: 12px; /* Espaciado interno más grande */
+    text-align: left; /* Alinear el texto a la izquierda */
+}
+
+.inventory-table th {
+    background-color: #4a90e2; /* Fondo azul para encabezados */
+    color: white; /* Texto blanco */
+    font-size: 16px; /* Aumentar tamaño de texto */
+}
+
+.inventory-table tr:nth-child(even) {
+    background-color: #f2f2f2; /* Fondo para filas pares */
+}
+
+/* Ajustar la columna "Acciones" */
+.inventory-table th:nth-child(6),
+.inventory-table td:nth-child(6) {
+    width: 160px; /* Ancho fijo para la columna de acciones */
+    text-align: center; /* Centrar contenido en la columna */
+}
+
+/* Contenedor de los botones en la columna "Acciones" */
+.inventory-table .action-buttons {
+    display: flex; /* Usar flex para organizar los botones horizontalmente */
+    justify-content: space-around; /* Espacio uniforme alrededor de los botones */
+}
+
+/* Estilo para los botones en la columna "Acciones" */
+.inventory-table button {
+    padding: 8px 12px; /* Ajustar tamaño de los botones */
+    background-color: #8ab0d9; /* Fondo azul claro */
+    border: none; /* Sin borde */
+    border-radius: 8px; /* Bordes redondeados */
+    cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+    transition: background-color 0.3s, box-shadow 0.3s; /* Transición suave */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+/* Estilo específico para el botón "Eliminar" */
+.inventory-table button:last-child {
+    background-color: #ff4c4c; /* Fondo rojo para el botón "Eliminar" */
+}
+
+.inventory-table button:hover {
+    background-color: #357abd; /* Fondo más oscuro al pasar el mouse */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Aumentar sombra al pasar el mouse */
+}
+
+.inventory-table button:last-child:hover {
+    background-color: #d93c3c; /* Fondo más oscuro para el botón "Eliminar" al pasar el mouse */
+}
+
+/* Estilo 3D para el título */
+.inventory-container h2 {
+    font-size: 40px; /* Tamaño más grande para el título */
+    font-family: 'Playfair Display', serif; /* Fuente elegante y clásica */
+    color: #574913; /* Color marrón oscuro para el título */
+    text-align: center; /* Centrar el texto */
+    text-shadow: 2px 2px 0 #9ab0d9, /* Primera sombra en un tono azul claro */
+                 4px 4px 0 #7aa1c1, /* Segunda sombra para mayor profundidad */
+                 6px 6px 0 rgba(0, 0, 0, 0.2); /* Sombra final para el efecto 3D */
+    font-weight: bold; /* Aumentar el grosor de la fuente */
+    margin-top: 2px; /* Reducir espacio superior */
+    margin-bottom: 20px; /* Espacio inferior para separar del contenido */
+}
+
+/* src/components/Inventory/Inventory.css */
+
+/* Estilos para mensajes de error */
+.error-message {
+    color: red;
+    background-color: #ffe6e6;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid red;
+    border-radius: 5px;
+  }
+  
+  /* Estilos para mensajes de éxito */
+  .success-message {
+    color: green;
+    background-color: #e6ffed;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid green;
+    border-radius: 5px;
+  }
+  

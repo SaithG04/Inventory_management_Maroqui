@@ -1,0 +1,233 @@
+/* ============================
+   General Styles for Suppliers
+============================ */
+.suppliers-container {
+    max-width: 1050px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Asegurarse de que la tabla ocupe el 100% del ancho disponible */
+}
+
+/* Title Styling */
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+/* Form container */
+.suppliers-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Input fields */
+.suppliers-form input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+/* Button styles */
+.suppliers-form button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    width: 100%;
+}
+
+.suppliers-form button:hover {
+    background-color: #45a049;
+}
+
+/* Styles for InputField labels */
+.suppliers-form label {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* Table Styles */
+.table-container {
+    width: 100%; /* Asegurarse de que ocupe el 100% del ancho */
+    max-width: 100%; /* Evitar que tenga un ancho máximo limitado */
+    margin: 0 auto;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Table headers */
+.table-container .p-datatable-thead {
+    background-color: #f0f4f8;
+    color: #333;
+    font-weight: bold;
+    text-align: left;
+}
+
+/* Table rows */
+.table-container .p-datatable-tbody td {
+    text-align: center;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Style for the action buttons */
+.table-container button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.table-container button.edit-button {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.table-container button.delete-button {
+    background-color: #d9534f;
+    color: white;
+}
+
+.table-container button.edit-button:hover {
+    background-color: #3e8e41;
+}
+
+.table-container button.delete-button:hover {
+    background-color: #c9302c;
+}
+
+/* Styles for the search container */
+.search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Search input */
+.search-input {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    width: 300px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Toggle button for the form */
+.toggle-button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    margin-left: 20px; /* Para separar el botón de la barra de búsqueda */
+}
+
+.toggle-button:hover {
+    background-color: #45a049;
+}
+
+/* Estilos específicos para la tabla */
+.p-datatable {
+    width: 100%; /* Asegurarse de que la tabla ocupe el 100% del ancho disponible */
+    font-size: 14px;
+}
+
+
+/* Ajustes para que el contenido en la tabla sea más legible */
+.p-datatable-thead > tr > th {
+    text-align: center;
+    padding: 12px 8px;
+    font-size: 16px;
+    color: #333;
+}
+
+.p-datatable-tbody > tr > td {
+    text-align: center;
+    padding: 10px 8px;
+    vertical-align: middle;
+}
+
+/* Espaciado adicional entre botones */
+.flex.space-x-2 > * {
+    margin-right: 12px;
+}
+/* Estilos para la columna de acciones */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;  /* Espacio entre botones */
+}
+
+.p-button-sm {
+    padding: 5px 10px;  /* Ajustar tamaño del padding para que los botones sean más pequeños */
+    font-size: 14px;     /* Ajustar tamaño de la fuente */
+}
+
+/* Botones de acciones */
+.edit-button {
+    background-color: #28a745;
+    color: white;
+    padding: 0.5rem 1rem;  /* Ajuste de padding para más espacio */
+    font-size: 0.85rem;    /* Ajustar el tamaño de la fuente */
+    width: auto;           /* Para que el botón se ajuste al contenido */
+    display: inline-flex;
+    align-items: center;   /* Asegurar la alineación con el icono */
+}
+
+.delete-button {
+    background-color: #dc3545;
+    color: white;
+    padding: 0.5rem 1rem;  /* Ajuste de padding para más espacio */
+    font-size: 0.85rem;    /* Ajustar el tamaño de la fuente */
+    width: auto;           /* Para que el botón se ajuste al contenido */
+    display: inline-flex;
+    align-items: center;   /* Asegurar la alineación con el icono */
+}
+
+.edit-button:hover {
+    background-color: #45a049;
+}
+
+.delete-button:hover {
+    background-color: #c9302c;
+}
+
+/* Espacio entre botones */
+.flex.space-x-2 > * {
+    margin-right: 8px;
+}
