@@ -37,7 +37,7 @@ class ProductApplicationServiceTest {
         List<Product> productList = Arrays.asList(product);
         Page<Product> productPage = new PageImpl<>(productList, PageRequest.of(0, 15), productList.size());
 
-        when(productService.listProducts(0, 15)).thenReturn(productPage); 
+        when(productService.listProducts(0, 15)).thenReturn(productPage);
 
         List<ProductDTO> products = productApplicationService.listProducts(0, 15);
 
