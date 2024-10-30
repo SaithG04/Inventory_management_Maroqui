@@ -66,7 +66,9 @@ const Productos = () => {
             { id: 1, name: 'Cuaderno', category: 'Papelería', unit: 'Unidad', status: 'Disponible', description: 'Cuaderno A4', stock: 100, cost: 1.5, price: 2.0 },
             { id: 2, name: 'Lápiz', category: 'Papelería', unit: 'Unidad', status: 'No Disponible', description: 'Lápiz HB', stock: 200, cost: 0.5, price: 1.0 },
             { id: 3, name: 'Borrador', category: 'Papelería', unit: 'Unidad', status: 'Disponible', description: 'Borrador blanco', stock: 50, cost: 0.3, price: 0.8 },
-            { id: 4, name: 'Tijeras', category: 'Oficina', unit: 'Unidad', status: 'Disponible', description: 'Tijeras escolares', stock: 30, cost: 2.0, price: 3.5 }
+            { id: 4, name: 'Tijeras', category: 'Oficina', unit: 'Unidad', status: 'Disponible', description: 'Tijeras escolares', stock: 30, cost: 2.0, price: 3.5 },
+            { id: 4, name: 'Tijeras', category: 'Oficina', unit: 'Unidad', status: 'Disponible', description: 'Tijeras escolares', stock: 30, cost: 2.0, price: 3.5 },
+            { id: 4, name: 'Tijeras', category: 'Oficina', unit: 'Unidad', status: 'Disponible', description: 'Tijeras escolares', stock: 30, cost: 2.0, price: 3.5 },
         ];
     }
 
@@ -234,8 +236,15 @@ const Productos = () => {
                 </div>
             )}
 
-            <DataTable value={filteredProducts} className="product-table">
-                <Column field="name" header="Nombre" />
+            <div className="product-table">
+                <DataTable
+                    value={filteredProducts} // Muestra solo los proveedores filtrados
+                    responsiveLayout="scroll"
+                    paginator
+                    rows={5}
+                    rowsPerPageOptions={[5, 10, 25]}
+                >
+                                  <Column field="name" header="Nombre" />
                 <Column field="category" header="Categoría" />
                 <Column field="unit" header="Unidad" />
                 <Column field="status" header="Estado" />
@@ -252,7 +261,8 @@ const Productos = () => {
                     )}
                     header="Acciones"
                 />
-            </DataTable>
+                </DataTable>
+            </div>
         </div>
     );
 

@@ -46,7 +46,7 @@ h2 {
 /* Button styles */
 .suppliers-form button {
     padding: 10px 20px;
-    background-color: #4CAF50;
+    background-color: #668a67;;
     color: white;
     border: none;
     border-radius: 6px;
@@ -58,7 +58,7 @@ h2 {
 }
 
 .suppliers-form button:hover {
-    background-color: #45a049;
+    background-color: #668a67;;
 }
 
 /* Styles for InputField labels */
@@ -200,7 +200,7 @@ h2 {
 
 /* Botones de acciones */
 .edit-button {
-    background-color: #28a745;
+    background-color: #668a67;
     color: white;
     padding: 0.5rem 1rem;  /* Ajuste de padding para más espacio */
     font-size: 0.85rem;    /* Ajustar el tamaño de la fuente */
@@ -210,7 +210,7 @@ h2 {
 }
 
 .delete-button {
-    background-color: #dc3545;
+    background-color: #9b6a67;
     color: white;
     padding: 0.5rem 1rem;  /* Ajuste de padding para más espacio */
     font-size: 0.85rem;    /* Ajustar el tamaño de la fuente */
@@ -220,11 +220,11 @@ h2 {
 }
 
 .edit-button:hover {
-    background-color: #45a049;
+    background-color: #5a7a5a;
 }
 
 .delete-button:hover {
-    background-color: #c9302c;
+    background-color: #8a5858;
 }
 
 /* Espacio entre botones */
