@@ -22,6 +22,5 @@ yarn-error.log*
 
 # react specific
 /src/setupTests.js
-/src/reportWebVitals.js
 /src/**/*.test.js
 /src/**/*.test.tsx

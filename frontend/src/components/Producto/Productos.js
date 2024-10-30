@@ -15,8 +15,9 @@ const Productos = () => {
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [newProduct, setNewProduct] = useState(initialProductState());
     const [isEditing, setIsEditing] = useState(false);
-    const [feedbackMessage, setFeedbackMessage] = useState('');
-
+    const [feedbackMessage, setFeedbackMessage] = useState({ text: '', type: '' });
+    const [first, setFirst] = useState(0);
+    const [rows, setRows] = useState(15); // Elimina esta línea si no necesitas `rows`
 
     const searchOptions = [
         { name: 'Nombre', code: 'name' },
@@ -30,24 +31,19 @@ const Productos = () => {
     ];
 
     useEffect(() => {
-        // Datos iniciales de productos
         setProducts(initialProductData());
         setFilteredProducts(initialProductData());
     }, []);
 
-    // Efecto para limpiar el mensaje de retroalimentación
     useEffect(() => {
-        // Temporizador para limpiar el mensaje de retroalimentación
         if (feedbackMessage) {
             const timer = setTimeout(() => {
                 setFeedbackMessage('');
-            }, 3000); // Cambia 3000 a la duración que desees en milisegundos
-
-            return () => clearTimeout(timer); // Limpia el temporizador si el mensaje cambia o si el componente se desmonta
+            }, 3000);
+            return () => clearTimeout(timer);
         }
     }, [feedbackMessage]);
 
-    // Estado inicial para el producto
     function initialProductState() {
         return {
             name: '',
@@ -117,37 +113,31 @@ const Productos = () => {
     };
 
     const handleCategoryChange = (e) => setNewProduct(prev => ({ ...prev, category: e.value.name }));
-    const handleStatusChange = (e) => {
-        setNewProduct(prev => ({ ...prev, status: e.value.value })); // Asegúrate de acceder al valor correcto
-    };
+    const handleStatusChange = (e) => setNewProduct(prev => ({ ...prev, status: e.value.value }));
 
     const handleAddOrEditProduct = () => {
         if (!isValidProduct()) return;
-    
-        // Variable para el mensaje de retroalimentación
-        let feedbackMessage = { text: '', type: 'success' };
-    
+
         if (isEditing) {
             const updatedProducts = products.map(product =>
                 product.id === newProduct.id ? { ...product, ...newProduct } : product
             );
             setProducts(updatedProducts);
             setFilteredProducts(updatedProducts);
-            feedbackMessage.text = 'Producto actualizado con éxito.'; // Asigna el mensaje
+            setFeedbackMessage({ text: 'Producto actualizado con éxito.', type: 'success' });
         } else {
             const newProductEntry = { ...newProduct, id: products.length + 1 };
             const newProductsList = [...products, newProductEntry];
             setProducts(newProductsList);
             setFilteredProducts(newProductsList);
-            feedbackMessage.text = 'Producto agregado con éxito.'; // Asigna el mensaje
+            setFeedbackMessage({ text: 'Producto agregado con éxito.', type: 'success' });
         }
-    
-        setFeedbackMessage(feedbackMessage); // Establece el mensaje de éxito
-        clearForm();
-        setShowAddProductForm(false);
+
+        setTimeout(() => {
+            clearForm();
+            setShowAddProductForm(false);
+        }, 1000); // 1 segundo
     };
-    
-    
 
 
     const clearForm = () => {
@@ -155,7 +145,6 @@ const Productos = () => {
         setIsEditing(false);
         setFeedbackMessage('');
     };
-
 
     const isValidProduct = () => {
         const { name, category, unit, status, description, stock, cost, price } = newProduct;
@@ -172,24 +161,25 @@ const Productos = () => {
         setShowAddProductForm(true);
     };
 
-
-
     const handleDeleteProduct = (id) => {
         if (window.confirm('¿Estás seguro de que deseas eliminar este producto?')) {
             const updatedProducts = products.filter(product => product.id !== id);
             setProducts(updatedProducts);
             setFilteredProducts(updatedProducts);
-            setFeedbackMessage({ text: 'Producto eliminado con éxito.', type: 'success' });
+            setFeedbackMessage({ text: 'Producto eliminado con éxito.', type: 'success' }); // Mensaje de éxito en color verde
         } else {
             setFeedbackMessage({ text: 'No se eliminó el producto.', type: 'error' });
         }
     };
-
-
-
+    
     const isFormNotEmpty = () => {
         const { name, category, unit, status, description, stock, cost, price } = newProduct;
         return name || category || unit || status || description || stock || cost || price;
+    };
+
+    const onPageChange = (event) => {
+        setFirst(event.first);
+        setRows(event.rows);
     };
 
     return (
@@ -216,10 +206,18 @@ const Productos = () => {
                 {showAddProductForm ? 'Cancelar' : 'Crear Producto'}
             </button>
 
+
+            {feedbackMessage.text && (
+                <div className={`feedback-message ${feedbackMessage.type === 'success' ? 'feedback-success' : 'feedback-error'}`}>
+                    {feedbackMessage.text}
+                </div>
+            )}
+
+
             {showAddProductForm && (
                 <AddProductForm
                     newProduct={newProduct}
-                    categoryOptions={categoryOptions} // Pasar las opciones de categoría
+                    categoryOptions={categoryOptions}
                     handleInputChange={handleInputChange}
                     handleCategoryChange={handleCategoryChange}
                     handleStatusChange={handleStatusChange}
@@ -236,37 +234,36 @@ const Productos = () => {
                 </div>
             )}
 
-            <div className="product-table">
-                <DataTable
-                    value={filteredProducts} // Muestra solo los proveedores filtrados
-                    responsiveLayout="scroll"
-                    paginator
-                    rows={5}
-                    rowsPerPageOptions={[5, 10, 25]}
-                >
-                                  <Column field="name" header="Nombre" />
-                <Column field="category" header="Categoría" />
-                <Column field="unit" header="Unidad" />
-                <Column field="status" header="Estado" />
-                <Column field="description" header="Descripción" />
-                <Column field="stock" header="Stock" />
-                <Column field="cost" header="Costo" />
-                <Column field="price" header="Precio" />
-                <Column
-                    body={(rowData) => (
-                        <>
-                            <button className="edit-button" onClick={() => handleEditProduct(rowData)}>Editar</button>
-                            <button className="delete-button" onClick={() => handleDeleteProduct(rowData.id)}>Eliminar</button>
-                        </>
-                    )}
-                    header="Acciones"
-                />
-                </DataTable>
+    <div className="product-table">
+                    <DataTable
+                        value={filteredProducts} // Muestra solo los proveedores filtrados
+                        responsiveLayout="scroll"
+                        paginator
+                        rows={5}
+                        rowsPerPageOptions={[5, 10, 25]}
+                    >
+                    <Column field="name" header="Nombre" />
+                    <Column field="category" header="Categoría" />
+                    <Column field="unit" header="Unidad" />
+                    <Column field="status" header="Estado" sortable />
+                    <Column field="description" header="Descripción" />
+                    <Column field="stock" header="Stock" />
+                    <Column field="cost" header="Costo" />
+                    <Column field="price" header="Precio" />
+                    <Column
+                        body={(rowData) => (
+                            <>
+                                <button className="edit-button" onClick={() => handleEditProduct(rowData)}>Editar</button>
+                                <button className="delete-button" onClick={() => handleDeleteProduct(rowData.id)}>Eliminar</button>
+                            </>
+                        )}
+                        header="Acciones"
+                    />
+                    </DataTable>
+                </div>
             </div>
-        </div>
-    );
-
-};
+        );
+    };
 
 // Componente de Sección de Búsqueda
 const SearchSection = ({
@@ -301,7 +298,6 @@ const SearchSection = ({
             <button onClick={handleSearch} className="search-button">Buscar</button>
             <button onClick={handleClearSearch} className="clear-button">Limpiar</button>
 
-            {/* Checkboxes alineados horizontalmente */}
             <div className="checkbox-group">
                 <div className="checkbox-item">
                     <Checkbox
@@ -321,12 +317,9 @@ const SearchSection = ({
                     <label htmlFor="notAvailable">No Disponible</label>
                 </div>
             </div>
-
-
         </div>
     );
 };
-
 
 // Componente de Formulario para Agregar o Editar Producto
 const AddProductForm = ({ newProduct, categoryOptions, handleInputChange, handleCategoryChange, handleStatusChange, handleAddOrEditProduct, feedbackMessage, isEditing }) => {
@@ -347,7 +340,7 @@ const AddProductForm = ({ newProduct, categoryOptions, handleInputChange, handle
                     value={newProduct.name}
                     onChange={handleInputChange}
                     placeholder="Nombre"
-                    className="input-name"  // Clase específica para el nombre
+                    className="input-name"
                 />
                 <input
                     type="text"
@@ -355,7 +348,7 @@ const AddProductForm = ({ newProduct, categoryOptions, handleInputChange, handle
                     value={newProduct.unit}
                     onChange={handleInputChange}
                     placeholder="Unidad de medida"
-                    className="input-unit-measurement"  // Clase específica para la unidad de medida
+                    className="input-unit-measurement"
                 />
             </div>
             <div className="form-row">
@@ -365,7 +358,7 @@ const AddProductForm = ({ newProduct, categoryOptions, handleInputChange, handle
                     value={newProduct.description}
                     onChange={handleInputChange}
                     placeholder="Descripción"
-                    className="input-description"  // Clase específica para la descripción
+                    className="input-description"
                 />
                 <Dropdown
                     value={categoryOptions.find(cat => cat.name === newProduct.category)}
@@ -400,10 +393,9 @@ const AddProductForm = ({ newProduct, categoryOptions, handleInputChange, handle
                 </button>
             </div>
 
-            {/* Ajuste para mostrar el mensaje de retroalimentación correctamente */}
             {feedbackMessage && (
                 <div className={`feedback-message feedback-${feedbackMessage.type}`}>
-                    {feedbackMessage.text} {/* Asegúrate de acceder al texto */}
+                    {feedbackMessage.text}
                 </div>
             )}
         </div>
