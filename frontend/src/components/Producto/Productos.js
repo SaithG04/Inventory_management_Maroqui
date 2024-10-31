@@ -1,3 +1,4 @@
+// Importación de componentes y estilos
 import React, { useState, useEffect } from "react";
 import { Dropdown } from 'primereact/dropdown';
 import { Checkbox } from 'primereact/checkbox';
@@ -5,36 +6,46 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import './Productos.css';
 
+// Componente principal de Productos
 const Productos = () => {
+    // Estados del componente
     const [searchCriteria, setSearchCriteria] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isAvailable, setIsAvailable] = useState(false);
-    const [isNotAvailable, setIsNotAvailable] = useState(false);
     const [showAddProductForm, setShowAddProductForm] = useState(false);
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [newProduct, setNewProduct] = useState(initialProductState());
     const [isEditing, setIsEditing] = useState(false);
-    const [feedbackMessage, setFeedbackMessage] = useState({ text: '', type: '' });
+    const [feedbackMessage, setFeedbackMessage] = useState('');
     const [first, setFirst] = useState(0);
-    const [rows, setRows] = useState(15); // Elimina esta línea si no necesitas `rows`
+    const [rows, setRows] = useState(15);
 
+    // Función para alternar el estado de `isAvailable` cada vez que se hace clic en un checkbox
+    const handleAvailabilityChange = (status) => {
+        setIsAvailable(prevStatus => (prevStatus === status ? null : status));
+    };
+
+    // Opciones de búsqueda
     const searchOptions = [
         { name: 'Nombre', code: 'name' },
         { name: 'Categoría', code: 'category' },
         { name: 'Proveedor', code: 'provider' }
     ];
 
+    // Opciones de categorías
     const categoryOptions = [
         { name: 'Papelería', code: 'papeleria' },
         { name: 'Oficina', code: 'oficina' }
     ];
 
+    // Efecto inicial para cargar los datos
     useEffect(() => {
         setProducts(initialProductData());
         setFilteredProducts(initialProductData());
     }, []);
 
+    // Efecto para limpiar el mensaje de retroalimentación después de cierto tiempo
     useEffect(() => {
         if (feedbackMessage) {
             const timer = setTimeout(() => {
@@ -44,6 +55,7 @@ const Productos = () => {
         }
     }, [feedbackMessage]);
 
+    // Estado inicial para el producto
     function initialProductState() {
         return {
             name: '',
@@ -51,21 +63,21 @@ const Productos = () => {
             unit: '',
             status: '',
             description: '',
-            stock: '',
-            cost: '',
-            price: ''
+            stock: ''
         };
     }
 
+    // Datos iniciales de ejemplo para productos
     function initialProductData() {
         return [
-            { id: 1, name: 'Cuaderno', category: 'Papelería', unit: 'Unidad', status: 'Disponible', description: 'Cuaderno A4', stock: 100, cost: 1.5, price: 2.0 },
-            { id: 2, name: 'Lápiz', category: 'Papelería', unit: 'Unidad', status: 'No Disponible', description: 'Lápiz HB', stock: 200, cost: 0.5, price: 1.0 },
-            { id: 3, name: 'Borrador', category: 'Papelería', unit: 'Unidad', status: 'Disponible', description: 'Borrador blanco', stock: 50, cost: 0.3, price: 0.8 },
-            { id: 4, name: 'Tijeras', category: 'Oficina', unit: 'Unidad', status: 'Disponible', description: 'Tijeras escolares', stock: 30, cost: 2.0, price: 3.5 }
+            { id: 1, name: 'Cuaderno', category: 'Papelería', unit: 'Unidad', status: 'Activo', description: 'Cuaderno A4', stock: 100 },
+            { id: 2, name: 'Lápiz', category: 'Papelería', unit: 'Unidad', status: 'Sin stock', description: 'Lápiz HB', stock: 200 },
+            { id: 3, name: 'Borrador', category: 'Papelería', unit: 'Unidad', status: 'Activo', description: 'Borrador blanco', stock: 50 },
+            { id: 4, name: 'Tijeras', category: 'Oficina', unit: 'Unidad', status: 'Descontinuado', description: 'Tijeras escolares', stock: 30 }
         ];
     }
 
+    // Función de búsqueda actualizada
     const handleSearch = () => {
         let results = products;
         if (searchCriteria && searchTerm) {
@@ -73,27 +85,20 @@ const Productos = () => {
                 product[searchCriteria.code]?.toLowerCase().includes(searchTerm.toLowerCase())
             );
         }
-        if (isAvailable) results = results.filter(product => product.status === 'Disponible');
-        else if (isNotAvailable) results = results.filter(product => product.status === 'No Disponible');
-
+        if (isAvailable) {
+            results = results.filter(product => product.status === isAvailable);
+        }
         setFilteredProducts(results);
     };
 
+    // Función para limpiar los filtros de búsqueda y resetear el estado de `isAvailable`
     const handleClearSearch = () => {
         setSearchTerm('');
+        setIsAvailable(null); // Limpiar el estado de disponibilidad
         setFilteredProducts(products);
     };
 
-    const handleAvailabilityChange = (type) => {
-        if (type === 'available') {
-            setIsAvailable(prev => !prev);
-            setIsNotAvailable(false);
-        } else {
-            setIsNotAvailable(prev => !prev);
-            setIsAvailable(false);
-        }
-    };
-
+    // Función para alternar el formulario de creación/edición de producto
     const handleToggleForm = () => {
         if (showAddProductForm && isFormNotEmpty()) {
             if (window.confirm('Hay datos en el formulario. ¿Estás seguro de que deseas cancelar?')) {
@@ -105,14 +110,18 @@ const Productos = () => {
         }
     };
 
+    // Manejo de cambios en los campos de entrada del formulario
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setNewProduct(prev => ({ ...prev, [name]: value }));
     };
 
     const handleCategoryChange = (e) => setNewProduct(prev => ({ ...prev, category: e.value.name }));
-    const handleStatusChange = (e) => setNewProduct(prev => ({ ...prev, status: e.value.value }));
+    const handleStatusChange = (e) => {
+        setNewProduct(prev => ({ ...prev, status: e.value.value }));
+    };
 
+    // Función para agregar o editar un producto
     const handleAddOrEditProduct = () => {
         if (!isValidProduct()) return;
 
@@ -134,52 +143,58 @@ const Productos = () => {
         setTimeout(() => {
             clearForm();
             setShowAddProductForm(false);
-        }, 1000); // 1 segundo
+        }, 1000);
     };
 
-
+    // Función para limpiar el formulario
     const clearForm = () => {
         setNewProduct(initialProductState());
         setIsEditing(false);
         setFeedbackMessage('');
     };
 
+    // Validación del formulario
     const isValidProduct = () => {
-        const { name, category, unit, status, description, stock, cost, price } = newProduct;
-        if (!name || !category || !unit || !status || !description || !stock || !cost || !price) {
+        const { name, category, unit, status, description, stock } = newProduct;
+        if (!name || !category || !unit || !status || !description || !stock) {
             setFeedbackMessage({ text: 'Por favor, complete todos los campos.', type: 'error' });
             return false;
         }
         return true;
     };
 
+    // Función para editar un producto
     const handleEditProduct = (product) => {
         setNewProduct(product);
         setIsEditing(true);
         setShowAddProductForm(true);
     };
 
+    // Función para eliminar un producto
     const handleDeleteProduct = (id) => {
         if (window.confirm('¿Estás seguro de que deseas eliminar este producto?')) {
             const updatedProducts = products.filter(product => product.id !== id);
             setProducts(updatedProducts);
             setFilteredProducts(updatedProducts);
-            setFeedbackMessage({ text: 'Producto eliminado con éxito.', type: 'success' }); // Mensaje de éxito en color verde
+            setFeedbackMessage({ text: 'Producto eliminado con éxito.', type: 'success' });
         } else {
             setFeedbackMessage({ text: 'No se eliminó el producto.', type: 'error' });
         }
     };
-    
+
+    // Comprobación de formulario no vacío
     const isFormNotEmpty = () => {
-        const { name, category, unit, status, description, stock, cost, price } = newProduct;
-        return name || category || unit || status || description || stock || cost || price;
+        const { name, category, unit, status, description, stock } = newProduct;
+        return name || category || unit || status || description || stock;
     };
 
+    // Función para el cambio de página y filas
     const onPageChange = (event) => {
         setFirst(event.first);
         setRows(event.rows);
     };
 
+    // Renderizado del componente
     return (
         <div className="productos-container">
             <h2>Productos</h2>
@@ -191,7 +206,6 @@ const Productos = () => {
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
                 isAvailable={isAvailable}
-                isNotAvailable={isNotAvailable}
                 handleAvailabilityChange={handleAvailabilityChange}
                 handleSearch={handleSearch}
                 handleClearSearch={handleClearSearch}
@@ -203,14 +217,6 @@ const Productos = () => {
             >
                 {showAddProductForm ? 'Cancelar' : 'Crear Producto'}
             </button>
-
-
-            {feedbackMessage.text && (
-                <div className={`feedback-message ${feedbackMessage.type === 'success' ? 'feedback-success' : 'feedback-error'}`}>
-                    {feedbackMessage.text}
-                </div>
-            )}
-
 
             {showAddProductForm && (
                 <AddProductForm
@@ -225,15 +231,21 @@ const Productos = () => {
                 />
             )}
 
+            {feedbackMessage && (
+                <div className={`feedback-message feedback-${feedbackMessage.type}`}>
+                    {feedbackMessage.text}
+                </div>
+            )}
+
             <DataTable
                 value={filteredProducts}
-                className="product-table"
+                className="product-table productos-table"
                 paginator
-                rows={rows} // Controla la cantidad de filas por página de forma dinámica
-                rowsPerPageOptions={[15, 30, 50]} // Opciones para cambiar el número de filas por página
+                rows={rows}
+                rowsPerPageOptions={[15, 30, 50]}
                 first={first}
-                onPage={onPageChange} // Evento para manejar el cambio de página y filas
-                removableSort // Permite remover el ordenamiento
+                onPage={onPageChange}
+                removableSort
             >
                 <Column field="name" header="Nombre" sortable />
                 <Column field="category" header="Categoría" sortable />
@@ -241,8 +253,6 @@ const Productos = () => {
                 <Column field="status" header="Estado" sortable />
                 <Column field="description" header="Descripción" />
                 <Column field="stock" header="Stock" />
-                <Column field="cost" header="Costo" />
-                <Column field="price" header="Precio" />
                 <Column
                     body={(rowData) => (
                         <>
@@ -251,8 +261,11 @@ const Productos = () => {
                         </>
                     )}
                     header="Acciones"
+                    className="acciones-columna"  // Agrega esta clase
+
                 />
             </DataTable>
+
         </div>
     );
 };
@@ -265,7 +278,6 @@ const SearchSection = ({
     searchTerm,
     setSearchTerm,
     isAvailable,
-    isNotAvailable,
     handleAvailabilityChange,
     handleSearch,
     handleClearSearch
@@ -293,20 +305,19 @@ const SearchSection = ({
             <div className="checkbox-group">
                 <div className="checkbox-item">
                     <Checkbox
-                        inputId="available"
-                        checked={isAvailable}
-                        onChange={() => handleAvailabilityChange('available')}
+                        inputId="activo"
+                        checked={isAvailable === 'Activo'}
+                        onChange={() => handleAvailabilityChange('Activo')}
                     />
-                    <label htmlFor="available">Disponible</label>
+                    <label htmlFor="activo">Activo</label>
                 </div>
-
                 <div className="checkbox-item">
                     <Checkbox
-                        inputId="notAvailable"
-                        checked={isNotAvailable}
-                        onChange={() => handleAvailabilityChange('notAvailable')}
+                        inputId="sinStock"
+                        checked={isAvailable === 'Sin stock'}
+                        onChange={() => handleAvailabilityChange('Sin stock')}
                     />
-                    <label htmlFor="notAvailable">No Disponible</label>
+                    <label htmlFor="sinStock">Sin stock</label>
                 </div>
             </div>
         </div>
@@ -352,6 +363,16 @@ const AddProductForm = ({ newProduct, categoryOptions, handleInputChange, handle
                     placeholder="Descripción"
                     className="input-description"
                 />
+                <input
+                    type="number"
+                    name="stock"
+                    value={newProduct.stock}
+                    onChange={handleInputChange}
+                    placeholder="Stock"
+                    className="input-stock"
+                />
+            </div>
+            <div className="form-row">
                 <Dropdown
                     value={categoryOptions.find(cat => cat.name === newProduct.category)}
                     options={categoryOptions}
@@ -360,14 +381,12 @@ const AddProductForm = ({ newProduct, categoryOptions, handleInputChange, handle
                     placeholder="Selecciona una categoría"
                     className="category-dropdown"
                 />
-            </div>
-
-            <div className="form-row">
                 <Dropdown
                     value={newProduct.status}
                     options={[
-                        { name: 'Disponible', value: 'Disponible' },
-                        { name: 'No Disponible', value: 'No Disponible' }
+                        { name: 'Activo', value: 'Activo' },
+                        { name: 'Descontinuado', value: 'Descontinuado' },
+                        { name: 'Sin stock', value: 'Sin stock' }
                     ]}
                     onChange={handleStatusChange}
                     optionLabel="name"
