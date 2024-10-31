@@ -21,7 +21,7 @@ const Productos = () => {
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(15);
 
-    // Función para alternar el estado de `isAvailable` cada vez que se hace clic en un checkbox
+    // Función para alternar el estado de isAvailable cada vez que se hace clic en un checkbox
     const handleAvailabilityChange = (status) => {
         setIsAvailable(prevStatus => (prevStatus === status ? null : status));
     };
@@ -91,7 +91,7 @@ const Productos = () => {
         setFilteredProducts(results);
     };
 
-    // Función para limpiar los filtros de búsqueda y resetear el estado de `isAvailable`
+    // Función para limpiar los filtros de búsqueda y resetear el estado de isAvailable
     const handleClearSearch = () => {
         setSearchTerm('');
         setIsAvailable(null); // Limpiar el estado de disponibilidad
@@ -261,8 +261,7 @@ const Productos = () => {
                         </>
                     )}
                     header="Acciones"
-                    className="acciones-columna"  // Agrega esta clase
-
+                    className="acciones-columna"
                 />
             </DataTable>
 
@@ -412,5 +411,6 @@ const AddProductForm = ({ newProduct, categoryOptions, handleInputChange, handle
         </div>
     );
 };
+
 
 export default Productos;
