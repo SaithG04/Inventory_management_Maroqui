@@ -1,46 +1,68 @@
-/* src/App.css */
+/* Estructura principal de la aplicación */
 
 .app-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh; /* Ocupa toda la altura de la pantalla */
-  overflow-y: auto; /* Solo este contenedor controla el desplazamiento vertical */
-  /*justify-content: center; /* Centra horizontalmente */
-  /*align-items: center;     /* Centra verticalmente */
-}
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ocupa toda la altura de la pantalla */
+    width: auto; /* Asegura que ocupe todo el ancho de la ventana */
 
+  }
+  
+  /* Header siempre en la parte superior */
+  .header {
+    background-color: #4a90e2;
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    width: 100%;
+  }
+  
+  /* Contenedor principal para sidebar y contenido principal */
+  .main-layout {
+    display: flex;
+    flex: 1;
+    width: 100%;
+    height: calc(100vh - 50px); /* Resta la altura del header */
+  }
+  
+  /* Sidebar a la izquierda */
+  .sidebar {
+    width: 280px;
+    background-color: #2c2c2c;
+    color: white;
+    padding: 20px;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5); /* Sombra para el sidebar */
+    overflow-y: auto;
+  }
+  
+  .main-content {
+    flex: 2; /* Permite que el main-content ocupe el espacio restante */
+    padding: 10px; /* Espaciado interno */
+    background: linear-gradient(135deg, #f0f4f8, #d9e2ec); /* Fondo suave en degradado */
+    border-radius: 10px; /* Bordes redondeados para un diseño moderno */
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1); /* Sombra para dar profundidad */
+    margin: 20px; /* Espaciado alrededor del main-content */
+    overflow-y: auto; /* Permite el desplazamiento si el contenido es muy largo */
+  }
+  
 
-.main-layout {
-  display: flex; /* Usa flexbox para organizar los elementos (sidebar y main-content). */
-  flex: 1; /* Permite que el main-layout ocupe todo el espacio disponible. */
-  height: 100%; /* Asegura que el main-layout ocupe toda la altura del contenedor. */
-  justify-content: flex-start; /* Alinea los elementos hacia la izquierda. */
-}
-
-
-.header {
-  background-color: #4a90e2; /* Aplica un color de fondo azul al header. */
-  color: white; /* Establece el color del texto dentro del header a blanco. */
-  display: flex; /* Usa flexbox para organizar los elementos internos en una fila. */
-  align-items: center; /* Centra verticalmente los elementos internos del header. */
-  padding: 10px 20px; /* Aplica un espaciado interno de 10px en la parte superior e inferior y 20px en los lados. */
-}
-
-.sidebar {
-  width: 250px;
-  background-color: #2c2c2c;
-  color: white;
-  padding: 20px;
-  height: 100%; /* Ocupa toda la altura de su contenedor (main-layout). */
-}
-
-.main-content {
-  flex: 1; /* Permite que el main-content ocupe el espacio restante. */
-  padding: 20px; /* Espaciado interno. */
-  background-color: #f7f9fc; /* Fondo del contenido principal. */
-  height: 100%; /* Asegurar que el contenido ocupe toda la altura disponible */
-  overflow-y: auto; /* Permitir desplazamiento si el contenido sobrepasa la altura */
-
-}
-
-
+  h2 {
+    font-size: 3rem; /* Tamaño de letra destacado */
+    color: #333;
+    font-family: 'Berkshire Swash', cursive; /* Fuente elegante */
+    text-align: center; /* Centra el título */
+    text-shadow: 
+      2px 2px 3px rgba(0, 0, 0, 0.2),
+      4px 4px 5px rgba(0, 0, 0, 0.15),
+      6px 6px 7px rgba(0, 0, 0, 0.1),
+      8px 8px 9px rgba(0, 0, 0, 0.05); /* Sombra gradual para un efecto 3D más suave */
+    margin-bottom: 20px;
+    line-height: 1.2;
+  }
+  
+  
+  .center-header {
+    text-align: center !important; /* Asegura que esté centrado */
+    padding-left: 50px;
+  }

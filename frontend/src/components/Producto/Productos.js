@@ -1,14 +1,19 @@
 // Importación de componentes y estilos
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Dropdown } from 'primereact/dropdown';
 import { Checkbox } from 'primereact/checkbox';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { Button } from 'primereact/button';
+import { Toast } from 'primereact/toast'; // Importar Toast
+
 import './Productos.css';
+import 'primereact/resources/themes/saga-blue/theme.css'; // Tema de PrimeReact
+import 'primereact/resources/primereact.min.css'; // Componentes de PrimeReact
+import 'primeicons/primeicons.css'; // Iconos de PrimeReact
 
 // Componente principal de Productos
 const Productos = () => {
-    // Estados del componente
     const [searchCriteria, setSearchCriteria] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isAvailable, setIsAvailable] = useState(false);
@@ -17,43 +22,32 @@ const Productos = () => {
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [newProduct, setNewProduct] = useState(initialProductState());
     const [isEditing, setIsEditing] = useState(false);
-    const [feedbackMessage, setFeedbackMessage] = useState('');
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(15);
+    const searchInputRef = useRef(null);
+    const toast = useRef(null); // Referencia para el Toast
+
+    // Opciones de búsqueda y categorías
+    const searchOptions = [
+        { name: 'Nombre', code: 'name' },
+        { name: 'Categoría', code: 'category' },
+        { name: 'Descripcion', code: 'description' }
+    ];
+    const categoryOptions = [
+        { name: 'Papelería', code: 'papeleria' },
+        { name: 'Oficina', code: 'oficina' }
+    ];
 
     // Función para alternar el estado de isAvailable cada vez que se hace clic en un checkbox
     const handleAvailabilityChange = (status) => {
         setIsAvailable(prevStatus => (prevStatus === status ? null : status));
     };
 
-    // Opciones de búsqueda
-    const searchOptions = [
-        { name: 'Nombre', code: 'name' },
-        { name: 'Categoría', code: 'category' },
-        { name: 'Proveedor', code: 'provider' }
-    ];
-
-    // Opciones de categorías
-    const categoryOptions = [
-        { name: 'Papelería', code: 'papeleria' },
-        { name: 'Oficina', code: 'oficina' }
-    ];
-
     // Efecto inicial para cargar los datos
     useEffect(() => {
         setProducts(initialProductData());
         setFilteredProducts(initialProductData());
     }, []);
-
-    // Efecto para limpiar el mensaje de retroalimentación después de cierto tiempo
-    useEffect(() => {
-        if (feedbackMessage) {
-            const timer = setTimeout(() => {
-                setFeedbackMessage('');
-            }, 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [feedbackMessage]);
 
     // Estado inicial para el producto
     function initialProductState() {
@@ -71,7 +65,7 @@ const Productos = () => {
     function initialProductData() {
         return [
             { id: 1, name: 'Cuaderno', category: 'Papelería', unit: 'Unidad', status: 'Activo', description: 'Cuaderno A4', stock: 100 },
-            { id: 2, name: 'Lápiz', category: 'Papelería', unit: 'Unidad', status: 'Sin stock', description: 'Lápiz HB', stock: 200 },
+            { id: 2, name: 'Lápiz', category: 'Papelería', unit: 'Unidad', status: 'Sin stock', description: 'Lápiz HB', stock: 0 },
             { id: 3, name: 'Borrador', category: 'Papelería', unit: 'Unidad', status: 'Activo', description: 'Borrador blanco', stock: 50 },
             { id: 4, name: 'Tijeras', category: 'Oficina', unit: 'Unidad', status: 'Descontinuado', description: 'Tijeras escolares', stock: 30 }
         ];
@@ -91,12 +85,19 @@ const Productos = () => {
         setFilteredProducts(results);
     };
 
-    // Función para limpiar los filtros de búsqueda y resetear el estado de isAvailable
+    // Función para limpiar los filtros de búsqueda
     const handleClearSearch = () => {
-        setSearchTerm('');
-        setIsAvailable(null); // Limpiar el estado de disponibilidad
-        setFilteredProducts(products);
+        setSearchTerm('');  // Limpia el término de búsqueda
+        setIsAvailable(null);  // Restablece la disponibilidad
+        setSearchCriteria(null); // Restablece el dropdown a su valor inicial
+        setFilteredProducts(products);  // Muestra todos los productos
+
+        // Establecer el foco al campo de búsqueda cuando el usuario lo necesite explícitamente
+        if (searchInputRef.current) {
+            searchInputRef.current.focus();
+        }
     };
+
 
     // Función para alternar el formulario de creación/edición de producto
     const handleToggleForm = () => {
@@ -113,12 +114,16 @@ const Productos = () => {
     // Manejo de cambios en los campos de entrada del formulario
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setNewProduct(prev => ({ ...prev, [name]: value }));
+        setNewProduct(prev => ({
+            ...prev,
+            [name]: name === "stock" ? parseInt(value) : value,
+            status: name === "stock" && parseInt(value) === 0 ? "Sin stock" : prev.status // Auto-ajusta estado si stock es 0
+        }));
     };
 
     const handleCategoryChange = (e) => setNewProduct(prev => ({ ...prev, category: e.value.name }));
     const handleStatusChange = (e) => {
-        setNewProduct(prev => ({ ...prev, status: e.value.value }));
+        setNewProduct(prev => ({ ...prev, status: e.value }));
     };
 
     // Función para agregar o editar un producto
@@ -131,13 +136,13 @@ const Productos = () => {
             );
             setProducts(updatedProducts);
             setFilteredProducts(updatedProducts);
-            setFeedbackMessage({ text: 'Producto actualizado con éxito.', type: 'success' });
+            toast.current.show({ severity: 'success', summary: 'Producto Actualizado', detail: 'Producto actualizado con éxito.', life: 3000 });
         } else {
             const newProductEntry = { ...newProduct, id: products.length + 1 };
             const newProductsList = [...products, newProductEntry];
             setProducts(newProductsList);
             setFilteredProducts(newProductsList);
-            setFeedbackMessage({ text: 'Producto agregado con éxito.', type: 'success' });
+            toast.current.show({ severity: 'success', summary: 'Producto Agregado', detail: 'Producto agregado con éxito.', life: 3000 });
         }
 
         setTimeout(() => {
@@ -150,35 +155,32 @@ const Productos = () => {
     const clearForm = () => {
         setNewProduct(initialProductState());
         setIsEditing(false);
-        setFeedbackMessage('');
     };
 
     // Validación del formulario
     const isValidProduct = () => {
         const { name, category, unit, status, description, stock } = newProduct;
-        if (!name || !category || !unit || !status || !description || !stock) {
-            setFeedbackMessage({ text: 'Por favor, complete todos los campos.', type: 'error' });
+        if (!name || !category || !unit || !status || !description || stock === '') {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor, complete todos los campos.', life: 3000 });
             return false;
         }
         return true;
     };
 
     // Función para editar un producto
-    const handleEditProduct = (product) => {
+    const handleEdit = (product) => {
         setNewProduct(product);
         setIsEditing(true);
         setShowAddProductForm(true);
     };
 
     // Función para eliminar un producto
-    const handleDeleteProduct = (id) => {
+    const handleDelete = (id) => {
         if (window.confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-            const updatedProducts = products.filter(product => product.id !== id);
+            const updatedProducts = products.filter((product) => product.id !== id);
             setProducts(updatedProducts);
             setFilteredProducts(updatedProducts);
-            setFeedbackMessage({ text: 'Producto eliminado con éxito.', type: 'success' });
-        } else {
-            setFeedbackMessage({ text: 'No se eliminó el producto.', type: 'error' });
+            toast.current.show({ severity: 'success', summary: 'Producto Eliminado', detail: 'Producto eliminado con éxito.', life: 3000 });
         }
     };
 
@@ -197,6 +199,8 @@ const Productos = () => {
     // Renderizado del componente
     return (
         <div className="productos-container">
+            <Toast ref={toast} /> {/* Agregar Toast aquí */}
+
             <h2>Productos</h2>
 
             <SearchSection
@@ -211,12 +215,15 @@ const Productos = () => {
                 handleClearSearch={handleClearSearch}
             />
 
-            <button
-                onClick={handleToggleForm}
-                className={`toggle-button ${showAddProductForm ? 'cancel' : 'create'}`}
-            >
-                {showAddProductForm ? 'Cancelar' : 'Crear Producto'}
-            </button>
+            {/* Botón para Mostrar/Ocultar Formulario de Crear Producto */}
+            <div className="product-toggle-form">
+                <Button
+                    label={showAddProductForm ? 'Cancelar' : 'Crear Producto'}
+                    icon={showAddProductForm ? 'pi pi-times' : 'pi pi-plus'}
+                    onClick={handleToggleForm}
+                    className={showAddProductForm ? 'p-button-danger' : 'p-button-success'}
+                />
+            </div>
 
             {showAddProductForm && (
                 <AddProductForm
@@ -226,19 +233,13 @@ const Productos = () => {
                     handleCategoryChange={handleCategoryChange}
                     handleStatusChange={handleStatusChange}
                     handleAddOrEditProduct={handleAddOrEditProduct}
-                    feedbackMessage={feedbackMessage}
                     isEditing={isEditing}
                 />
             )}
 
-            {feedbackMessage && (
-                <div className={`feedback-message feedback-${feedbackMessage.type}`}>
-                    {feedbackMessage.text}
-                </div>
-            )}
-
             <DataTable
                 value={filteredProducts}
+                style={{ margin: "0 auto", width: "100%" }} // Centra la tabla en el componente
                 className="product-table productos-table"
                 paginator
                 rows={rows}
@@ -246,25 +247,50 @@ const Productos = () => {
                 first={first}
                 onPage={onPageChange}
                 removableSort
+                paginatorClassName="custom-paginator" // Añadir clase específica al paginator
             >
-                <Column field="name" header="Nombre" sortable />
-                <Column field="category" header="Categoría" sortable />
-                <Column field="unit" header="Unidad" />
-                <Column field="status" header="Estado" sortable />
-                <Column field="description" header="Descripción" />
-                <Column field="stock" header="Stock" />
+                <Column field="name" header="Nombre" sortable headerClassName="center-header" bodyClassName="center-body" />
+                <Column field="category" header="Categoría" sortable headerClassName="center-header" bodyClassName="center-body" />
+                <Column field="unit" header="Unidad" headerClassName="center-header" bodyClassName="center-body" />
+                <Column field="status" header="Estado" sortable headerClassName="center-header" bodyClassName="center-body" />
+                <Column
+                    field="description"
+                    header="Descripción"
+                    headerClassName="center-header"
+                    bodyClassName="center-body"
+                    body={rowData => (
+                        <div className="description-wrapper">
+                            <span className="description-cell">
+                                {rowData.description}
+                            </span>
+                            <div className="custom-tooltip">{rowData.description}</div>
+                        </div>
+                    )}
+                />
+
+
+
+                <Column field="stock" header="Stock" headerClassName="center-header" bodyClassName="center-body" />
                 <Column
                     body={(rowData) => (
                         <>
-                            <button className="edit-button" onClick={() => handleEditProduct(rowData)}>Editar</button>
-                            <button className="delete-button" onClick={() => handleDeleteProduct(rowData.id)}>Eliminar</button>
+                            <Button
+                                icon="pi pi-pencil"
+                                label="Editar"
+                                className="products-button-edit p-button-rounded p-button-text"
+                                onClick={() => handleEdit(rowData)}
+                            />
+                            <Button
+                                icon="pi pi-trash"
+                                label="Eliminar"
+                                className="products-button-delete p-button-rounded p-button-text"
+                                severity="danger"
+                                onClick={() => handleDelete(rowData.id)}
+                            />
                         </>
                     )}
-                    header="Acciones"
-                    className="acciones-columna"
                 />
             </DataTable>
-
         </div>
     );
 };
@@ -291,6 +317,7 @@ const SearchSection = ({
                 optionLabel="name"
                 placeholder="Selecciona un criterio"
             />
+
             <input
                 type="text"
                 className="search-input"
@@ -324,7 +351,7 @@ const SearchSection = ({
 };
 
 // Componente de Formulario para Agregar o Editar Producto
-const AddProductForm = ({ newProduct, categoryOptions, handleInputChange, handleCategoryChange, handleStatusChange, handleAddOrEditProduct, feedbackMessage, isEditing }) => {
+const AddProductForm = ({ newProduct, categoryOptions, handleInputChange, handleCategoryChange, handleStatusChange, handleAddOrEditProduct, isEditing }) => {
     const handleConfirmEdit = () => {
         const isConfirmed = window.confirm("¿Estás seguro de que deseas actualizar este producto?");
         if (isConfirmed) {
@@ -381,13 +408,13 @@ const AddProductForm = ({ newProduct, categoryOptions, handleInputChange, handle
                     className="category-dropdown"
                 />
                 <Dropdown
-                    value={newProduct.status}
+                    value={newProduct.status} // Asegúrate de que esté leyendo directamente el valor de `status`
                     options={[
                         { name: 'Activo', value: 'Activo' },
                         { name: 'Descontinuado', value: 'Descontinuado' },
                         { name: 'Sin stock', value: 'Sin stock' }
                     ]}
-                    onChange={handleStatusChange}
+                    onChange={(e) => handleStatusChange(e)}
                     optionLabel="name"
                     placeholder="Selecciona un estado"
                     className="status-dropdown"
@@ -395,22 +422,15 @@ const AddProductForm = ({ newProduct, categoryOptions, handleInputChange, handle
             </div>
 
             <div className="add-product-section">
-                <button
-                    className={`add-button ${isEditing ? 'update' : 'add'}`}
+                <Button
+                    label={isEditing ? 'Actualizar Producto' : 'Agregar Producto'}
+                    icon="pi pi-check"
                     onClick={isEditing ? handleConfirmEdit : handleAddOrEditProduct}
-                >
-                    {isEditing ? 'Actualizar Producto' : 'Agregar Producto'}
-                </button>
+                    className={isEditing ? 'p-button-update' : 'p-button-success'}
+                />
             </div>
-
-            {feedbackMessage && (
-                <div className={`feedback-message feedback-${feedbackMessage.type}`}>
-                    {feedbackMessage.text}
-                </div>
-            )}
         </div>
     );
 };
-
 
 export default Productos;

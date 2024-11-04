@@ -4,7 +4,7 @@
 /* src/Productos.css */
 
 .productos-container {
-    max-width: 1050px;
+    max-width: 1150px;
     margin: 0 auto;
     padding: 20px;
     background-color: #f9f9f9;
@@ -13,14 +13,6 @@
     overflow-y: auto; /* Permite el desplazamiento en el contenedor */
     max-height: 80vh; /* Limita la altura máxima al 80% de la pantalla */
 }
-
-
-h2 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 20px;
-}
-
 
 /* ============================
    Estilos de la Sección de Búsqueda
@@ -35,46 +27,12 @@ h2 {
     border-radius: 6px;
 }
 
-.p-dropdown {
-    width: 200px;
-    padding: 10px;
-    background-color: #ffffff;
-    border-radius: 6px;
-    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
-    font-size: 14px;
-    border: 1px solid #000000;
-    transition: border-color 0.2s ease-in-out;
-}
-
-
-/* Lista de opciones del dropdown */
-.p-dropdown-panel {
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-/* Opciones del dropdown */
-.p-dropdown-item {
-    padding: 8px 12px;
-    font-size: 14px;
-    background-color: #ffffff;
-    transition: background-color 0.3s ease-in-out;
-}
-
-/* Hover para las opciones del dropdown */
-.p-dropdown-item:hover {
-    background-color: #f2f2f2;
-    color: #e00a0a;
-}
-
 /* Estilo de Input */
 .search-input {
     padding: 8px;
     border-radius: 4px;
     border: 1px solid #ccc;
     font-size: 14px;
-    width: 250px;
 }
 
 /* Botones de búsqueda y limpieza */
@@ -88,7 +46,6 @@ h2 {
     cursor: pointer;
     font-weight: bold;
     transition: background-color 0.3s;
-    margin-left: 25px; /* Ajusta este valor para mover los checkboxes hacia la derecha */
 
 }
 
@@ -106,9 +63,9 @@ h2 {
 
 .checkbox-group {
     display: flex;
-    gap: 25px; /* Espacio entre cada checkbox-item */
+    gap: 10px; /* Espacio entre cada checkbox-item */
     align-items: center;
-    margin-left: 45px; /* Ajusta este valor para mover los checkboxes hacia la derecha */
+    margin-left: 10px; /* Ajusta este valor para mover los checkboxes hacia la derecha */
 }
 
 .checkbox-item {
@@ -122,20 +79,10 @@ h2 {
     display: none;
 }
 
-
-/* 2. Caja de texto para búsqueda */
-.search-input {
-    width: 300px; /* Tamaño adecuado para que se pueda ver el texto ingresado */
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    background-color: #ffffff; /* Fondo blanco para evitar transparencia */
-}
-
 /* 3. Botones de Buscar y Limpiar */
 .search-button {
     padding: 10px 15px;
+    width: 100px;
     border-radius: 4px;
     font-size: 14px;
     border: none;
@@ -151,6 +98,7 @@ h2 {
 
 .clear-button {
     padding: 10px 15px;
+    width: 120px;
     border-radius: 4px;
     font-size: 14px;
     border: none;
@@ -168,51 +116,27 @@ h2 {
    Estilos para el boton ocultar el formulario de Crear Producto
 =================================================================== */
 
-/* Estilos para el botón de alternar el formulario */
-.toggle-button {
-    padding: 8px 20px; /* Espaciado interno (12px arriba/abajo y 20px izquierda/derecha) */
-    border: none; /* Sin borde */
+.product-toggle-form {
+    text-align: left; /* Centra el botón */
+    margin: 20px 0; /* Espaciado superior e inferior */
+  }
+
+  .product-toggle-form .p-button {
+    padding: 12px 20px; /* Espaciado interno */
+    font-size: 16px; /* Tamaño de fuente */
     border-radius: 5px; /* Bordes redondeados */
-    cursor: pointer; /* Cambia el cursor al pasar el mouse */
-    width: 25%; /* Ancho del botón */
-    font-size: 16px; /* Tamaño de letra */
-    transition: background-color 0.3s ease, transform 0.2s ease; /* Transiciones suaves para color y transformación */
-    margin: 20px auto; /* Centrar el botón y añadir margen superior e inferior */
-    display: inline-block; /* Permitir que el botón se alinee a la izquierda */
-}
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Transiciones */
+    width: 250px; /* Ancho fijo */
+  }
 
-/* Estilo cuando el formulario está visible (Cancelar) */
-.toggle-button.cancel {
-    background-color: #9b6a67; /* Color para cancelar */
-    color: white; /* Texto en blanco */
-}
 
-/* Estilo cuando el formulario está oculto (Crear Producto) */
-.toggle-button.create {
-    background-color: #668a67; /* Color para crear */
-    color: white; /* Texto en blanco */
-}
-
-/* Efecto de hover */
-.toggle-button.cancel:hover {
-    background-color: #7f3736; /* Color más oscuro al pasar el mouse */
-}
-
-/* Efecto de hover */
-.toggle-button.create:hover {
-    background-color: #355537; /* Color más oscuro al pasar el mouse */
-}
-
-/* Efecto de foco */
-.toggle-button.cancel:focus {
-    outline: none; /* Eliminar el contorno por defecto */
-    box-shadow: 0 0 0 3px rgba(49, 4, 4, 0.5); /* Sombra azul al enfocar */
-}
-
-.toggle-button.create:focus {
-    outline: none; /* Eliminar el contorno por defecto */
-    box-shadow: 0 0 0 3px rgba(4, 49, 26, 0.5); /* Sombra azul al enfocar */
-}
+ 
+  /* Botón de ocultar formulario (peligro) */
+  .product-toggle-form .p-button-danger {
+    background-color: #9b6a67; /* Rojo */
+    border: none;
+  
+  }
 
 
 
@@ -294,12 +218,6 @@ h2 {
     outline: none; /* Eliminar contorno por defecto */
 }
 
-/* Estilos para las etiquetas */
-.add-product-form label {
-    font-size: 15px; /* Tamaño de letra ajustado */
-    color: #333; /* Color del texto */
-    display: block; /* Que ocupen toda la línea */
-}
 
 /* ============================================================
    Estilos del Boton Crear Producto y Actualizar Producto
@@ -336,81 +254,131 @@ h2 {
     background-color: #355537; /* Color más oscuro al pasar el mouse */
 }
 
-/* Estilos para el botón de actualizar producto */
-.add-button.update {
-    background-color: #9b6a67; /* Azul para el botón de actualizar */
-    color: white; /* Texto en blanco */
-}
-
-.add-button.update:hover {
-    background-color: #7f3736; /* Color más oscuro al pasar el mouse */
-}
 
 /* Mensaje de retroalimentación */
 .feedback-message {
     margin-top: 15px; /* Espacio encima del mensaje */
     padding: 10px; /* Espaciado interno */
-    background-color: #f8d7da; /* Fondo rojo claro */
-    border: 1px solid #f5c6cb; /* Borde más pronunciado */
+    background-color: #c3e6cb; /* Fondo rojo claro */
+    border: 1px solid #668a67; /* Borde más pronunciado */
     border-radius: 5px; /* Bordes redondeados */
     text-align: center; /* Centrar el mensaje */
     font-size: 14px; /* Tamaño de letra del mensaje */
 }
 
-.feedback-success {
-    background-color: #d4edda; /* Fondo verde claro */
-    color: #155724; /* Texto verde oscuro */
+.p-button-update {
+    background-color: #668a67; /* Fondo verde claro */
+    color: white; /* Texto verde oscuro */
     border: 1px solid #c3e6cb;
   }
-  
-  .feedback-error {
-    background-color: #f8d7da; /* Fondo rojo claro */
-    color: #721c24; /* Texto rojo oscuro */
-    border: 1px solid #f5c6cb;
-  }
+
 
 /* ============================
    Estilo de la Tabla de Productos
 ============================ */
-
-/* Estilo para centrar los encabezados de las columnas en la tabla de productos */
-/* Asegúrate de que solo aplique a los encabezados de la tabla en cuestión */
-.p-datatable .p-column-header-content {
-    text-align: center;
-  }
-  
-
-
+/* Opcional: Si necesitas que todo el contenido de las celdas esté centrado también */
+.p-datatable .p-datatable-tbody > tr > td {
+    text-align: center; /* Centra el texto dentro de las celdas de la tabla */
+}
 
 /* ======================================
    Estilos de la Tabla para los botones
 ========================================= */
 
-/* Estilos para los botones en la tabla */
-.product-table button {
-    margin-right: 0.5rem; /* Espacio entre botones */
-    padding: 0.5rem 1rem; /* Espaciado interno */
+
+/* Contenedor de los Botones de Acción */
+.products-button-container {
+    display: flex; /* Coloca los elementos en línea */
+    align-items: center; /* Alinea verticalmente los botones */
+    gap: 0.5rem; /* Espacio entre los botones */
+}
+
+/* Botones Generales */
+.products-button-edit,
+.products-button-delete {
+    margin-right: 0.5px; /* Espacio entre botones */
+    padding: 0.2rem 0.7rem; /* Ajusta el tamaño del botón */
     border: none; /* Sin borde */
     border-radius: 4px; /* Bordes redondeados */
     cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
     font-weight: bold; /* Hacer el texto más destacado */
-    transition: background-color 0.3s; /* Transición suave para el fondo */
+    transition: background-color 0.3s, transform 0.3s ease; /* Transición suave para el fondo y el efecto de transformación */
 }
 
-.product-table button.edit-button {
+/* Botón Editar */
+.products-button-edit {
     background-color: #668a67; /* Color de fondo para editar */
-    color: white; /* Color de texto */
+    color: #ffffff; /* Color de texto blanco */
 }
 
-.product-table button.edit-button:hover {
+.products-button-edit:hover {
     background-color: #5a7a5a; /* Color de fondo al pasar el ratón para editar */
+    transform: scale(1.05); /* Aumenta ligeramente el tamaño al hacer hover */
 }
 
-.product-table button.delete-button {
+/* Botón Eliminar */
+.products-button-delete {
     background-color: #9b6a67; /* Color de fondo para eliminar */
-    color: white; /* Color de texto */
+    color: #ffffff; /* Color de texto blanco */
 }
 
-.product-table button.delete-button:hover {
+.products-button-delete:hover {
     background-color: #8a5858; /* Color de fondo al pasar el ratón para eliminar */
+    transform: scale(1.05); /* Aumenta ligeramente el tamaño al hacer hover */
 }
+
+/* Contenedor que envuelve la celda de descripción */
+.description-wrapper {
+    position: relative; /* Necesario para el posicionamiento del tooltip */
+    display: inline-block; /* Muestra en línea */
+}
+
+/* Aplica un estilo para limitar la descripción */
+.description-cell {
+    max-width: 120px; /* Define el ancho máximo para la celda de descripción */
+    overflow: hidden; /* Oculta el desbordamiento */
+    text-overflow: ellipsis; /* Añade "..." si el texto es demasiado largo */
+    white-space: normal; /* Permite varias líneas */
+    display: -webkit-box; /* Necesario para limitar el número de líneas */
+
+}
+
+/* Tooltip personalizado */
+.custom-tooltip {
+    visibility: hidden; /* Por defecto, el tooltip está oculto */
+    background-color: rgba(0, 0, 0, 0.8); /* Fondo oscuro semi-transparente */
+    color: #fff; /* Texto blanco */
+    text-align: center; /* Centra el texto del tooltip */
+    border-radius: 6px; /* Bordes redondeados */
+    padding: 8px; /* Espaciado interno */
+    position: absolute; /* Posiciona el tooltip respecto al contenedor padre */
+    z-index: 1; /* Asegura que el tooltip esté encima de otros elementos */
+    bottom: 125%; /* Posiciona el tooltip por encima del texto */
+    left: 50%; /* Centra horizontalmente el tooltip */
+    transform: translateX(-50%); /* Ajusta el tooltip para que esté perfectamente centrado */
+    width: 200px; /* Ancho fijo del tooltip */
+    opacity: 0; /* Inicialmente invisible */
+    transition: opacity 0.3s; /* Añade una transición suave */
+}
+
+/* Flecha para el tooltip */
+.custom-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%; /* Posiciona la flecha debajo del tooltip */
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+}
+
+/* Muestra el tooltip al pasar el cursor sobre la celda de descripción */
+.description-wrapper:hover .custom-tooltip {
+    visibility: visible;
+    opacity: 1; /* Muestra el tooltip */
+}
+
+  
+  
+  

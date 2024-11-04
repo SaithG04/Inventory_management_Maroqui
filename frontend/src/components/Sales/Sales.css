@@ -1,140 +1,202 @@
-/* src/components/Sales/Sales.css */
+/* Sales.css */
 
 .sales-container {
-    width: 100%;
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    background-color: #f9f9f9; /* Fondo suave */
-    border-radius: 10px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil */
-}
-
-.sales-header {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .sales-header {
     text-align: center;
     margin-bottom: 20px;
-}
-
-.sales-header h2 {
-    font-size: 1.8rem;
-    color: #333; /* Color oscuro para el título */
-}
-
-.sales-form {
+  }
+  
+  .sales-header h2 {
+    font-size: 32px;
+    color: #444;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .client-form,
+  .sales-form {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
-}
-
-.sales-form h3 {
-    font-size: 1.5rem;
-    color: #444; /* Color gris oscuro */
-    margin-bottom: 15px;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
+  }
+  
+  .client-form h3,
+  .sales-form h3 {
+    font-size: 24px;
+    color: #444;
+    margin-bottom: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
     display: block;
-    font-size: 1rem;
-    color: #555; /* Gris para etiquetas */
-    margin-bottom: 5px;
-}
-
-.form-group input {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 8px;
+  }
+  
+  .client-input,
+  .search-input,
+  .quantity-input {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc; /* Bordes claros */
+    padding: 12px;
+    border: 1px solid #ddd;
     border-radius: 5px;
-    box-sizing: border-box;
-}
-
-.product-list {
+    font-size: 15px;
+    transition: border-color 0.3s ease-in-out;
+  }
+  
+  .client-input:focus,
+  .search-input:focus,
+  .quantity-input:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+  
+  .product-list {
     list-style: none;
-    margin-top: 10px;
     padding: 0;
-    border: 1px solid #ccc; /* Bordes claros */
+    margin: 10px 0;
+    border: 1px solid #ddd;
     border-radius: 5px;
-    background-color: #fff; /* Fondo blanco */
     max-height: 150px;
     overflow-y: auto;
-}
-
-.product-item {
+  }
+  
+  .product-item {
     padding: 10px;
     cursor: pointer;
-}
-
-.product-item:hover {
-    background-color: #f2f2f2; /* Fondo gris suave al pasar el cursor */
-}
-
-.btn-primary {
-    background-color: #8ab0d9; /* Color azul suave */
-    color: white;
-    padding: 10px 20px;
+    transition: background-color 0.3s ease-in-out;
+  }
+  
+  .product-item:hover {
+    background-color: #f2f2f2;
+  }
+  
+  .btn-primary {
+    background-color: #668a67 !important;
     border: none;
+    color: #fff;
+    font-size: 16px;
+    padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-}
-
-.btn-primary:hover {
-    background-color: #6699c1; /* Azul más oscuro al pasar el cursor */
-}
-
-/* Tabla de ventas */
-.sales-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-.sales-table th, 
-.sales-table td {
-    padding: 12px;
-    border: 1px solid #ddd; /* Bordes claros */
-    text-align: left;
-    font-size: 1rem;
-}
-
-.sales-table th {
-    background-color: #eef1bf; /* Cambia a un tono que combine con el diseño */
-    color: #333; /* Color oscuro para el encabezado */
-}
-
-.sales-table td {
-    color: #555; /* Color gris para las celdas */
-}
-
-@media (max-width: 600px) {
-    .sales-container {
-        padding: 10px; /* Ajuste de padding en dispositivos pequeños */
-    }
-
-    .sales-table th, 
-    .sales-table td {
-        font-size: 0.9rem;
-        padding: 10px; /* Ajuste de padding en la tabla */
-    }
-}
-/* src/components/Sales/Sales.css */
-
-/* Estilos para el botón de eliminar */
-.btn-delete {
-    background-color: #f44336;
-    color: white;
-    padding: 8px 12px;
+  }
+  
+  .btn-primary:hover {
+    background-color: #355537 !important;
+  }
+  
+  .btn-success {
+    background-color: #4CAF50 !important;
     border: none;
+    color: #fff;
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+  }
+  
+  .btn-success:hover {
+    background-color: #388E3C !important;
+  }
+  
+  .btn-delete {
+    background-color: #9b6a67 !important;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    padding: 10px;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
   
   .btn-delete:hover {
-    background-color: #d32f2f;
+    background-color: #7f3736 !important;
   }
   
-  /* Otros estilos ya agregados... */
+  .sales-table .p-datatable-tbody > tr > td {
+    padding: 10px;
+    text-align: center;
+  }
   
+  .sales-button-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .sales-table .p-datatable-header {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .sales-table .p-datatable-tbody > tr > td {
+    padding: 10px;
+    text-align: center;
+    vertical-align: middle;
+  }
+  
+  .sales-table .p-datatable-tbody > tr > td .p-button {
+    margin-right: 5px;
+  }
+  
+  .sales-table .p-paginator {
+    justify-content: center;
+  }
+  
+  .product-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    max-height: 150px;
+    overflow-y: auto;
+  }
+  
+  .product-item {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .product-item:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .p-button {
+    margin: 0;
+    font-size: 14px;
+  }
+  
+  .btn-register {
+    margin-top: 20px;
+    width: 100%;
+  }
+  
+  .client-input {
+    width: calc(100% - 20px);
+  }
+  
+  .sales-table {
+    margin-top: 20px;
+  }
   

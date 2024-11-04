@@ -1,24 +1,8 @@
-.main-content {
-  margin-left: 0; /* Elimina el margen izquierdo ya que la barra lateral ya ocupa un espacio fijo. */
-  padding: 20px; /* Mantiene el espaciado interno para una mejor legibilidad. */
-  background-color: #f7f9fc; /* Fondo suave que combina con el diseño del login. */
-  border-radius: 10px; /* Bordes redondeados para suavizar el diseño. */
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Sombra sutil para dar profundidad. */
-}
+/* src/components/MainContent/MainContent.css */
 
-.dashboard-cards {
-  display: flex; /* Organiza las tarjetas en una fila. */
-  gap: 20px; /* Espacio entre las tarjetas. */
-  margin-top: 20px; /* Espacio en la parte superior. */
-}
-
-h2 {
-  font-size: 28px; /* Tamaño del encabezado principal. */
-  color: #8ab0d9; /* Color azul suave para el encabezado. */
-}
-
-p {
-  font-size: 16px; /* Tamaño del texto en los párrafos. */
-  color: #666; /* Color gris para el texto. */
-  margin-top: 10px; /* Espacio superior para separar el texto. */
-}
+  
+  /* Ajuste para el contenedor principal */
+  .app-container {
+    display: flex;
+  }
+  

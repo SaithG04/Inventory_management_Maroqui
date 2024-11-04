@@ -1,15 +1,19 @@
 // src/components/Sales/Sales.js
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { Button } from 'primereact/button';
+import { Toast } from 'primereact/toast';
 import './Sales.css';
 
 const Sales = () => {
   // Productos disponibles para la venta (datos estáticos de ejemplo)
-  const [products] = useState([
-    { id: 1, name: 'Cuaderno', price: 5.50 },
-    { id: 2, name: 'Lápiz', price: 1.20 },
-    { id: 3, name: 'Borrador', price: 0.80 },
-    { id: 4, name: 'Regla', price: 2.00 },
-    { id: 5, name: 'Calculadora', price: 10.00 }
+  const [products, setProducts] = useState([
+    { id: 1, name: 'Cuaderno', price: 5.50, stock: 100 },
+    { id: 2, name: 'Lápiz', price: 1.20, stock: 200 },
+    { id: 3, name: 'Borrador', price: 0.80, stock: 150 },
+    { id: 4, name: 'Regla', price: 2.00, stock: 80 },
+    { id: 5, name: 'Calculadora', price: 10.00, stock: 50 }
   ]);
 
   // Estado para almacenar las ventas realizadas
@@ -23,9 +27,11 @@ const Sales = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState('');
 
-  // Estado para manejar mensajes de éxito o error
-  const [error, setError] = useState('');
-  const [feedbackMessage, setFeedbackMessage] = useState('');
+  // Estado para manejar los datos del cliente
+  const [clientName, setClientName] = useState('');
+
+  // Referencia para el Toast de notificaciones
+  const toast = useRef(null);
 
   // Manejar cambios en el término de búsqueda
   const handleSearchChange = (e) => {
@@ -60,14 +66,17 @@ const Sales = () => {
   // Validar la venta antes de procesarla
   const isValidSale = () => {
     if (!selectedProduct) {
-      setError('Debe seleccionar un producto.');
+      toast.current.show({ severity: 'error', summary: 'Error', detail: 'Debe seleccionar un producto.', life: 3000 });
       return false;
     }
     if (!quantity || isNaN(quantity) || quantity <= 0) {
-      setError('Debe ingresar una cantidad válida.');
+      toast.current.show({ severity: 'error', summary: 'Error', detail: 'Debe ingresar una cantidad válida.', life: 3000 });
       return false;
     }
-    setError(''); // Limpiar errores
+    if (quantity > selectedProduct.stock) {
+      toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La cantidad solicitada supera el stock disponible.', life: 3000 });
+      return false;
+    }
     return true;
   };
 
@@ -89,42 +98,71 @@ const Sales = () => {
     };
 
     setSales([...sales, newSale]);
-    setFeedbackMessage('Producto agregado a la venta.');
+    setProducts(products.map(p => p.id === selectedProduct.id ? { ...p, stock: p.stock - newSale.quantity } : p));
+    toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Producto agregado a la venta.', life: 3000 });
     setQuantity(''); // Limpiar la cantidad
     setSelectedProduct(null); // Limpiar la selección de producto
     setSearchTerm(''); // Limpiar el término de búsqueda
+  };
 
-    // Limpiar mensaje de éxito después de 5 segundos
-    setTimeout(() => {
-      setFeedbackMessage('');
-    }, 5000);
+  // Manejar el cambio en el nombre del cliente
+  const handleClientNameChange = (e) => {
+    setClientName(e.target.value);
+  };
+
+  // Registrar la venta completa
+  const handleRegisterSale = () => {
+    if (!clientName.trim()) {
+      toast.current.show({ severity: 'error', summary: 'Error', detail: 'Debe ingresar el nombre del cliente.', life: 3000 });
+      return;
+    }
+
+    if (sales.length === 0) {
+      toast.current.show({ severity: 'error', summary: 'Error', detail: 'Debe agregar al menos un producto antes de registrar la venta.', life: 3000 });
+      return;
+    }
+
+    if (window.confirm('¿Está seguro de que desea registrar la venta?')) {
+      toast.current.show({ severity: 'success', summary: 'Venta Registrada', detail: `Venta registrada para el cliente: ${clientName}`, life: 5000 });
+      setClientName(''); // Limpiar el nombre del cliente
+      setSales([]); // Limpiar las ventas realizadas
+    }
   };
 
   // Eliminar un producto de la lista de ventas
   const handleDeleteSale = (id) => {
+    const saleToDelete = sales.find(sale => sale.id === id);
+    if (saleToDelete) {
+      setProducts(products.map(p => p.name === saleToDelete.product ? { ...p, stock: p.stock + saleToDelete.quantity } : p));
+    }
     const updatedSales = sales.filter(sale => sale.id !== id);
     setSales(updatedSales);
-    setFeedbackMessage('Producto eliminado de la venta.');
-    
-    // Limpiar mensaje después de 5 segundos
-    setTimeout(() => {
-      setFeedbackMessage('');
-    }, 5000);
+    toast.current.show({ severity: 'info', summary: 'Eliminado', detail: 'Producto eliminado de la venta.', life: 3000 });
   };
 
   return (
     <div className="sales-container">
-      <div className="sales-header">
+      <Toast ref={toast} />
         <h2>Gestión de Ventas</h2>
+
+      {/* Formulario para los datos del cliente */}
+      <div className="client-form">
+        <h3>Datos del Cliente</h3>
+        <div className="form-group">
+          <label>Nombre del Cliente / Colegio / Empresa</label>
+          <input
+            type="text"
+            placeholder="Nombre del cliente..."
+            value={clientName}
+            onChange={handleClientNameChange}
+            className="client-input"
+          />
+        </div>
       </div>
 
       {/* Formulario para realizar la venta */}
       <div className="sales-form">
         <h3>Registrar Nueva Venta</h3>
-
-        {/* Mensajes de error y éxito */}
-        {error && <p className="error-message">{error}</p>}
-        {feedbackMessage && <p className="success-message">{feedbackMessage}</p>}
 
         <div className="form-group">
           <label>Buscar Producto</label>
@@ -133,6 +171,7 @@ const Sales = () => {
             placeholder="Buscar por nombre o código..."
             value={searchTerm}
             onChange={handleSearchChange}
+            className="search-input"
           />
           {/* Mostrar lista de productos filtrados solo si hay un término de búsqueda */}
           {searchTerm.trim() !== '' && filteredProducts.length > 0 && (
@@ -143,7 +182,7 @@ const Sales = () => {
                   onClick={() => handleProductSelect(product)}
                   className="product-item"
                 >
-                  {product.name} - ${product.price}
+                  {product.name} - S/{product.price} (Stock: {product.stock})
                 </li>
               ))}
             </ul>
@@ -157,42 +196,43 @@ const Sales = () => {
             placeholder="Cantidad"
             value={quantity}
             onChange={handleQuantityChange}
+            className="quantity-input"
           />
         </div>
 
-        <button onClick={handleAddSale} className="btn-primary">Agregar Producto</button>
+        <Button label="Agregar Producto" icon="pi pi-check" onClick={handleAddSale} className="btn-primary" />
       </div>
 
+      <Button label="Registrar Venta" icon="pi pi-save" onClick={handleRegisterSale} className="btn-success" disabled={sales.length === 0} />
+
       {/* Lista de ventas realizadas */}
-      <table className="sales-table">
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Precio Unitario</th>
-            <th>Total</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sales.map(sale => (
-            <tr key={sale.id}>
-              <td>{sale.product}</td>
-              <td>{sale.quantity}</td>
-              <td>${sale.price}</td>
-              <td>${sale.total}</td>
-              <td>
-                <button
-                  className="btn-delete"
-                  onClick={() => handleDeleteSale(sale.id)}
-                >
-                  Eliminar
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <DataTable value={sales} paginator rows={5} className="sales-table" responsiveLayout="scroll">
+        <Column field="product" header="Producto" headerStyle={{ textAlign: 'center' }} bodyStyle={{ textAlign: 'center' }} />
+        <Column field="quantity" header="Cantidad" headerStyle={{ textAlign: 'center' }} bodyStyle={{ textAlign: 'center' }} />
+        <Column field="price" header="Precio Unitario (S/)" headerStyle={{ textAlign: 'center' }} bodyStyle={{ textAlign: 'center' }} />
+        <Column field="total" header="Total (S/)" headerStyle={{ textAlign: 'center' }} bodyStyle={{ textAlign: 'center' }} />
+        <Column
+          header="Acciones"
+          body={(rowData) => (
+            <div className="sales-button-container">
+              <Button
+                icon="pi pi-pencil"
+                className="btn-primary"
+                onClick={() => {}}
+                tooltip="Editar"
+              />
+              <Button
+                icon="pi pi-trash"
+                className="btn-delete"
+                onClick={() => handleDeleteSale(rowData.id)}
+                tooltip="Eliminar"
+              />
+            </div>
+          )}
+          headerStyle={{ textAlign: 'center' }}
+          bodyStyle={{ textAlign: 'center' }}
+        />
+      </DataTable>
     </div>
   );
 };

@@ -1,151 +1,306 @@
-/* ============================ Contenedor Principal (Employee Management) ============================ */
+/* ============================
+   Estilos Generales
+============================ */
+/* Contenedor principal para la gestión de empleados */
 .employee-management {
-  width: 100%;
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #f9f9f9; /* Fondo claro */
-  border-radius: 10px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
-}
+    max-width: 1200px; /* Ancho máximo del contenedor */
+    margin: 0 auto; /* Centra el contenedor horizontalmente */
+    padding: 20px; /* Espaciado interno */
+    background-color: #f9f9f9; /* Color de fondo claro */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para dar profundidad */
+    overflow-y: auto; /* Permite desplazamiento vertical */
+    max-height: 80vh; /* Limita la altura máxima al 80% de la pantalla */
+  }
+    
+  /* ============================
+     Estilos de la Sección de Búsqueda
+  ============================ */
+  /* Contenedor general de la sección de búsqueda */
+  .employee-search-section {
+    display: flex; /* Alinea elementos en fila */
+    align-items: center; /* Centra verticalmente los elementos */
+    gap: 10px; /* Espacio entre los elementos */
+    padding: 10px 20px; /* Espaciado interno */
+    background-color: #f0f4f8; /* Color de fondo */
+    border-radius: 6px; /* Bordes redondeados */
+    margin-bottom: 20px; /* Espaciado inferior */
+  }
+  
+  /* Entrada de búsqueda */
+  .employee-search-input {
+    width: 500px; /* Ancho fijo para mejor visibilidad del texto */
+  }
+  
+  /* Input de búsqueda */
+  .employee-search-input .p-inputtext {
+    width: 100%; /* Ocupa todo el ancho disponible */
 
-.employee-management h2 {
-  text-align: center;
-  font-size: 2rem;
-  color: #333;
-  margin-bottom: 20px;
-}
-
-/* ============================ Formulario de Empleados ============================ */
-
-.employee-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-.employee-form input {
-  width: calc(50% - 10px);
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 1rem;
-  box-sizing: border-box;
-}
-
-.employee-form input[type="date"] {
-  padding: 8px;
-}
-
-/* Contenedor de Botones del Formulario */
-.employee-form-buttons {
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-/* Botón Registrar Empleado */
-.employee-register-button {
-  background-color: #000000; /* Azul claro */
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.employee-register-button:hover {
-  background-color: #6699c1; /* Azul más oscuro al pasar el cursor */
-}
-
-/* Botón Limpiar */
-.employee-clear-button {
-  background-color: #f44336; /* Rojo para el botón de limpiar */
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.employee-clear-button:hover {
-  background-color: #e53935; /* Rojo más oscuro */
-}
-
-/* ============================ Mensajes de Error ============================ */
-
-.employee-error-message {
-  color: red;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-/* ============================ Tabla de Empleados ============================ */
-
-.employee-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-.employee-table th,
-.employee-table td {
-  padding: 12px;
-  border: 1px solid #ddd;
-  text-align: left;
-  font-size: 1rem;
-}
-
-.employee-table th {
-  background-color: #eef1bf; /* Tono que combina con el esquema */
-  color: #333;
-}
-
-.employee-table td {
-  color: #555;
-}
-
-/* Botones de Acciones en la Tabla (Editar/Eliminar) */
-.employee-table td .employee-edit-button,
-.employee-table td .employee-delete-button {
-  background-color: #4CAF50; /* Verde para los botones de acciones */
-  margin-right: 10px;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.employee-table td .employee-edit-button:hover {
-  background-color: #45a049; /* Verde más oscuro al pasar el cursor */
-}
-
-.employee-table td .employee-delete-button {
-  background-color: #f44336; /* Rojo para el botón de eliminar */
-}
-
-.employee-table td .employee-delete-button:hover {
-  background-color: #d32f2f; /* Rojo más oscuro */
-}
-
-/* ============================ Ajustes de Media Queries ============================ */
-
-
-@media (max-width: 600px) {
-  .employee-form input {
-      width: 100%; /* Ajuste para pantallas pequeñas */
+  }
+  
+  /* Contenedor de los botones de búsqueda */
+  .employee-search-buttons {
+    display: flex; /* Alinea botones en fila */
+  }
+  
+  /* Botones de búsqueda */
+  .employee-search-buttons .p-button {
+    padding: 10px 25px; /* Aumenta el espaciado interno para agrandar el botón */
+    border-radius: 6px; /* Bordes más grandes para un look más suave */
+    font-size: 14px; /* Tamaño de fuente más grande */
+    cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+    width: 150px; /* Ancho fijo para agrandar el botón */
+    margin-left: 10px; /* Ajusta este valor si necesitas mover los botones hacia la derecha */
+  }
+  
+  /* Botón de búsqueda (primario) */
+  .employee-search-buttons .p-button.p-button-primary {
+    background-color: #668a67 !important; /* Color verde */
+    border: none; /* Sin borde */
+    color: #fff; /* Asegura que el texto sea legible */
+  }
+  
+  /* Botón de limpiar (secundario) */
+  .employee-search-buttons .p-button-secondary {
+    background-color: #9b6a67; /* Rojo */
+    border: none;
+    color: #fff; /* Asegura que el texto sea legible */
+  
+  }
+  
+  /* Efecto hover para los botones */
+  .employee-search-buttons .p-button:hover {
+    opacity: 0.9; /* Opacidad al pasar el cursor */
+  }
+  
+  .employee-checkbox-group {
+    display: flex; /* Coloca todos los elementos en una sola fila */
+    gap: 35px; /* Espacio entre cada uno de los elementos */  
+  }
+  
+  .employee-checkbox-item {
+    display: flex; /* Coloca el checkbox y su etiqueta en una fila */
+    align-items: center; /* Alinea el checkbox y la etiqueta verticalmente */
+    gap: 10px; /* Espacio entre el checkbox y la etiqueta */
+  }
+  
+  
+  /* ================================================================
+     Estilos para el Botón Mostrar/Ocultar Formulario
+  =================================================================== */
+  /* Contenedor del botón de mostrar/ocultar formulario */
+  .employee-toggle-form {
+    text-align: left; /* Centra el botón */
+    margin: 20px 0; /* Espaciado superior e inferior */
+  }
+  
+  /* Estilo del botón */
+  .employee-toggle-form .p-button {
+    padding: 12px 20px; /* Espaciado interno */
+    font-size: 16px; /* Tamaño de fuente */
+    border-radius: 5px; /* Bordes redondeados */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Transiciones */
+    width: 250px; /* Ancho fijo */
+  }
+  
+  /* Botón de mostrar formulario (éxito) */
+  .employee-toggle-form .p-button-success {
+    background-color: #668a67; /* Verde */
+    border: none;
+    color: #fff; /* Asegura que el texto sea legible */
+  
+  }
+  
+  /* Botón de ocultar formulario (peligro) */
+  .employee-toggle-form .p-button-danger {
+    background-color: #9b6a67; /* Rojo */
+    border: none;
+    color: #fff; /* Asegura que el texto sea legible */
+  
+  }
+  
+  /* Efecto hover en el botón */
+  .employee-toggle-form .p-button:hover {
+    opacity: 0.9;
+  }
+  
+  /* ============================================
+     Estilos para el Formulario Crear/Editar Empleado
+  =============================================== */
+  /* Contenedor del formulario */
+  .employee-add-form {
+    background-color: #fff; /* Fondo blanco */
+    padding: 25px; /* Espaciado interno */
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Sombra */
+    margin-bottom: 20px; /* Espaciado inferior */
+  }
+  
+  /* Título del formulario */
+  .employee-add-form h3 {
+    font-size: 24px;
+    color: #444; /* Color oscuro */
+    margin-bottom: 20px;
+  }
+  
+  /* Fila de formulario para inputs */
+  .employee-form-row {
+    display: flex;
+    flex-wrap: wrap; /* Permite que los elementos se ajusten en varias filas */
+    gap: 20px; /* Espacio entre inputs */
+    margin-bottom: 20px;
+  }
+  
+  /* Input en la fila de formulario */
+  .employee-form-row .p-inputtext,
+  .employee-form-row select {
+    flex: 1;
+    min-width: 200px; /* Ancho mínimo */
+    padding: 12px;
+    border: 1px solid #ddd; /* Borde gris claro */
+    border-radius: 5px;
+    font-size: 15px;
+  }
+  
+  /* Efecto de enfoque en inputs */
+  .employee-form-row .p-inputtext:focus,
+  .employee-form-row select:focus {
+    border-color: #007bff; /* Cambia el color del borde al enfoque */
+    outline: none;
   }
 
-  .employee-table th,
-  .employee-table td {
-      font-size: 0.9rem;
-      padding: 10px;
-  }
+  /* Contenedor para el botón de agregar/actualizar */
+.add-employee-section {
+  margin-top: 20px; /* Margen superior para separación del contenido anterior */
+  margin-bottom: 20px; /* Margen inferior para separación adicional */
+  text-align: center; /* Centrar el botón dentro del contenedor */
 }
+
+
+  /* ============================================
+     Estilos para el Formulario de Restablecimiento de Contraseña
+  =============================================== */
+  /* Contenedor del formulario de restablecimiento */
+  .employee-reset-password-form {
+    background-color: #fff; /* Fondo blanco */
+    padding: 25px; /* Espaciado interno */
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Sombra */
+    margin-bottom: 20px; /* Espaciado inferior */
+  }
+  
+  /* Título del formulario */
+  .employee-reset-password-form h3 {
+    font-size: 24px; /* Tamaño del título */
+    color: #444; /* Color del texto */
+    margin-bottom: 20px; /* Espacio inferior */
+  }
+  
+  /* Input en la fila de formulario */
+  .employee-reset-password-form .p-inputtext,
+  .employee-reset-password-form select {
+    flex: 1; /* Cada input ocupa una parte igual */
+    min-width: 200px; /* Ancho mínimo */
+    padding: 12px; /* Espaciado interno */
+    border: 1px solid #ddd; /* Borde gris claro */
+    border-radius: 5px; /* Bordes redondeados */
+    font-size: 15px; /* Tamaño de fuente */
+    margin-bottom: 20px; /* Espacio inferior para separar el input del botón */
+  
+  }
+  
+  /* Efecto de enfoque en inputs */
+  .employee-reset-password-form .p-inputtext:focus,
+  .employee-reset-password-form select:focus {
+    border-color: #007bff; /* Cambia el color del borde al enfoque */
+    outline: none; /* Elimina el borde predeterminado */
+  }
+  
+  /* Contenedor de los botones en el formulario */
+  .employee-button-group {
+    display: flex;                   /* Alinea los elementos en una fila */
+    justify-content: center;         /* Centra los botones horizontalmente */
+    align-items: center;             /* Alinea verticalmente en el centro */
+    margin-top: 20px;                /* Espacio superior entre los botones y el formulario */
+  }
+  
+  /* Botón de guardar en el formulario */
+  .p-button-success {
+    width: 40%;                      /* Reduce el ancho del botón de guardar */
+    padding: 12px;                   /* Espaciado interno */
+    font-size: 16px;                 /* Tamaño de fuente */
+    background-color: #668a67;       /* Verde para el botón de guardar */
+    border: none;                    /* Sin borde */
+    color: #fff;                     /* Asegura que el texto sea legible */
+    margin-right: 10px;              /* Añade espacio a la derecha del botón de guardar */
+  }
+  
+  /* Botón de cancelar en el formulario */
+  .p-button-secondary {
+    width: 40%;                      /* Reduce el ancho del botón de cancelar */
+    padding: 12px;                   /* Espaciado interno */
+    font-size: 16px;                 /* Tamaño de fuente */
+    background-color: #9b6a67;       /* Rojo para el botón de cancelar */
+    border: none;                    /* Sin borde */
+    color: #fff;                     /* Asegura que el texto sea legible */
+  }
+  
+  /* Hover en ambos botones */
+  .p-button:hover {
+    opacity: 0.9;                    /* Ligera opacidad al pasar el cursor */
+  }
+  
+  /* ======================================
+     Estilos de la Tabla para los botones (Gestión de Empleados)
+  ========================================= */
+  
+  /* Estilos generales para los botones en la tabla de empleados */
+  .employee-table .employee-button {
+    padding: 0.3rem 1rem; /* Espaciado interno */
+    border: none; /* Sin borde */
+    border-radius: 4px; /* Bordes redondeados */
+    cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+    font-weight: bold; /* Hacer el texto más destacado */
+    transition: background-color 0.3s, color 0.3s; /* Transición suave para fondo y color */
+    text-align: center; /* Alineación central del texto */
+  }
+  
+  /* Estilo para el botón de Editar */
+  .employee-table .employee-button-edit {
+    background-color: #668a67; /* Verde para el botón de Editar */
+    color: white; /* Color de texto */
+  }
+  
+  .employee-table .employee-button-edit:hover {
+    background-color: #2b5c2b; /* Color más oscuro al pasar el ratón */
+  }
+  
+  /* Estilo para el botón de Activar/Desactivar */
+  .employee-table .employee-button-toggle-status {
+    background-color: #e7c775; /* Amarillo para el botón de Activar/Desactivar */
+    color: white; /* Color de texto */
+  }
+  
+  .employee-table .employee-button-toggle-status:hover {
+    background-color: #e6a700; /* Color más oscuro al pasar el ratón */
+  }
+  
+  /* Estilo para el botón de Restablecer Contraseña */
+  .employee-table .employee-button-reset-password {
+    background-color: #9b6a67; /* Rojo suave para Restablecer Contraseña */
+    color: white; /* Color de texto */
+  }
+  
+  .employee-table .employee-button-reset-password:hover {
+    background-color: #4e1e1e; /* Color más oscuro al pasar el ratón */
+  }
+  
+  /* Alineación de los botones en la tabla */
+  .employee-table .employee-button-container {
+    display: grid; /* Usar Grid para crear columnas */
+    /*grid-template-columns: 1fr 1fr 1fr; /* Tres columnas iguales */
+    justify-content: space-around; /* Espacia uniformemente los botones */
+    align-items: center; /* Alinea los botones verticalmente al centro */
+    gap: 0.5rem; /* Espacio entre los botones */
+  }
+  

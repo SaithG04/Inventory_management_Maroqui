@@ -1,33 +1,52 @@
 // src/components/Sidebar/Sidebar.js
 import React from 'react';
-import { FaUser, FaChartLine, FaClipboardList, FaShoppingCart, FaSignOutAlt, FaUsers } from 'react-icons/fa'; // Importar íconos
+import { FaChartLine, FaClipboardList, FaShoppingCart, FaSignOutAlt, FaUsers } from 'react-icons/fa';
 import './Sidebar.css';
 
-const Sidebar = ({ onButtonClick }) => {
+const Sidebar = ({ onButtonClick, userRole, userName }) => {
+  const modulesByRole = {
+    Administrador: ['dashboard', 'producto', 'ventas', 'empleados', 'suppliers'],
+    Almacenero: ['dashboard', 'producto'],
+    Vendedor: ['dashboard', 'ventas']
+  };
+
+  const allowedModules = modulesByRole[userRole] || [];
+
   return (
     <div className="sidebar">
-      <div className="profile-section">
-        <FaUser size={40} className="icon" /> {/* Ícono de usuario */}
-        <p>Usuario: <strong>Nombre de Usuario</strong></p>
+       <div className="profile-section">
+        <p>Usuario: <strong>{userRole}</strong></p>
+        <p>Nombre: <span className="user-name">{userName}</span></p> {/* Nombre en la misma línea */}
       </div>
+
       <ul className="menu-list">
-        <li onClick={() => onButtonClick('dashboard')}>
-          <FaChartLine className="icon" /> Dashboard {/* Ícono para el Dashboard */}
-        </li>
-        <li onClick={() => onButtonClick('producto')}>
-          <FaClipboardList className="icon" /> Productos {/* Ícono para Inventario */}
-        </li>
-        <li onClick={() => onButtonClick('ventas')}>
-          <FaShoppingCart className="icon" /> Ventas {/* Ícono de carrito de compras para Ventas */}
-        </li>
-        <li onClick={() => onButtonClick('empleados')}>  {/* Nuevo ícono para Administración de Empleados */}
-          <FaUsers className="icon" /> Empleados {/* Ícono de usuarios para Empleados */}
-        </li>
-        <li onClick={() => onButtonClick('suppliers')}>  {/* Nuevo ícono para Administración de Empleados */}
-          <FaUsers className="icon" /> Proveedores {/* Ícono de usuarios para Empleados */}
-        </li>
-        <li onClick={() => onButtonClick('salir')}>
-          <FaSignOutAlt className="icon" /> Salir {/* Ícono de salida */}
+        {allowedModules.includes('dashboard') && (
+          <li onClick={() => onButtonClick('dashboard')}>
+            <FaChartLine className="icon" /> Dashboard
+          </li>
+        )}
+        {allowedModules.includes('producto') && (
+          <li onClick={() => onButtonClick('producto')}>
+            <FaClipboardList className="icon" /> Productos
+          </li>
+        )}
+        {allowedModules.includes('ventas') && (
+          <li onClick={() => onButtonClick('ventas')}>
+            <FaShoppingCart className="icon" /> Ventas
+          </li>
+        )}
+        {allowedModules.includes('empleados') && (
+          <li onClick={() => onButtonClick('empleados')}>
+            <FaUsers className="icon" /> Empleados
+          </li>
+        )}
+        {allowedModules.includes('suppliers') && (
+          <li onClick={() => onButtonClick('suppliers')}>
+            <FaUsers className="icon" /> Proveedores
+          </li>
+        )}
+        <li onClick={() => onButtonClick('salir')} className="logout-button">
+        <FaSignOutAlt className="icon" /> Salir
         </li>
       </ul>
     </div>
@@ -35,4 +54,3 @@ const Sidebar = ({ onButtonClick }) => {
 };
 
 export default Sidebar;
-
