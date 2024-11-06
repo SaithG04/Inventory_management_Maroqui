@@ -242,14 +242,16 @@
 /* ============================
  Estilo Personalizado de Dialog Confirmación
 ============================ */
+/* Estilos personalizados para los diálogos de confirmación */
 .p-confirm-dialog .p-dialog {
   max-width: 500px;
   width: 100%;
   border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .p-confirm-dialog .p-dialog-header {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: bold;
   color: #444;
   text-align: center;
@@ -260,25 +262,35 @@
   color: #555;
   text-align: center;
   padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
+/* Icono de advertencia */
+.p-confirm-dialog .p-dialog-content .pi-exclamation-triangle {
+  color: #ffa726;
+  font-size: 24px;
+}
+
+/* Botones personalizados para Confirmación */
 .p-confirm-dialog .p-dialog-footer {
-  padding: 20px;
   display: flex;
-  justify-content: space-around;
-  align-items: center;
+  justify-content: center;
   gap: 20px;
+  padding: 20px;
 }
 
 .custom-accept-button {
   background-color: #668a67;
   border: none;
-  color: white;
-  padding: 12px;
+  color: #fff;
+  padding: 12px 20px;
   font-size: 16px;
   border-radius: 5px;
-  width: 150px;
-  transition: background-color 0.3s, transform 0.3s;
+  cursor: pointer;
+  width: 100px;
+  transition: background-color 0.3s, transform 0.3s ease;
 }
 
 .custom-accept-button:hover {
@@ -289,12 +301,13 @@
 .custom-reject-button {
   background-color: #9b6a67;
   border: none;
-  color: white;
-  padding: 12px;
+  color: #fff;
+  padding: 12px 20px;
   font-size: 16px;
   border-radius: 5px;
-  width: 150px;
-  transition: background-color 0.3s, transform 0.3s;
+  cursor: pointer;
+  width: 100px;
+  transition: background-color 0.3s, transform 0.3s ease;
 }
 
 .custom-reject-button:hover {
@@ -537,3 +550,6 @@
   .sales-table {
     margin-top: 20px;
   }
+
+
+  

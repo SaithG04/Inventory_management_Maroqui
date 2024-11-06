@@ -203,17 +203,19 @@
 .products-button-container {
     display: flex;
     align-items: center;
+    justify-content: center; /* Asegura que los botones estén centrados horizontalmente */
     gap: 10px; /* Espacio entre los botones */
+    flex-wrap: nowrap; /* Evita que los botones se apilen si el contenedor es estrecho */
 }
 
 /* Botones generales */
 .products-button-edit,
 .products-button-delete {
-    padding: 0.5rem 1rem;
+    padding: 0.3rem 0.8rem; /* Ajustar el padding para reducir el tamaño del botón */
+    font-size: 14px; /* Reducir el tamaño de la fuente si es necesario */
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-weight: bold;
     transition: background-color 0.3s, transform 0.3s ease;
     color: #fff;
 }

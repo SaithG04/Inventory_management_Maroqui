@@ -1,5 +1,5 @@
 // Importación de componentes y estilos
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { Dropdown } from 'primereact/dropdown';
 import { Checkbox } from 'primereact/checkbox';
 import { DataTable } from 'primereact/datatable';
@@ -7,6 +7,7 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import { ProductContext } from '../../context/ProductContext'; // Importar el contexto
 
 import './Productos.css';
 import 'primereact/resources/themes/saga-blue/theme.css'; // Tema de PrimeReact
@@ -15,22 +16,18 @@ import 'primeicons/primeicons.css'; // Iconos de PrimeReact
 
 // Componente principal de Productos
 const Productos = ({ userRole }) => {
+    const { products, addProduct, updateProductStock, deleteProduct, categoryOptions, addCategory } = useContext(ProductContext);
     const isVendedor = userRole === 'Vendedor';
     const [searchCriteria, setSearchCriteria] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isAvailable, setIsAvailable] = useState(false);
     const [showAddProductForm, setShowAddProductForm] = useState(false);
     const [showAddCategoryForm, setShowAddCategoryForm] = useState(false);
-    const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [newProduct, setNewProduct] = useState(initialProductState());
     const [isEditing, setIsEditing] = useState(false);
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(15);
-    const [categoryOptions, setCategoryOptions] = useState([
-        { name: 'Papelería', code: 'papeleria' },
-        { name: 'Oficina', code: 'oficina' }
-    ]);
     const [newCategory, setNewCategory] = useState('');
     const searchInputRef = useRef(null);
     const toast = useRef(null);
@@ -41,16 +38,11 @@ const Productos = ({ userRole }) => {
         { name: 'Descripcion', code: 'description' }
     ];
 
-    // Función para alternar el estado de isAvailable cada vez que se hace clic en un checkbox
-    const handleAvailabilityChange = (status) => {
-        setIsAvailable(prevStatus => (prevStatus === status ? null : status));
-    };
-
-    // Efecto inicial para cargar los datos
+    // Efecto para filtrar productos
     useEffect(() => {
-        setProducts(initialProductData());
-        setFilteredProducts(initialProductData());
-    }, []);
+        // Cada vez que los productos del contexto cambien, actualiza filteredProducts
+        setFilteredProducts(products);
+    }, [products]);
 
     function initialProductState() {
         return {
@@ -62,15 +54,11 @@ const Productos = ({ userRole }) => {
             stock: ''
         };
     }
+    
 
-    function initialProductData() {
-        return [
-            { id: 1, name: 'Cuaderno', category: 'Papelería', unit: 'Unidad', status: 'Activo', description: 'Cuaderno A4', stock: 100 },
-            { id: 2, name: 'Lápiz', category: 'Papelería', unit: 'Unidad', status: 'Sin stock', description: 'Lápiz HB', stock: 0 },
-            { id: 3, name: 'Borrador', category: 'Papelería', unit: 'Unidad', status: 'Activo', description: 'Borrador blanco', stock: 50 },
-            { id: 4, name: 'Tijeras', category: 'Oficina', unit: 'Unidad', status: 'Descontinuado', description: 'Tijeras escolares', stock: 30 }
-        ];
-    }
+    const handleAvailabilityChange = (status) => {
+        setIsAvailable(prevStatus => (prevStatus === status ? null : status));
+    };
 
     const handleSearch = () => {
         let results = products;
@@ -152,42 +140,43 @@ const Productos = ({ userRole }) => {
 
     const handleAddOrEditProduct = () => {
         if (!isValidProduct()) return;
-
+    
+        const productToAdd = {
+            ...newProduct,
+            id: isEditing ? newProduct.id : Date.now(),
+        };
+    
         if (isEditing) {
-            const updatedProducts = products.map(product =>
-                product.id === newProduct.id ? { ...product, ...newProduct } : product
-            );
-            setProducts(updatedProducts);
-            setFilteredProducts(updatedProducts);
-            toast.current.show({ severity: 'success', summary: 'Producto Actualizado', detail: 'Producto actualizado con éxito.', life: 3000 });
+            updateProductStock(productToAdd.id, productToAdd.stock); // Usar updateProductStock para actualizar
         } else {
-            const newProductEntry = { ...newProduct, id: products.length + 1 };
-            const newProductsList = [...products, newProductEntry];
-            setProducts(newProductsList);
-            setFilteredProducts(newProductsList);
-            toast.current.show({ severity: 'success', summary: 'Producto Agregado', detail: 'Producto agregado con éxito.', life: 3000 });
+            addProduct(productToAdd); // Usar addProduct para agregar un nuevo producto
         }
-
-        setTimeout(() => {
-            clearForm();
-            setShowAddProductForm(false);
-        }, 1000);
+    
+        toast.current.show({
+            severity: 'success',
+            summary: 'Producto Actualizado',
+            detail: 'El inventario ha sido actualizado con éxito.',
+            life: 3000,
+        });
+    
+        setShowAddProductForm(false);
+        clearForm();
     };
-
+    
+    
+    
     const handleAddCategory = () => {
         if (!newCategory.trim()) {
             toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Por favor, ingrese un nombre de categoría.', life: 3000 });
             return;
         }
 
-        // Verificar si la categoría ya existe
-        if (categoryOptions.some(category => category.name.toLowerCase() === newCategory.toLowerCase())) {
+        if (categoryOptions && categoryOptions.some(category => category.name.toLowerCase() === newCategory.toLowerCase())) {
             toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La categoría ya existe.', life: 3000 });
             return;
         }
 
-        const newCategoryEntry = { name: newCategory, code: newCategory.toLowerCase() };
-        setCategoryOptions(prev => [...prev, newCategoryEntry]);
+        addCategory({ name: newCategory, code: newCategory.toLowerCase() });
         toast.current.show({ severity: 'success', summary: 'Categoría Agregada', detail: 'Categoría agregada con éxito.', life: 3000 });
         setNewCategory('');
         setShowAddCategoryForm(false);
@@ -200,7 +189,7 @@ const Productos = ({ userRole }) => {
 
     const isValidProduct = () => {
         const { name, category, unit, status, stock } = newProduct;
-        if (!name || !category || !unit || !status || stock === '') {
+        if (!name || !category || !unit || status === '' || stock === '') {
             toast.current.show({
                 severity: 'warn',
                 summary: 'Advertencia',
@@ -211,6 +200,7 @@ const Productos = ({ userRole }) => {
         }
         return true;
     };
+    
 
     const handleEdit = (product) => {
         confirmDialog({
@@ -219,8 +209,8 @@ const Productos = ({ userRole }) => {
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: 'Aceptar',
             rejectLabel: 'Cancelar',
-            acceptClassName: 'custom-accept-button', // Clase personalizada
-            rejectClassName: 'custom-reject-button', // Clase personalizada
+            acceptClassName: 'custom-accept-button',
+            rejectClassName: 'custom-reject-button',
             accept: () => {
                 setNewProduct(product);
                 setIsEditing(true);
@@ -237,12 +227,10 @@ const Productos = ({ userRole }) => {
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: 'Eliminar',
             rejectLabel: 'Cancelar',
-            acceptClassName: 'custom-accept-button', // Aplicar estilo de botón aceptado
-            rejectClassName: 'custom-reject-button', // Aplicar estilo de botón rechazado
+            acceptClassName: 'custom-accept-button',
+            rejectClassName: 'custom-reject-button',
             accept: () => {
-                const updatedProducts = products.filter((product) => product.id !== id);
-                setProducts(updatedProducts);
-                setFilteredProducts(updatedProducts);
+                deleteProduct(id); // Usar función del contexto para eliminar
                 toast.current.show({ severity: 'success', summary: 'Producto Eliminado', detail: 'Producto eliminado con éxito.', life: 3000 });
             },
             reject: () => {}
@@ -284,7 +272,7 @@ const Productos = ({ userRole }) => {
                     icon={showAddProductForm ? 'pi pi-times' : 'pi pi-plus'}
                     onClick={handleToggleForm}
                     className={showAddProductForm ? 'p-button-danger' : 'p-button-success'}
-                    disabled={isVendedor} // Desactiva el botón para Vendedor
+                    disabled={isVendedor}
                 />
                 <Button
                     label={showAddCategoryForm ? 'Cancelar' : 'Crear Categoría'}
@@ -292,7 +280,7 @@ const Productos = ({ userRole }) => {
                     onClick={handleToggleCategoryForm}
                     className={showAddCategoryForm ? 'p-button-danger' : 'p-button-success'}
                     style={{ marginLeft: '10px' }}
-                    disabled={isVendedor} // Desactiva el botón para Vendedor
+                    disabled={isVendedor}
                 />
             </div>
 
@@ -330,59 +318,60 @@ const Productos = ({ userRole }) => {
                 />
             )}
 
-            <DataTable
-                value={filteredProducts}
-                style={{ margin: "0 auto", width: "100%" }}
-                className="product-table productos-table"
-                paginator
-                rows={rows}
-                rowsPerPageOptions={[15, 30, 50]}
-                first={first}
-                onPage={onPageChange}
-                removableSort
-                paginatorClassName="custom-paginator"
-            >
-                <Column field="name" header="Nombre" sortable headerClassName="center-header" bodyClassName="center-body" />
-                <Column field="category" header="Categoría" sortable headerClassName="center-header" bodyClassName="center-body" />
-                <Column field="unit" header="Unidad" headerClassName="center-header" bodyClassName="center-body" />
-                <Column field="status" header="Estado" sortable headerClassName="center-header" bodyClassName="center-body" />
-                <Column
-                    field="description"
-                    header="Descripción"
-                    headerClassName="center-header"
-                    bodyClassName="center-body"
-                    body={rowData => (
-                        <div className="description-wrapper">
-                            <span className="description-cell">
-                                {rowData.description}
-                            </span>
-                            <div className="custom-tooltip">{rowData.description}</div>
-                        </div>
-                    )}
+<DataTable
+    value={filteredProducts}
+    style={{ margin: "0 auto", width: "100%" }}
+    className="product-table productos-table"
+    paginator
+    rows={rows}
+    rowsPerPageOptions={[15, 30, 50]}
+    first={first}
+    onPage={onPageChange}
+    removableSort
+    paginatorClassName="custom-paginator"
+>
+    <Column field="name" header="Nombre" sortable headerClassName="center-header" bodyClassName="center-body" />
+    <Column field="category" header="Categoría" sortable headerClassName="center-header" bodyClassName="center-body" />
+    <Column field="unit" header="Unidad" headerClassName="center-header" bodyClassName="center-body" />
+    <Column field="status" header="Estado" sortable headerClassName="center-header" bodyClassName="center-body" />
+    <Column
+        field="description"
+        header="Descripción"
+        headerClassName="center-header"
+        bodyClassName="center-body"
+        body={rowData => (
+            <div className="description-wrapper">
+                <span className="description-cell">
+                    {rowData.description}
+                </span>
+                <div className="custom-tooltip">{rowData.description}</div>
+            </div>
+        )}
+    />
+    <Column field="stock" header="Stock" headerClassName="center-header" bodyClassName="center-body" />
+    <Column
+        body={(rowData) => (
+            <div className="product-button-container">
+                <Button
+                    icon="pi pi-pencil"
+                    label="Editar"
+                    className="products-button-edit p-button-rounded p-button-text"
+                    onClick={() => handleEdit(rowData)}
+                    disabled={isVendedor}
                 />
-                <Column field="stock" header="Stock" headerClassName="center-header" bodyClassName="center-body" />
-                <Column
-                    body={(rowData) => (
-                        <div className="product-button-container">
-                            <Button
-                                icon="pi pi-pencil"
-                                label="Editar"
-                                className="products-button-edit p-button-rounded p-button-text"
-                                onClick={() => handleEdit(rowData)}
-                                disabled={isVendedor} // Desactiva para Vendedor
-                            />
-                            <Button
-                                icon="pi pi-trash"
-                                label="Eliminar"
-                                className="products-button-delete p-button-rounded p-button-text"
-                                severity="danger"
-                                onClick={() => handleDelete(rowData.id)}
-                                disabled={isVendedor} // Desactiva para Vendedor
-                            />
-                        </div>
-                    )}
+                <Button
+                    icon="pi pi-trash"
+                    label="Eliminar"
+                    className="products-button-delete p-button-rounded p-button-text"
+                    severity="danger"
+                    onClick={() => handleDelete(rowData.id)}
+                    disabled={isVendedor}
                 />
-            </DataTable>
+            </div>
+        )}
+    />
+</DataTable>
+
         </div>
     );
 };
@@ -443,7 +432,7 @@ const SearchSection = ({
 };
 
 // Componente de Formulario para Agregar o Editar Producto
-const AddProductForm = ({ newProduct, categoryOptions, handleInputChange, handleCategoryChange, handleStatusChange, handleAddOrEditProduct, isEditing }) => {
+const AddProductForm = ({ newProduct, categoryOptions = [], handleInputChange, handleCategoryChange, handleStatusChange, handleAddOrEditProduct, isEditing }) => {
     return (
         <div className="add-product-form">
             <h3>{isEditing ? 'Editar Producto' : 'Agregar Producto'}</h3>
@@ -517,5 +506,6 @@ const AddProductForm = ({ newProduct, categoryOptions, handleInputChange, handle
         </div>
     );
 };
+
 
 export default Productos;
