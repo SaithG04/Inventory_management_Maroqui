@@ -6,8 +6,8 @@ import './Sidebar.css';
 const Sidebar = ({ onButtonClick, userRole, userName }) => {
   const modulesByRole = {
     Administrador: ['dashboard', 'producto', 'ventas', 'empleados', 'suppliers'],
-    Almacenero: ['dashboard', 'producto'],
-    Vendedor: ['dashboard', 'ventas']
+    Almacenero: ['producto'],
+    Vendedor: ['producto', 'ventas']
   };
 
   const allowedModules = modulesByRole[userRole] || [];

@@ -250,57 +250,104 @@
     opacity: 0.9;                    /* Ligera opacidad al pasar el cursor */
   }
   
-  /* ======================================
-     Estilos de la Tabla para los botones (Gestión de Empleados)
-  ========================================= */
-  
-  /* Estilos generales para los botones en la tabla de empleados */
-  .employee-table .employee-button {
-    padding: 0.3rem 1rem; /* Espaciado interno */
-    border: none; /* Sin borde */
-    border-radius: 4px; /* Bordes redondeados */
-    cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
-    font-weight: bold; /* Hacer el texto más destacado */
-    transition: background-color 0.3s, color 0.3s; /* Transición suave para fondo y color */
-    text-align: center; /* Alineación central del texto */
+    /* ======================================
+      Estilos de la Tabla para los botones (Gestión de Empleados)
+    ========================================= */
+    
+    /* Estilos generales para los botones en la tabla de empleados */
+    .employee-table .employee-button {
+      padding: 0.3rem 1rem; /* Espaciado interno */
+      border: none; /* Sin borde */
+      border-radius: 4px; /* Bordes redondeados */
+      cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+      font-weight: bold; /* Hacer el texto más destacado */
+      transition: background-color 0.3s, color 0.3s; /* Transición suave para fondo y color */
+      text-align: center; /* Alineación central del texto */
+    }
+    
+    /* Estilo para el botón de Editar */
+    .employee-table .employee-button-edit {
+      background-color: #668a67; /* Verde para el botón de Editar */
+      color: white; /* Color de texto */
+    }
+    
+    .employee-table .employee-button-edit:hover {
+      background-color: #2b5c2b; /* Color más oscuro al pasar el ratón */
+    }
+    
+    /* Estilo para el botón de Activar/Desactivar */
+    .employee-table .employee-button-toggle-status {
+      background-color: #e7c775; /* Amarillo para el botón de Activar/Desactivar */
+      color: white; /* Color de texto */
+    }
+    
+    .employee-table .employee-button-toggle-status:hover {
+      background-color: #e6a700; /* Color más oscuro al pasar el ratón */
+    }
+    
+    /* Estilo para el botón de Restablecer Contraseña */
+    .employee-table .employee-button-reset-password {
+      background-color: #9b6a67; /* Rojo suave para Restablecer Contraseña */
+      color: white; /* Color de texto */
+    }
+    
+    .employee-table .employee-button-reset-password:hover {
+      background-color: #4e1e1e; /* Color más oscuro al pasar el ratón */
+    }
+    
+    /* Alineación de los botones en la tabla */
+    .employee-table .employee-button-container {
+      display: grid; /* Usar Grid para crear columnas */
+      /*grid-template-columns: 1fr 1fr 1fr; /* Tres columnas iguales */
+      justify-content: space-around; /* Espacia uniformemente los botones */
+      align-items: center; /* Alinea los botones verticalmente al centro */
+      gap: 0.5rem; /* Espacio entre los botones */
+    }
+    
+    /* Diseño personalizado para los diálogos de confirmación */
+
+  /* Contenedor de botones en el diálogo de confirmación */
+  .p-confirm-dialog .p-dialog-footer {
+    display: flex;                /* Alinea los botones en fila */
+    justify-content: space-around; /* Distribuye el espacio entre los botones */
+    align-items: center;           /* Centra los botones verticalmente */
+    gap: 20px;                     /* Añade espacio entre los botones */
   }
-  
-  /* Estilo para el botón de Editar */
-  .employee-table .employee-button-edit {
-    background-color: #668a67; /* Verde para el botón de Editar */
-    color: white; /* Color de texto */
+
+  /* Estilo para el botón Aceptar */
+  .custom-accept-button {
+    background-color: #668a67; /* Verde similar al botón de éxito */
+    border: none;
+    color: white;
+    padding: 12px; /* Espaciado interno */
+    font-size: 16px; /* Tamaño de fuente */
   }
-  
-  .employee-table .employee-button-edit:hover {
-    background-color: #2b5c2b; /* Color más oscuro al pasar el ratón */
+
+  .custom-accept-button:hover {
+    background-color: #2b5c2b; /* Un tono más oscuro al pasar el ratón */
   }
-  
-  /* Estilo para el botón de Activar/Desactivar */
-  .employee-table .employee-button-toggle-status {
-    background-color: #e7c775; /* Amarillo para el botón de Activar/Desactivar */
-    color: white; /* Color de texto */
+
+  /* Estilo para el botón Cancelar */
+  .custom-reject-button {
+    background-color: #9b6a67; /* Rojo similar al botón de cancelar */
+    border: none;
+    color: white;
+    padding: 12px; /* Espaciado interno */
+    font-size: 16px; /* Tamaño de fuente */
   }
-  
-  .employee-table .employee-button-toggle-status:hover {
-    background-color: #e6a700; /* Color más oscuro al pasar el ratón */
+
+  .custom-reject-button:hover {
+    background-color: #4e1e1e; /* Un tono más oscuro al pasar el ratón */
   }
-  
-  /* Estilo para el botón de Restablecer Contraseña */
-  .employee-table .employee-button-reset-password {
-    background-color: #9b6a67; /* Rojo suave para Restablecer Contraseña */
-    color: white; /* Color de texto */
+
+  /* Estilo general del diálogo de confirmación */
+  .p-confirm-dialog .p-dialog-header {
+    font-size: 20px;
+    font-weight: bold;
+    color: #444; /* Color del texto del encabezado */
   }
-  
-  .employee-table .employee-button-reset-password:hover {
-    background-color: #4e1e1e; /* Color más oscuro al pasar el ratón */
+
+  .p-confirm-dialog .p-dialog-content {
+    font-size: 16px;
+    color: #555; /* Color del texto del mensaje */
   }
-  
-  /* Alineación de los botones en la tabla */
-  .employee-table .employee-button-container {
-    display: grid; /* Usar Grid para crear columnas */
-    /*grid-template-columns: 1fr 1fr 1fr; /* Tres columnas iguales */
-    justify-content: space-around; /* Espacia uniformemente los botones */
-    align-items: center; /* Alinea los botones verticalmente al centro */
-    gap: 0.5rem; /* Espacio entre los botones */
-  }
-  

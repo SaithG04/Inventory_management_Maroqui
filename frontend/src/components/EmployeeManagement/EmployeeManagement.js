@@ -6,6 +6,7 @@ import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Checkbox } from 'primereact/checkbox';
 import { Toast } from 'primereact/toast';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog'; // Importa los componentes necesarios
 import './EmployeeManagement.css';
 
 const EmployeeManagement = () => {
@@ -65,7 +66,7 @@ const EmployeeManagement = () => {
         status: 'Activo'
       }
     ];
-  
+
     const savedEmployees = localStorage.getItem('employees');
     if (!savedEmployees) {
       const initialEmployees = initialEmployeeData();
@@ -172,45 +173,63 @@ const EmployeeManagement = () => {
       newEmployee.password ||
       newEmployee.role !== ''
     ) {
-      const confirmCancel = window.confirm(
-        'Hay datos ingresados en el formulario. ¿Seguro que deseas cancelar?'
-      );
-      if (!confirmCancel) {
-        return;
+      confirmDialog({
+        message: 'Hay datos ingresados en el formulario. ¿Seguro que deseas cancelar?',
+        header: 'Confirmación de Cancelación',
+        icon: 'pi pi-exclamation-triangle',
+        acceptClassName: 'custom-accept-button', // Aplicar la clase personalizada para aceptar
+        rejectClassName: 'custom-reject-button', // Aplicar la clase personalizada para rechazar
+        accept: () => {
+          setShowAddEmployeeForm((prev) => !prev);
+          setIsEditing(false);
+          setNewEmployee({
+            id: '',
+            fullName: '',
+            email: '',
+            password: '',
+            role: '',
+            status: 'Activo',
+          });
+          if (formInputRef.current) {
+            formInputRef.current.focus();
+          }
+        },
+        reject: () => {
+          // Acción opcional si el usuario rechaza la cancelación
+        }
+      });
+    } else {
+      setShowAddEmployeeForm((prev) => !prev);
+      setIsEditing(false);
+      setNewEmployee({
+        id: '',
+        fullName: '',
+        email: '',
+        password: '',
+        role: '',
+        status: 'Activo',
+      });
+      if (formInputRef.current) {
+        formInputRef.current.focus();
       }
-    }
-
-    setShowAddEmployeeForm((prev) => !prev);
-    setIsEditing(false);
-    setNewEmployee({
-      id: '',
-      fullName: '',
-      email: '',
-      password: '',
-      role: '',
-      status: 'Activo',
-    });
-
-    if (formInputRef.current) {
-      formInputRef.current.focus();
     }
   };
 
-const handleRegisterEmployee = () => {
+
+  const handleRegisterEmployee = () => {
     if (!newEmployee.fullName || !newEmployee.email || !newEmployee.password || !newEmployee.role) {
-      alert('Por favor, complete todos los campos obligatorios.');
+      toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Por favor, complete todos los campos obligatorios.', life: 3000 });
       return;
     }
 
     // Validar que el email termine con @miroqui.es
     if (!newEmployee.email.endsWith('@miroqui.es')) {
-      alert('El correo debe terminar con "@miroqui.es".');
+      toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El correo debe terminar con "@miroqui.es".', life: 3000 });
       return;
     }
 
     const employees = JSON.parse(localStorage.getItem('employees')) || [];
 
-    // Si estamos en modo de edición
     if (isEditing) {
       const updatedEmployees = employees.map(emp =>
         emp.id === newEmployee.id ? newEmployee : emp
@@ -218,16 +237,15 @@ const handleRegisterEmployee = () => {
       localStorage.setItem('employees', JSON.stringify(updatedEmployees));
       setEmployees(updatedEmployees);
       setFilteredEmployees(updatedEmployees);
-      alert('Empleado actualizado con éxito.');
+      toast.current.show({ severity: 'success', summary: 'Actualización Exitosa', detail: 'Empleado actualizado con éxito.', life: 3000 });
       setIsEditing(false);
     } else {
-      // Si estamos creando un nuevo empleado
       const newId = employees.length > 0 ? employees[employees.length - 1].id + 1 : 1;
       const updatedEmployees = [...employees, { ...newEmployee, id: newId }];
       localStorage.setItem('employees', JSON.stringify(updatedEmployees)); // Guardar en localStorage
       setEmployees(updatedEmployees);
       setFilteredEmployees(updatedEmployees);
-      alert('Empleado registrado con éxito.');
+      toast.current.show({ severity: 'success', summary: 'Registro Exitoso', detail: 'Empleado registrado con éxito.', life: 3000 });
     }
 
     setShowAddEmployeeForm(false);
@@ -239,13 +257,26 @@ const handleRegisterEmployee = () => {
       role: '',
       status: 'Activo',
     });
-};
-
+  };
 
   const handleEditEmployee = (employee) => {
-    setNewEmployee(employee);
-    setIsEditing(true);
-    setShowAddEmployeeForm(true);
+    confirmDialog({
+      message: '¿Estás seguro de que deseas actualizar este empleado?',
+      header: 'Confirmación de actualización',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Aceptar',
+      rejectLabel: 'Cancelar',
+      acceptClassName: 'p-button-success custom-accept-button',
+      rejectClassName: 'p-button-secondary custom-reject-button',
+      accept: () => {
+        setNewEmployee(employee);
+        setIsEditing(true);
+        setShowAddEmployeeForm(true);
+      },
+      reject: () => {
+        // Acción opcional si se rechaza la confirmación
+      }
+    });
   };
 
   const handleToggleEmployeeStatus = (employee) => {
@@ -260,9 +291,23 @@ const handleRegisterEmployee = () => {
   };
 
   const handleResetPassword = (employee) => {
-    setEmployeeToReset(employee);
-    setShowResetPasswordForm(true);
-    setNewPassword('');
+    confirmDialog({
+      message: `¿Estás seguro de que deseas restablecer la contraseña de ${employee.fullName}?`,
+      header: 'Confirmación de Restablecimiento',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Aceptar',
+      rejectLabel: 'Cancelar',
+      acceptClassName: 'p-button-success custom-accept-button',
+      rejectClassName: 'p-button-secondary custom-reject-button',
+      accept: () => {
+        setEmployeeToReset(employee);
+        setShowResetPasswordForm(true);
+        setNewPassword('');
+      },
+      reject: () => {
+        // No hacer nada si se cancela la acción
+      }
+    });
   };
 
   const handleSaveNewPassword = () => {
@@ -281,12 +326,9 @@ const handleRegisterEmployee = () => {
     toast.current.show({ severity: 'success', summary: 'Contraseña Actualizada', detail: `La contraseña de ${employeeToReset.fullName} ha sido actualizada.`, life: 3000 });
   };
 
-  const maskPassword = (password) => {
-    return '•'.repeat(password.length);
-  };
-
   return (
     <div className="employee-management">
+      <ConfirmDialog />
       <Toast ref={toast} />
 
       {/* Encabezado */}
@@ -431,7 +473,6 @@ const handleRegisterEmployee = () => {
       >
         <Column field="fullName" header="Nombres completos" sortable headerClassName="center-header" bodyClassName="center-body" />
         <Column field="email" header="Correo Electrónico" headerClassName="center-header" bodyClassName="center-body" />
-        <Column field="password" header="Contraseña" body={rowData => maskPassword(rowData.password)} headerClassName="center-header" bodyClassName="center-body" />
         <Column field="role" header="Rol" sortable headerClassName="center-header" bodyClassName="center-body" />
         <Column field="status" header="Estatus" sortable headerClassName="center-header" bodyClassName="center-body" />
         <Column
@@ -461,6 +502,7 @@ const handleRegisterEmployee = () => {
           bodyClassName="center-body"
         />
       </DataTable>
+
     </div>
   );
 };

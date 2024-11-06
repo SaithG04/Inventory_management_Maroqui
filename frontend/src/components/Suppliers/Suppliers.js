@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Checkbox } from 'primereact/checkbox';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
-import './Suppliers.css';
-import 'primereact/resources/themes/saga-blue/theme.css'; // Tema de PrimeReact
-import 'primereact/resources/primereact.min.css'; // Componentes de PrimeReact
-import 'primeicons/primeicons.css'; // Iconos de PrimeReact
-
-// Importación de los estilos personalizados
-import './Suppliers.css'; // Tus estilos personalizados para el DataTable
+import { Toast } from 'primereact/toast';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import 'primereact/resources/themes/saga-blue/theme.css'; // Importar el tema primero
+import 'primereact/resources/primereact.min.css'; // Importar componentes de PrimeReact después
+import 'primeicons/primeicons.css';
+import './Suppliers.css'; // Finalmente, importar tus propios estilos
 
 const Suppliers = () => {
     const [proveedores, setProveedores] = useState([]);
@@ -20,27 +19,13 @@ const Suppliers = () => {
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
     const [address, setAddress] = useState('');
-    const [conditions, setConditions] = useState('');
-    const [categoryId, setCategoryId] = useState(null);
-    const [status, setStatus] = useState('ACTIVE');
+    const [status, setStatus] = useState('');
     const [editingIndex, setEditingIndex] = useState(null);
     const [isFormVisible, setIsFormVisible] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [isActive, setIsActive] = useState(false);
     const [isInactive, setIsInactive] = useState(false);
-    const [categories] = useState([
-        { label: 'Categoría 1', value: 1 },
-        { label: 'Categoría 2', value: 2 },
-        { label: 'Categoría 3', value: 3 }
-    ]);
-
-    // Estados de error para la validación del formulario
-    const [nameError, setNameError] = useState(false);
-    const [contactError, setContactError] = useState(false);
-    const [phoneError, setPhoneError] = useState(false);
-    const [emailError, setEmailError] = useState(false);
-    const [categoryIdError, setCategoryIdError] = useState(false);
-    const [statusError, setStatusError] = useState(false);
+    const toast = useRef(null);
 
     useEffect(() => {
         const storedProveedores = JSON.parse(localStorage.getItem('proveedores')) || [];
@@ -51,125 +36,107 @@ const Suppliers = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Reiniciar errores anteriores
-        setNameError(false);
-        setContactError(false);
-        setPhoneError(false);
-        setEmailError(false);
-        setCategoryIdError(false);
-        setStatusError(false);
-
         // Validación de campos
-        let valid = true;
-
-        if (!name) {
-            setNameError(true);
-            valid = false;
-        }
-        if (!contact) {
-            setContactError(true);
-            valid = false;
-        }
-        if (!phone) {
-            setPhoneError(true);
-            valid = false;
-        }
-        if (!email) {
-            setEmailError(true);
-            valid = false;
-        }
-        if (!categoryId) {
-            setCategoryIdError(true);
-            valid = false;
-        }
-        if (!status) {
-            setStatusError(true);
-            valid = false;
-        }
-
-        if (!valid) {
-            // No continuar si los campos no son válidos
+        if (!name || !contact || !phone || !email || !address || !status) {
+            toast.current.show({
+                severity: 'warn',
+                summary: 'Advertencia',
+                detail: 'Por favor, complete todos los campos obligatorios.',
+                life: 3000
+            });
             return;
         }
 
-        // Confirmación antes de guardar
-        const confirmSave = window.confirm("¿Estás seguro de que deseas guardar el proveedor?");
-        if (!confirmSave) {
-            return;
-        }
+        confirmDialog({
+            message: '¿Estás seguro de que deseas guardar el proveedor?',
+            header: 'Confirmación de Guardado',
+            icon: 'pi pi-exclamation-triangle',
+            acceptClassName: 'custom-accept-button',
+            rejectClassName: 'custom-reject-button',
+            accept: () => {
+                const nuevoProveedor = { name, contact, phone, email, address, status };
 
-        const nuevoProveedor = { name, contact, phone, email, address, conditions, categoryId, status };
+                let updatedProveedores;
 
-        let updatedProveedores;
+                if (editingIndex !== null) {
+                    // Editar un proveedor existente
+                    updatedProveedores = proveedores.map((proveedor, i) =>
+                        i === editingIndex ? nuevoProveedor : proveedor
+                    );
+                    setEditingIndex(null);
+                    toast.current.show({ severity: 'success', summary: 'Proveedor Actualizado', detail: 'Proveedor actualizado con éxito.', life: 3000 });
+                } else {
+                    // Agregar un nuevo proveedor
+                    updatedProveedores = [...proveedores, nuevoProveedor];
+                    toast.current.show({ severity: 'success', summary: 'Proveedor Agregado', detail: 'Proveedor agregado con éxito.', life: 3000 });
+                }
 
-        if (editingIndex !== null) {
-            // Editar un proveedor existente
-            updatedProveedores = proveedores.map((proveedor, i) =>
-                i === editingIndex ? nuevoProveedor : proveedor
-            );
-            setEditingIndex(null);
-        } else {
-            // Agregar un nuevo proveedor
-            updatedProveedores = [...proveedores, nuevoProveedor];
-        }
+                setProveedores(updatedProveedores);
+                setFilteredProveedores(updatedProveedores);
+                localStorage.setItem('proveedores', JSON.stringify(updatedProveedores));
 
-        setProveedores(updatedProveedores);
-        setFilteredProveedores(updatedProveedores);
-        localStorage.setItem('proveedores', JSON.stringify(updatedProveedores));
-
-        // Limpiar los campos del formulario
-        setName('');
-        setContact('');
-        setPhone('');
-        setEmail('');
-        setAddress('');
-        setConditions('');
-        setCategoryId('');
-        setStatus('ACTIVE');
-        setIsFormVisible(false);
+                // Limpiar los campos del formulario
+                resetForm();
+                setIsFormVisible(false);
+            },
+            reject: () => { }
+        });
     };
-
-
 
     const handleEdit = (index) => {
-        const proveedor = proveedores[index];
-        setName(proveedor.name);
-        setContact(proveedor.contact);
-        setPhone(proveedor.phone);
-        setEmail(proveedor.email);
-        setAddress(proveedor.address);
-        setConditions(proveedor.conditions);
-        setCategoryId(proveedor.categoryId);
-        setStatus(proveedor.status);
-        setEditingIndex(index);
-        setIsFormVisible(true);
+        confirmDialog({
+            message: '¿Estás seguro de que deseas actualizar este proveedor?',
+            header: 'Confirmación de Actualización',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Aceptar',
+            rejectLabel: 'Cancelar',
+            acceptClassName: 'custom-accept-button',
+            rejectClassName: 'custom-reject-button',
+            accept: () => {
+                const proveedor = proveedores[index];
+                setName(proveedor.name);
+                setContact(proveedor.contact);
+                setPhone(proveedor.phone);
+                setEmail(proveedor.email);
+                setAddress(proveedor.address);
+                setStatus(proveedor.status);
+                setEditingIndex(index);
+                setIsFormVisible(true);
+            },
+            reject: () => { }
+        });
     };
 
-    const handleDelete = (index) => {
-        const updatedProveedores = proveedores.filter((_, i) => i !== index);
+    const handleToggleStatus = (index) => {
+        const updatedProveedores = proveedores.map((proveedor, i) =>
+            i === index ? { ...proveedor, status: proveedor.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE' } : proveedor
+        );
         setProveedores(updatedProveedores);
         setFilteredProveedores(updatedProveedores);
         localStorage.setItem('proveedores', JSON.stringify(updatedProveedores));
+        toast.current.show({ severity: 'success', summary: 'Estado Actualizado', detail: 'Estado del proveedor actualizado con éxito.', life: 3000 });
     };
 
     // Función para alternar la visibilidad del formulario (agregar/cancelar)
     const handleToggleForm = () => {
-        // Verificar si hay datos ingresados en el formulario
-        if (isFormVisible && (name || contact || phone || email || address || conditions || categoryId)) {
-            const confirmCancel = window.confirm("Hay datos ingresados. ¿Estás seguro de que deseas cancelar y perder los datos?");
-            if (!confirmCancel) {
-                return; // No cerrar si el usuario decide no cancelar
-            }
-        }
-
-        // Alternar la visibilidad del formulario
-        setIsFormVisible(!isFormVisible);
-
-        // Si se está ocultando el formulario, limpiar los campos
-        if (isFormVisible) {
-            resetForm();
+        if (isFormVisible && (name || contact || phone || email || address)) {
+            confirmDialog({
+                message: 'Hay datos ingresados en el formulario. ¿Estás seguro de que deseas cancelar?',
+                header: 'Confirmación de Cancelación',
+                icon: 'pi pi-exclamation-triangle',
+                acceptClassName: 'custom-accept-button', // Añadir clase personalizada para aceptar
+                rejectClassName: 'custom-reject-button', // Añadir clase personalizada para rechazar
+                accept: () => {
+                    resetForm();
+                    setIsFormVisible(false);
+                },
+                reject: () => { }
+            });
+        } else {
+            setIsFormVisible(!isFormVisible);
         }
     };
+
 
     // Función para limpiar los campos del formulario
     const resetForm = () => {
@@ -178,9 +145,8 @@ const Suppliers = () => {
         setPhone('');
         setEmail('');
         setAddress('');
-        setConditions('');
-        setCategoryId(''); // Reiniciar a un valor vacío
-        setStatus(''); // Reiniciar a un valor vacío para mostrar el placeholder
+        setStatus('');
+        setEditingIndex(null);
     };
 
     const filterProveedores = () => {
@@ -202,15 +168,18 @@ const Suppliers = () => {
     const handleCheckboxChange = (type) => {
         if (type === 'active') {
             setIsActive(!isActive);
-            setIsInactive(false); // Desmarca el otro checkbox
+            setIsInactive(false);
         } else if (type === 'inactive') {
             setIsInactive(!isInactive);
-            setIsActive(false); // Desmarca el otro checkbox
+            setIsActive(false);
         }
     };
 
     return (
         <div className="suppliers-container">
+            <ConfirmDialog />
+            <Toast ref={toast} />
+
             <h2>Proveedores</h2>
             <div className="suppliers-search-section">
                 <div className="suppliers-search-input">
@@ -259,119 +228,90 @@ const Suppliers = () => {
                 </div>
             </div>
 
-
-            <div className="suppliers-container">
-                {/* Botón Agregar / Cancelar */}
-                <div className="suppliers-toggle-form">
-                    <Button
-                        label={isFormVisible ? 'Cancelar' : 'Agregar Proveedor'}
-                        icon={isFormVisible ? 'pi pi-times' : 'pi pi-plus'}
-                        onClick={handleToggleForm}
-                        className={isFormVisible ? 'suppliers-button-cancel p-button-danger' : 'suppliers-button-add p-button-success'}
-                    />
-                </div>
-
-                {/* Formulario para Agregar / Editar */}
-                {isFormVisible && (
-                    <form className="suppliers-form" onSubmit={handleSubmit}>
-                        <h3 className="suppliers-form-title">
-                            {editingIndex !== null ? 'Editar Proveedor' : 'Agregar Proveedor'}
-                        </h3>
-
-                        {/* Fila 1: Nombre y Contacto */}
-                        <div className="suppliers-form-row">
-                            <input
-                                type="text"
-                                placeholder="Nombre"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                className="suppliers-input"
-                                required
-                            />
-                            {nameError && <p className="suppliers-error-message">Nombre es requerido.</p>}
-                            <input
-                                type="text"
-                                placeholder="Contacto"
-                                value={contact}
-                                onChange={(e) => setContact(e.target.value)}
-                                className="suppliers-input"
-                                required
-                            />
-                            {contactError && <p className="suppliers-error-message">Contacto es requerido.</p>}
-                        </div>
-
-                        {/* Fila 2: Teléfono y Email */}
-                        <div className="suppliers-form-row">
-                            <input
-                                type="tel"
-                                placeholder="Teléfono"
-                                value={phone}
-                                onChange={(e) => {
-                                    const newValue = e.target.value.replace(/\D/g, '');
-                                    if (newValue.length <= 9) {
-                                        setPhone(newValue);
-                                    }
-                                }}
-                                className="suppliers-input"
-                                required
-                            />
-                            {phoneError && <p className="suppliers-error-message">Teléfono es requerido.</p>}
-                            <input
-                                type="email"
-                                placeholder="Correo Electrónico"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="suppliers-input"
-                                required
-                            />
-                            {emailError && <p className="suppliers-error-message">Correo electrónico es requerido.</p>}
-                        </div>
-
-                        {/* Fila 4: Categoría y Estado */}
-                        <div className="suppliers-form-row">
-                            <select
-                                value={categoryId || ""}
-                                onChange={(e) => setCategoryId(e.target.value)}
-                                className="suppliers-input"
-                                required
-                            >
-                                <option value="" disabled>Selecciona una categoría</option>
-                                {categories.map((category) => (
-                                    <option key={category.value} value={category.value}>
-                                        {category.label}
-                                    </option>
-                                ))}
-                            </select>
-                            {categoryIdError && <p className="suppliers-error-message">Categoría es requerida.</p>}
-
-                            <select
-                                value={status || ""}
-                                onChange={(e) => setStatus(e.target.value)}
-                                className="suppliers-input"
-                                required
-                            >
-                                <option value="" disabled>Selecciona el estado</option>
-                                <option value="ACTIVE">ACTIVE</option>
-                                <option value="INACTIVE">INACTIVE</option>
-                            </select>
-                            {statusError && <p className="suppliers-error-message">Estado es requerido.</p>}
-
-                        </div>
-
-                        {/* Botón Guardar */}
-                        <div className="suppliers-button-submit-container">
-                            <button
-                                type="submit"
-                                className="suppliers-button-submit"
-                            >
-                                {editingIndex !== null ? 'Actualizar Proveedor' : 'Guardar Proveedor'}
-                            </button>
-                        </div>
-                    </form>
-                )}
-
-
+            <div className="suppliers-toggle-form">
+                <Button
+                    label={isFormVisible ? 'Cancelar' : 'Agregar Proveedor'}
+                    icon={isFormVisible ? 'pi pi-times' : 'pi pi-plus'}
+                    onClick={handleToggleForm}
+                    className={isFormVisible ? 'suppliers-button-cancel custom-reject-button' : 'suppliers-button-add custom-accept-button'}
+                />
             </div>
+
+            {isFormVisible && (
+                <form className="suppliers-form" onSubmit={handleSubmit}>
+                    <h3 className="suppliers-form-title">
+                        {editingIndex !== null ? 'Editar Proveedor' : 'Agregar Proveedor'}
+                    </h3>
+
+                    <div className="suppliers-form-row">
+                        <input
+                            type="text"
+                            placeholder="Nombre"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className="suppliers-input"
+                        />
+                        <input
+                            type="text"
+                            placeholder="Contacto"
+                            value={contact}
+                            onChange={(e) => setContact(e.target.value)}
+                            className="suppliers-input"
+                        />
+                    </div>
+
+                    <div className="suppliers-form-row">
+                        <input
+                            type="tel"
+                            placeholder="Teléfono"
+                            value={phone}
+                            onChange={(e) => {
+                                const newValue = e.target.value.replace(/\D/g, '');
+                                if (newValue.length <= 9) {
+                                    setPhone(newValue);
+                                }
+                            }}
+                            className="suppliers-input"
+                        />
+                        <input
+                            type="email"
+                            placeholder="Correo Electrónico"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="suppliers-input"
+                        />
+                    </div>
+
+                    <div className="suppliers-form-row">
+                        <input
+                            type="text"
+                            placeholder="Dirección"
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                            className="suppliers-input"
+                        />
+                        <select
+                            value={status || ""}
+                            onChange={(e) => setStatus(e.target.value)}
+                            className="suppliers-input"
+                        >
+                            <option value="" disabled>Selecciona el estado</option>
+                            <option value="ACTIVE">Activo</option>
+                            <option value="INACTIVE">Inactivo</option>
+                        </select>
+                    </div>
+
+                    <div className="suppliers-button-submit-container" style={{ textAlign: 'center' }}>
+                        <Button
+                            type="submit"
+                            label={editingIndex !== null ? 'Actualizar Proveedor' : 'Guardar Proveedor'}
+                            icon="pi pi-check"
+                            className={editingIndex !== null ? 'custom-accept-button' : 'custom-accept-button'}
+                            style={{ width: '250px' }}
+                        />
+                    </div>
+                </form>
+            )}
 
             <div className="suppliers-table-container" style={{ marginTop: '2rem' }}>
                 <DataTable
@@ -384,36 +324,33 @@ const Suppliers = () => {
                 >
                     <Column field="name" header="Nombre" sortable headerClassName="suppliers-header" bodyClassName="suppliers-body" />
                     <Column field="contact" header="Contacto" sortable headerClassName="suppliers-header" bodyClassName="suppliers-body" />
-                    <Column field="phone" header="Teléfono" sortable headerClassName="suppliers-header" bodyClassName="suppliers-body" />
-                    <Column field="email" header="Email" sortable headerClassName="suppliers-header" bodyClassName="suppliers-body" />
-                    <Column field="address" header="Dirección" sortable headerClassName="suppliers-header" bodyClassName="suppliers-body" />
-                    <Column field="conditions" header="Condiciones" sortable headerClassName="suppliers-header" bodyClassName="suppliers-body" />
+                    <Column field="phone" header="Teléfono"  headerClassName="suppliers-header" bodyClassName="suppliers-body" />
+                    <Column field="email" header="Email"  headerClassName="suppliers-header" bodyClassName="suppliers-body" />
+                    <Column field="address" header="Dirección"  headerClassName="suppliers-header" bodyClassName="suppliers-body" />
+                    <Column field="status" header="Estado" sortable headerClassName="suppliers-header" bodyClassName="suppliers-body" />
                     <Column
                         body={(rowData, rowProps) => (
-                            <>
+                            <div className="suppliers-button-container">
                                 <Button
                                     icon="pi pi-pencil"
                                     label="Editar"
-                                    className="suppliers-button-edit p-button-rounded p-button-text"
+                                    className="suppliers-button suppliers-button-edit"
                                     onClick={() => handleEdit(rowProps.rowIndex)}
                                 />
                                 <Button
-                                    icon="pi pi-trash"
-                                    label="Eliminar"
-                                    className="suppliers-button-delete p-button-rounded p-button-text"
-                                    severity="danger"
-                                    onClick={() => handleDelete(rowProps.rowIndex)}
+                                    label={rowData.status === 'ACTIVE' ? 'Desactivar' : 'Activar'}
+                                    icon="pi pi-user-edit"
+                                    className="suppliers-button suppliers-button-toggle"
+                                    data-status={rowData.status}
+                                    onClick={() => handleToggleStatus(rowProps.rowIndex)}
                                 />
-                            </>
+                            </div>
                         )}
-                        headerClassName="suppliers-header"
-                        bodyClassName="suppliers-body"
                     />
                 </DataTable>
             </div>
         </div>
     );
 };
-
 
 export default Suppliers;

@@ -97,7 +97,7 @@ function App() {
       case 'dashboard':
         return <Dashboard />;
       case 'producto':
-        return <Productos />;
+        return <Productos userRole={userRole} />; // Pasando userRole a Productos
       case 'ventas':
         return <Sales />;
       case 'empleados':
@@ -108,6 +108,7 @@ function App() {
         return <Dashboard />;
     }
   };
+  
 
   return (
     <div className="app-container">

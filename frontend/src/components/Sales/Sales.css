@@ -1,6 +1,344 @@
-/* Sales.css */
+/* ============================
+   Estilos Generales
+============================ */
+/* src/Suppliers.css */
 
-.sales-container {
+.suppliers-container {
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow-y: auto; 
+  max-height: 80vh; 
+}
+
+/* ============================
+ Estilos de la Sección de Búsqueda
+============================ */
+.suppliers-search-section {
+  display: flex; 
+  align-items: center; 
+  gap: 15px; 
+  padding: 10px 20px; 
+  background-color: #f0f4f8; 
+  border-radius: 6px; 
+  margin-bottom: 20px; 
+}
+
+.suppliers-search-input {
+  width: 500px;
+}
+
+.suppliers-search-input .p-inputtext {
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  background-color: #ffffff;
+}
+
+.suppliers-search-buttons {
+  display: flex; 
+  gap: 20px;
+}
+
+.suppliers-search-buttons .p-button {
+  padding: 10px 25px; 
+  border-radius: 6px; 
+  font-size: 14px; 
+  cursor: pointer; 
+  width: 150px; 
+  margin-left: 10px; 
+}
+
+.suppliers-search-buttons .p-button-primary {
+  background-color: #668a67 !important; 
+  border: none; 
+  color: #fff; 
+}
+
+.suppliers-search-buttons .p-button-secondary {
+  background-color: #9b6a67; 
+  border: none;
+  color: #fff; 
+}
+
+.suppliers-search-buttons .p-button:hover {
+  opacity: 0.9; 
+}
+
+.suppliers-checkbox-group {
+  display: flex; 
+  gap: 15px; 
+  margin-left: 10px;
+}
+
+.suppliers-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.suppliers-checkbox-item label {
+  font-size: 14px;
+  margin: 0;
+}
+
+/* ================================================================
+ Estilos para el Botón Mostrar/Ocultar Formulario
+=================================================================== */
+.suppliers-toggle-form {
+  text-align: left;
+  margin: 20px 0; 
+}
+
+.suppliers-toggle-form .p-button {
+  padding: 12px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  width: 250px;
+  color: #fff;
+}
+
+.suppliers-toggle-form .p-button-success {
+  background-color: #668a67;
+  border: none;
+  color: #fff;
+}
+
+.suppliers-toggle-form .p-button-danger {
+  background-color: #9b6a67;
+  border: none;
+  color: #fff;
+}
+
+.suppliers-toggle-form .p-button:hover {
+  opacity: 0.9;
+}
+
+/* ============================================
+ Estilos para el Formulario Crear/Editar Proveedor
+=============================================== */
+.suppliers-form {
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  margin: 0 auto 20px;
+  max-width: 800px;
+  font-family: Arial, sans-serif;
+}
+
+.suppliers-form-title {
+  font-size: 24px;
+  color: #444;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.suppliers-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.suppliers-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 15px;
+  background-color: #f9f9f9;
+}
+
+.suppliers-input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.suppliers-button-submit {
+  width: 100%;
+  padding: 15px;
+  font-size: 16px;
+  background-color: #668a67;
+  border: none;
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  max-width: 300px;
+}
+
+.suppliers-button-submit:hover {
+  background-color: #557857;
+}
+
+/* ============================
+ Estilo de la Tabla de Proveedores
+============================ */
+.suppliers-table-container {
+  margin-top: 2rem;
+}
+
+.suppliers-datatable .p-datatable-tbody > tr > td {
+  text-align: center;
+}
+
+/* =============================
+ Estilos de los Botones en la Tabla
+============================= */
+.suppliers-button-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.suppliers-button-edit,
+.suppliers-button-delete,
+.suppliers-button-toggle {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s, transform 0.3s ease;
+  color: #ffffff;
+  text-align: center;
+}
+
+.suppliers-button-edit {
+  background-color: #668a67;
+}
+
+.suppliers-button-edit:hover {
+  background-color: #2b5c2b;
+}
+
+.suppliers-button-delete {
+  background-color: #9b6a67;
+}
+
+.suppliers-button-delete:hover {
+  background-color: #4e1e1e;
+}
+
+.suppliers-button-toggle {
+  background-color: #e7c775;
+  color: #fff;
+}
+
+.suppliers-button-toggle:hover {
+  background-color: #e6a700;
+}
+
+/* ============================
+ Estilo Personalizado de Dialog Confirmación
+============================ */
+.p-confirm-dialog .p-dialog {
+  max-width: 500px;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.p-confirm-dialog .p-dialog-header {
+  font-size: 20px;
+  font-weight: bold;
+  color: #444;
+  text-align: center;
+}
+
+.p-confirm-dialog .p-dialog-content {
+  font-size: 16px;
+  color: #555;
+  text-align: center;
+  padding: 20px;
+}
+
+.p-confirm-dialog .p-dialog-footer {
+  padding: 20px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 20px;
+}
+
+.custom-accept-button {
+  background-color: #668a67;
+  border: none;
+  color: white;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 5px;
+  width: 150px;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.custom-accept-button:hover {
+  background-color: #2b5c2b;
+  transform: scale(1.05);
+}
+
+.custom-reject-button {
+  background-color: #9b6a67;
+  border: none;
+  color: white;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 5px;
+  width: 150px;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.custom-reject-button:hover {
+  background-color: #4e1e1e;
+  transform: scale(1.05);
+}
+
+/* ============================
+ Estilos de los Botones en la Tabla de Ventas
+============================= */
+.sales-button-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sales-button-edit,
+.sales-button-delete {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s, transform 0.3s ease;
+  color: #ffffff;
+  text-align: center;
+}
+
+.sales-button-edit {
+  background-color: #668a67;
+}
+
+.sales-button-edit:hover {
+  background-color: #2b5c2b;
+}
+
+.sales-button-delete {
+  background-color: #9b6a67;
+}
+
+.sales-button-delete:hover {
+  background-color: #4e1e1e;
+}
+  .sales-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
@@ -199,4 +537,3 @@
   .sales-table {
     margin-top: 20px;
   }
-  

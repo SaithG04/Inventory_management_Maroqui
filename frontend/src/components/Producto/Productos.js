@@ -5,7 +5,8 @@ import { Checkbox } from 'primereact/checkbox';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
-import { Toast } from 'primereact/toast'; // Importar Toast
+import { Toast } from 'primereact/toast';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
 import './Productos.css';
 import 'primereact/resources/themes/saga-blue/theme.css'; // Tema de PrimeReact
@@ -13,29 +14,31 @@ import 'primereact/resources/primereact.min.css'; // Componentes de PrimeReact
 import 'primeicons/primeicons.css'; // Iconos de PrimeReact
 
 // Componente principal de Productos
-const Productos = () => {
+const Productos = ({ userRole }) => {
+    const isVendedor = userRole === 'Vendedor';
     const [searchCriteria, setSearchCriteria] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isAvailable, setIsAvailable] = useState(false);
     const [showAddProductForm, setShowAddProductForm] = useState(false);
+    const [showAddCategoryForm, setShowAddCategoryForm] = useState(false);
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [newProduct, setNewProduct] = useState(initialProductState());
     const [isEditing, setIsEditing] = useState(false);
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(15);
+    const [categoryOptions, setCategoryOptions] = useState([
+        { name: 'Papelería', code: 'papeleria' },
+        { name: 'Oficina', code: 'oficina' }
+    ]);
+    const [newCategory, setNewCategory] = useState('');
     const searchInputRef = useRef(null);
-    const toast = useRef(null); // Referencia para el Toast
+    const toast = useRef(null);
 
-    // Opciones de búsqueda y categorías
     const searchOptions = [
         { name: 'Nombre', code: 'name' },
         { name: 'Categoría', code: 'category' },
         { name: 'Descripcion', code: 'description' }
-    ];
-    const categoryOptions = [
-        { name: 'Papelería', code: 'papeleria' },
-        { name: 'Oficina', code: 'oficina' }
     ];
 
     // Función para alternar el estado de isAvailable cada vez que se hace clic en un checkbox
@@ -49,7 +52,6 @@ const Productos = () => {
         setFilteredProducts(initialProductData());
     }, []);
 
-    // Estado inicial para el producto
     function initialProductState() {
         return {
             name: '',
@@ -61,7 +63,6 @@ const Productos = () => {
         };
     }
 
-    // Datos iniciales de ejemplo para productos
     function initialProductData() {
         return [
             { id: 1, name: 'Cuaderno', category: 'Papelería', unit: 'Unidad', status: 'Activo', description: 'Cuaderno A4', stock: 100 },
@@ -71,7 +72,6 @@ const Productos = () => {
         ];
     }
 
-    // Función de búsqueda actualizada
     const handleSearch = () => {
         let results = products;
         if (searchCriteria && searchTerm) {
@@ -85,48 +85,71 @@ const Productos = () => {
         setFilteredProducts(results);
     };
 
-    // Función para limpiar los filtros de búsqueda
     const handleClearSearch = () => {
-        setSearchTerm('');  // Limpia el término de búsqueda
-        setIsAvailable(null);  // Restablece la disponibilidad
-        setSearchCriteria(null); // Restablece el dropdown a su valor inicial
-        setFilteredProducts(products);  // Muestra todos los productos
+        setSearchTerm('');
+        setIsAvailable(null);
+        setSearchCriteria(null);
+        setFilteredProducts(products);
 
-        // Establecer el foco al campo de búsqueda cuando el usuario lo necesite explícitamente
         if (searchInputRef.current) {
             searchInputRef.current.focus();
         }
     };
 
-
-    // Función para alternar el formulario de creación/edición de producto
     const handleToggleForm = () => {
         if (showAddProductForm && isFormNotEmpty()) {
-            if (window.confirm('Hay datos en el formulario. ¿Estás seguro de que deseas cancelar?')) {
-                clearForm();
-                setShowAddProductForm(false);
-            }
+            confirmDialog({
+                message: 'Hay datos ingresados en el formulario. ¿Seguro que deseas cancelar?',
+                header: 'Confirmación de Cancelación',
+                icon: 'pi pi-exclamation-triangle',
+                acceptLabel: 'Aceptar',
+                rejectLabel: 'Cancelar',
+                acceptClassName: 'custom-accept-button',
+                rejectClassName: 'custom-reject-button',
+                accept: () => {
+                    clearForm();
+                    setShowAddProductForm(false);
+                },
+                reject: () => {}
+            });
         } else {
             setShowAddProductForm(prev => !prev);
         }
     };
 
-    // Manejo de cambios en los campos de entrada del formulario
+    const handleToggleCategoryForm = () => {
+        if (showAddCategoryForm && newCategory.trim() !== '') {
+            confirmDialog({
+                message: 'Hay datos ingresados en el formulario. ¿Seguro que deseas cancelar?',
+                header: 'Confirmación de Cancelación',
+                icon: 'pi pi-exclamation-triangle',
+                acceptLabel: 'Aceptar',
+                rejectLabel: 'Cancelar',
+                acceptClassName: 'custom-accept-button',
+                rejectClassName: 'custom-reject-button',
+                accept: () => {
+                    setNewCategory('');
+                    setShowAddCategoryForm(false);
+                },
+                reject: () => {}
+            });
+        } else {
+            setShowAddCategoryForm(prev => !prev);
+        }
+    };
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setNewProduct(prev => ({
             ...prev,
             [name]: name === "stock" ? parseInt(value) : value,
-            status: name === "stock" && parseInt(value) === 0 ? "Sin stock" : prev.status // Auto-ajusta estado si stock es 0
+            status: name === "stock" && parseInt(value) === 0 ? "Sin stock" : prev.status
         }));
     };
 
     const handleCategoryChange = (e) => setNewProduct(prev => ({ ...prev, category: e.value.name }));
-    const handleStatusChange = (e) => {
-        setNewProduct(prev => ({ ...prev, status: e.value }));
-    };
+    const handleStatusChange = (e) => setNewProduct(prev => ({ ...prev, status: e.value }));
 
-    // Función para agregar o editar un producto
     const handleAddOrEditProduct = () => {
         if (!isValidProduct()) return;
 
@@ -151,55 +174,95 @@ const Productos = () => {
         }, 1000);
     };
 
-    // Función para limpiar el formulario
+    const handleAddCategory = () => {
+        if (!newCategory.trim()) {
+            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Por favor, ingrese un nombre de categoría.', life: 3000 });
+            return;
+        }
+
+        // Verificar si la categoría ya existe
+        if (categoryOptions.some(category => category.name.toLowerCase() === newCategory.toLowerCase())) {
+            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La categoría ya existe.', life: 3000 });
+            return;
+        }
+
+        const newCategoryEntry = { name: newCategory, code: newCategory.toLowerCase() };
+        setCategoryOptions(prev => [...prev, newCategoryEntry]);
+        toast.current.show({ severity: 'success', summary: 'Categoría Agregada', detail: 'Categoría agregada con éxito.', life: 3000 });
+        setNewCategory('');
+        setShowAddCategoryForm(false);
+    };
+
     const clearForm = () => {
         setNewProduct(initialProductState());
         setIsEditing(false);
     };
 
-    // Validación del formulario
     const isValidProduct = () => {
-        const { name, category, unit, status, description, stock } = newProduct;
-        if (!name || !category || !unit || !status || !description || stock === '') {
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor, complete todos los campos.', life: 3000 });
+        const { name, category, unit, status, stock } = newProduct;
+        if (!name || !category || !unit || !status || stock === '') {
+            toast.current.show({
+                severity: 'warn',
+                summary: 'Advertencia',
+                detail: 'Por favor, complete todos los campos obligatorios.',
+                life: 3000
+            });
             return false;
         }
         return true;
     };
 
-    // Función para editar un producto
     const handleEdit = (product) => {
-        setNewProduct(product);
-        setIsEditing(true);
-        setShowAddProductForm(true);
+        confirmDialog({
+            message: '¿Estás seguro de que deseas actualizar este producto?',
+            header: 'Confirmación de Actualización',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Aceptar',
+            rejectLabel: 'Cancelar',
+            acceptClassName: 'custom-accept-button', // Clase personalizada
+            rejectClassName: 'custom-reject-button', // Clase personalizada
+            accept: () => {
+                setNewProduct(product);
+                setIsEditing(true);
+                setShowAddProductForm(true);
+            },
+            reject: () => {}
+        });
     };
 
-    // Función para eliminar un producto
     const handleDelete = (id) => {
-        if (window.confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-            const updatedProducts = products.filter((product) => product.id !== id);
-            setProducts(updatedProducts);
-            setFilteredProducts(updatedProducts);
-            toast.current.show({ severity: 'success', summary: 'Producto Eliminado', detail: 'Producto eliminado con éxito.', life: 3000 });
-        }
+        confirmDialog({
+            message: '¿Estás seguro de que deseas eliminar este producto?',
+            header: 'Confirmación de Eliminación',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Eliminar',
+            rejectLabel: 'Cancelar',
+            acceptClassName: 'custom-accept-button', // Aplicar estilo de botón aceptado
+            rejectClassName: 'custom-reject-button', // Aplicar estilo de botón rechazado
+            accept: () => {
+                const updatedProducts = products.filter((product) => product.id !== id);
+                setProducts(updatedProducts);
+                setFilteredProducts(updatedProducts);
+                toast.current.show({ severity: 'success', summary: 'Producto Eliminado', detail: 'Producto eliminado con éxito.', life: 3000 });
+            },
+            reject: () => {}
+        });
     };
 
-    // Comprobación de formulario no vacío
     const isFormNotEmpty = () => {
         const { name, category, unit, status, description, stock } = newProduct;
         return name || category || unit || status || description || stock;
     };
 
-    // Función para el cambio de página y filas
     const onPageChange = (event) => {
         setFirst(event.first);
         setRows(event.rows);
     };
 
-    // Renderizado del componente
     return (
         <div className="productos-container">
-            <Toast ref={toast} /> {/* Agregar Toast aquí */}
+            <ConfirmDialog />
+            <Toast ref={toast} />
 
             <h2>Productos</h2>
 
@@ -215,15 +278,45 @@ const Productos = () => {
                 handleClearSearch={handleClearSearch}
             />
 
-            {/* Botón para Mostrar/Ocultar Formulario de Crear Producto */}
             <div className="product-toggle-form">
                 <Button
                     label={showAddProductForm ? 'Cancelar' : 'Crear Producto'}
                     icon={showAddProductForm ? 'pi pi-times' : 'pi pi-plus'}
                     onClick={handleToggleForm}
                     className={showAddProductForm ? 'p-button-danger' : 'p-button-success'}
+                    disabled={isVendedor} // Desactiva el botón para Vendedor
+                />
+                <Button
+                    label={showAddCategoryForm ? 'Cancelar' : 'Crear Categoría'}
+                    icon={showAddCategoryForm ? 'pi pi-times' : 'pi pi-plus'}
+                    onClick={handleToggleCategoryForm}
+                    className={showAddCategoryForm ? 'p-button-danger' : 'p-button-success'}
+                    style={{ marginLeft: '10px' }}
+                    disabled={isVendedor} // Desactiva el botón para Vendedor
                 />
             </div>
+
+            {showAddCategoryForm && (
+                <div className="add-category-form">
+                    <h3>Agregar Categoría</h3>
+                    <div className="form-row">
+                        <input
+                            type="text"
+                            value={newCategory}
+                            onChange={(e) => setNewCategory(e.target.value)}
+                            placeholder="Nombre de la Categoría"
+                            className="input-category-name"
+                        />
+                        <Button
+                            label="Agregar Categoría"
+                            icon="pi pi-check"
+                            onClick={handleAddCategory}
+                            className="p-button-success"
+                            style={{ marginLeft: '10px' }}
+                        />
+                    </div>
+                </div>
+            )}
 
             {showAddProductForm && (
                 <AddProductForm
@@ -239,7 +332,7 @@ const Productos = () => {
 
             <DataTable
                 value={filteredProducts}
-                style={{ margin: "0 auto", width: "100%" }} // Centra la tabla en el componente
+                style={{ margin: "0 auto", width: "100%" }}
                 className="product-table productos-table"
                 paginator
                 rows={rows}
@@ -247,7 +340,7 @@ const Productos = () => {
                 first={first}
                 onPage={onPageChange}
                 removableSort
-                paginatorClassName="custom-paginator" // Añadir clase específica al paginator
+                paginatorClassName="custom-paginator"
             >
                 <Column field="name" header="Nombre" sortable headerClassName="center-header" bodyClassName="center-body" />
                 <Column field="category" header="Categoría" sortable headerClassName="center-header" bodyClassName="center-body" />
@@ -267,18 +360,16 @@ const Productos = () => {
                         </div>
                     )}
                 />
-
-
-
                 <Column field="stock" header="Stock" headerClassName="center-header" bodyClassName="center-body" />
                 <Column
                     body={(rowData) => (
-                        <>
+                        <div className="product-button-container">
                             <Button
                                 icon="pi pi-pencil"
                                 label="Editar"
                                 className="products-button-edit p-button-rounded p-button-text"
                                 onClick={() => handleEdit(rowData)}
+                                disabled={isVendedor} // Desactiva para Vendedor
                             />
                             <Button
                                 icon="pi pi-trash"
@@ -286,8 +377,9 @@ const Productos = () => {
                                 className="products-button-delete p-button-rounded p-button-text"
                                 severity="danger"
                                 onClick={() => handleDelete(rowData.id)}
+                                disabled={isVendedor} // Desactiva para Vendedor
                             />
-                        </>
+                        </div>
                     )}
                 />
             </DataTable>
@@ -352,13 +444,6 @@ const SearchSection = ({
 
 // Componente de Formulario para Agregar o Editar Producto
 const AddProductForm = ({ newProduct, categoryOptions, handleInputChange, handleCategoryChange, handleStatusChange, handleAddOrEditProduct, isEditing }) => {
-    const handleConfirmEdit = () => {
-        const isConfirmed = window.confirm("¿Estás seguro de que deseas actualizar este producto?");
-        if (isConfirmed) {
-            handleAddOrEditProduct();
-        }
-    };
-
     return (
         <div className="add-product-form">
             <h3>{isEditing ? 'Editar Producto' : 'Agregar Producto'}</h3>
@@ -408,7 +493,7 @@ const AddProductForm = ({ newProduct, categoryOptions, handleInputChange, handle
                     className="category-dropdown"
                 />
                 <Dropdown
-                    value={newProduct.status} // Asegúrate de que esté leyendo directamente el valor de `status`
+                    value={newProduct.status}
                     options={[
                         { name: 'Activo', value: 'Activo' },
                         { name: 'Descontinuado', value: 'Descontinuado' },
@@ -425,7 +510,7 @@ const AddProductForm = ({ newProduct, categoryOptions, handleInputChange, handle
                 <Button
                     label={isEditing ? 'Actualizar Producto' : 'Agregar Producto'}
                     icon="pi pi-check"
-                    onClick={isEditing ? handleConfirmEdit : handleAddOrEditProduct}
+                    onClick={handleAddOrEditProduct}
                     className={isEditing ? 'p-button-update' : 'p-button-success'}
                 />
             </div>
