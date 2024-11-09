@@ -149,10 +149,12 @@ body, html {
 .login-icon-container {
     background: linear-gradient(135deg, #eef1bf, #d8e8dc); /* Fondo del icono */
     border-right: 2px solid #3a5a7e; /* Borde derecho */
-    padding: 1.5rem; /* Espaciado interno */
     display: flex;
     align-items: center; /* Centra verticalmente el icono */
     justify-content: center; /* Centra horizontalmente el icono */
+    width: 60px; /* Ancho deseado para pantallas grandes */
+    height: 60px; /* Altura deseada para pantallas grandes */
+    box-sizing: border-box; /* Asegura que el borde y el padding no afecten el tamaño */
 }
 
 /* Estilos específicos para el ícono */
@@ -237,5 +239,68 @@ body, html {
     }
     100% {
         opacity: 0; /* Desvanece completamente */
+    }
+}
+
+@media (max-width: 768px) {
+    .login-container {
+        flex-direction: column; /* Cambia la disposición a columna */
+        max-width: 90%; /* Ajusta el ancho máximo en móviles */
+        margin: 0 auto; /* Centra el contenedor */
+        height: auto; /* Ajusta la altura automáticamente */
+        padding: 1rem; /* Agrega padding interno para evitar que se pegue a los bordes */
+    }
+
+    .login-logo-section {
+        width: 100%; /* Asegura que ocupe el ancho completo */
+        border-radius: 10px;
+        padding: 1rem; /* Reduce el padding en móviles */
+        border-right: none; /* Elimina el borde derecho */
+        border-bottom: 1px solid #f1f1f1; /* Agrega un borde inferior para separar visualmente */
+    }
+
+    .login-logo-section img {
+        max-width: 40%; /* Reduce el tamaño del logo en dispositivos móviles */
+        height: auto; /* Mantiene la proporción */
+    }
+
+    .login-form-section {
+        width: 100%; /* Asegura que el formulario ocupe el ancho completo */
+        padding: 1.5rem; /* Ajusta el padding para un mejor espaciado */
+    }
+
+    .login-title {
+        font-size: 1.8rem; /* Ajusta el tamaño del título */
+    }
+
+    .login-title-container {
+        margin-bottom: 1rem; /* Reduce el margen inferior del título */
+    }
+
+    .login-input-container {
+        padding: 0rem; /* Ajusta el padding para un diseño más compacto */
+        font-size: 1rem; /* Ajusta el tamaño de texto */
+        margin-bottom: 1rem; /* Reduce el espacio entre campos */
+    }
+
+    .login-input-field {
+        padding: 0.5rem 0.75rem; /* Ajusta el padding interno */
+        font-size: 1rem; /* Reduce el tamaño de fuente */
+    }
+
+    .login-icon-container {
+        width: 30px; /* Ajusta el ancho en móviles */
+        height: 40px; /* Ajusta la altura en móviles */
+        
+    }
+
+    .login-icon-container i.fas {
+        font-size: 1rem; /* Ajusta el tamaño del ícono en móviles */
+    }
+
+    .login-button {
+        padding: 0.75rem; /* Reduce el padding del botón en móviles */
+        font-size: 1rem; /* Ajusta el tamaño de fuente del botón */
+        border-radius: 6px; /* Reduce el radio para un diseño más compacto */
     }
 }
