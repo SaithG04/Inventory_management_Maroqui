@@ -70,8 +70,8 @@ jobs:
           else
             # Comando para el análisis de backend con Jacoco y SonarCloud
             mvn clean verify org.jacoco:jacoco-maven-plugin:prepare-agent org.sonarsource.scanner.maven:sonar-maven-plugin:5.0.0.4389:sonar \
-              -Dsonar.projectKey=ucv.app_inventory:${{ env.service_dir }} \
-              -Dsonar.host.url=https://sonarcloud.io \
-              -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
-              -Dsonar.java.binaries=target/classes \
-              -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+              "-Dsonar.projectKey=ucv.app_inventory:${{ env.service_dir }}" \
+              "-Dsonar.host.url=https://sonarcloud.io" \
+              "-Dsonar.token=${{ secrets.SONAR_TOKEN }}" \
+              "-Dsonar.java.binaries=target/classes" \
+              "-Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml"
