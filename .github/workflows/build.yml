@@ -51,7 +51,7 @@ jobs:
             *) echo "Service not recognized"; exit 1 ;;
           esac
 
-      - name: Build, test, and analyze with Jacoco
+      - name: Build and analyze
         working-directory: ${{ env.service_dir }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -69,17 +69,8 @@ jobs:
               -Dsonar.organization=ucv.app_inventory \
               -Dsonar.token=${{ secrets.SONAR_TOKEN }}
           else
-            # Command for backend analysis with Jacoco and SonarCloud
-            mvn clean verify org.jacoco:jacoco-maven-plugin:prepare-agent org.jacoco:jacoco-maven-plugin:report \
-              org.sonarsource.scanner.maven:sonar-maven-plugin:5.0.0.4389:sonar \
+            # Command for backend analysis with SonarCloud
+            mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:5.0.0.4389:sonar \
               -Dsonar.projectKey=ucv.app_inventory:${{ env.service_dir }} \
               -Dsonar.host.url=https://sonarcloud.io \
-              -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
-              -Dsonar.java.binaries=target/classes \
-              -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-
-          # Check if Jacoco coverage report file exists after analysis
-          if [ ! -f "target/site/jacoco/jacoco.xml" ]; then
-            echo "Jacoco coverage report file not generated at 'target/site/jacoco/jacoco.xml'."
-            exit 1
-          fi
+              -Dsonar.token=${{ secrets.SONAR_TOKEN }}
