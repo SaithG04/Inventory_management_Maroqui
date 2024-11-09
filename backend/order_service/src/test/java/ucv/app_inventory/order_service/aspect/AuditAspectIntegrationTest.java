@@ -45,7 +45,7 @@ public class AuditAspectIntegrationTest {
         assertThat(audits).hasSize(1);
 
         // Verificar detalles de la auditoría
-        Audit audit = audits.getFirst();
+        Audit audit = audits.get(0);
         assertThat(audit.getEntidad()).isEqualTo("Order");
         assertThat(audit.getTipoAccion()).isEqualTo("CREAR");
         assertEquals("testUser", audit.getUsuario());
