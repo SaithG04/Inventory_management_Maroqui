@@ -24,3 +24,6 @@ yarn-error.log*
 /src/setupTests.js
 /src/**/*.test.js
 /src/**/*.test.tsx
+
+# sonarcloud
+/.scannerwork
