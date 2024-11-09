@@ -1,0 +1,74 @@
+name: SonarCloud
+
+on:
+  pull_request:
+    branches:
+      - develop
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build:
+    name: Build and analyze specific service or frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'zulu'
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache Node.js packages (para React)
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Determine service or frontend directory
+        id: service_dir
+        run: |
+          # Extrae el nombre del servicio o frontend a partir de la rama
+          case "${GITHUB_HEAD_REF}" in
+            feature/moduloAutenticacion) echo "service_dir=backend/authentication_service" >> $GITHUB_ENV ;;
+            feature/moduloPedidos) echo "service_dir=backend/order_service" >> $GITHUB_ENV ;;
+            feature/moduloProductos) echo "service_dir=backend/product_service" >> $GITHUB_ENV ;;
+            feature/moduloProveedores) echo "service_dir=backend/provider_service" >> $GITHUB_ENV ;;
+            feature/frontAppDev) echo "service_dir=frontend" >> $GITHUB_ENV ;;
+            *) echo "Service not recognized"; exit 1 ;;
+          esac
+
+      - name: Build and analyze
+        working-directory: ${{ env.service_dir }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          if [ "${{ env.service_dir }}" == "frontend" ]; then
+            # Comandos específicos para analizar el frontend en React
+            npm install
+            npm run build
+            # Ejecutar el análisis de Sonar para el frontend
+            npx sonar-scanner \
+              -Dsonar.projectKey=SaithG04_frontAppDev \
+              -Dsonar.sources=src \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -Dsonar.organization=saithg04 \
+              -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+          else
+            # Comando para el análisis de backend
+            mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+              -Dsonar.projectKey=SaithG04_${{ env.service_dir }}
+          fi
