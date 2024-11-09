@@ -2,6 +2,7 @@ package ucv.app_inventory.order_service.application;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ucv.app_inventory.order_service.application.dto.ProductDTO;
 import ucv.app_inventory.order_service.application.dto.ProviderDTO;
 import ucv.app_inventory.order_service.domain.model.Order;
@@ -17,6 +18,7 @@ public class OrderCreateUseCase {
     private final ProviderAPIClient providerAPIClient;
     private final ProductAPIClient productClient;
 
+    @Transactional
     public Order crearPedido(Order order) {
         return orderMySqlRepository.save(order);
     }

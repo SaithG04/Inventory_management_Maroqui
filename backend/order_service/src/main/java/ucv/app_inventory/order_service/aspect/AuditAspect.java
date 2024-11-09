@@ -35,7 +35,7 @@ public class AuditAspect {
         return authentication.getName(); // O getPrincipal() si es necesario obtener más información
     }
 
-    @AfterReturning(value = "execution(* ucv.app_inventory.order_service.application.service.*.crear*(..))", returning = "result")
+    @AfterReturning(value = "execution(* ucv.app_inventory.order_service.application.*.crear*(..))", returning = "result")
     public void auditarCreacion(JoinPoint joinPoint, Object result) {
         String usuario = obtenerUsuarioAutenticado();
         String entidad = result.getClass().getSimpleName();
@@ -43,7 +43,7 @@ public class AuditAspect {
         auditoriaServiceImpl.registrarAuditoria(entidad, "CREAR", usuario, result.toString());
     }
 
-    @AfterReturning(value = "execution(* ucv.app_inventory.order_service.application.service.*.actualizar*(..))", returning = "result")
+    @AfterReturning(value = "execution(* ucv.app_inventory.order_service.application.*.actualizar*(..))", returning = "result")
     public void auditarActualizacion(JoinPoint joinPoint, Object result) {
 
         String usuario = obtenerUsuarioAutenticado();
@@ -53,7 +53,7 @@ public class AuditAspect {
         auditoriaServiceImpl.registrarAuditoria(entidad, "ACTUALIZAR", usuario, result.toString());
     }
 
-    @Before("execution(* ucv.app_inventory.order_service.application.service.*.eliminar*(..))")
+    @Before("execution(* ucv.app_inventory.order_service.application.*.eliminar*(..))")
     public void auditarEliminacion(JoinPoint joinPoint) {
         String entidad = joinPoint.getSignature().getDeclaringTypeName();
         String usuario = obtenerUsuarioAutenticado();
