@@ -49,24 +49,6 @@ jobs:
             *) echo "Service not recognized"; exit 1 ;;
           esac
 
-      # Paso adicional para generar el informe de cobertura con Java 17
-      - name: Set up JDK 17 for Coverage
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: 'zulu'
-      
-      - name: Run tests and generate coverage report
-        working-directory: ${{ env.service_dir }}
-        run: |
-          mvn clean verify cobertura:cobertura
-
-      - name: Set up JDK 21 for Analysis
-        uses: actions/setup-java@v4
-        with:
-          java-version: 21
-          distribution: 'zulu'
-      
       - name: Build and analyze
         working-directory: ${{ env.service_dir }}
         env:
@@ -74,7 +56,6 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           if [ "${{ env.service_dir }}" == "frontend" ]; then
-            # Comandos específicos para analizar el frontend en React
             npm install
             npm run build
             npx sonar-scanner \
@@ -84,11 +65,8 @@ jobs:
               -Dsonar.organization=ucv.app_inventory \
               -Dsonar.token=${{ secrets.SONAR_TOKEN }}
           else
-            # Comando para el análisis de backend con cobertura de código
-            mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:5.0.0.4389:sonar \
+            mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:5.0.0.4389:sonar \
               -Dsonar.projectKey=ucv.app_inventory:${{ env.service_dir }} \
               -Dsonar.host.url=https://sonarcloud.io \
-              -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
-              -Dsonar.java.coveragePlugin=cobertura \
-              -Dsonar.coverage.jacoco.xmlReportPaths=target/site/cobertura/coverage.xml
+              -Dsonar.token=${{ secrets.SONAR_TOKEN }}
           fi
