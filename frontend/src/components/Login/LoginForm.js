@@ -43,7 +43,7 @@ const LoginForm = ({ onLogin }) => {
         dispatch({ type: 'SET_SUCCESS', value: false });
         dispatch({ type: 'SET_EMAIL_ERROR', message: '' });
         dispatch({ type: 'SET_PASSWORD_ERROR', message: '' });
-    
+
         const result = await loginAdapter(state.email, state.password);
         if (result.success) {
             dispatch({ type: 'SET_SUCCESS', value: true });
@@ -112,7 +112,7 @@ const LoginForm = ({ onLogin }) => {
                                     dispatch({ type: 'SET_FIELD', field: 'password', value: e.target.value })
                                 }
                                 error={state.passwordError}
-  autocomplete="current-password" 
+                                autocomplete="current-password"
                             />
 
                             <div className="mt-8">
