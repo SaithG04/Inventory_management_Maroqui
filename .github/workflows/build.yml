@@ -26,16 +26,16 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
-          key: "${{ runner.os }}-sonar"
-          restore-keys: "${{ runner.os }}-sonar"
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
 
       - name: Cache Node.js packages (para React)
         uses: actions/cache@v4
         with:
           path: ~/.npm
-          key: "${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}"
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            "${{ runner.os }}-npm-"
+            ${{ runner.os }}-npm-
 
       - name: Determine service or frontend directory
         id: service_dir
@@ -51,10 +51,10 @@ jobs:
           esac
 
       - name: Build, test, and analyze with Jacoco
-        working-directory: "${{ env.service_dir }}"
+        working-directory: ${{ env.service_dir }}
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           if [ "${{ env.service_dir }}" == "frontend" ]; then
             # Comandos específicos para analizar el frontend en React
@@ -62,16 +62,16 @@ jobs:
             npm run build
             # Ejecutar el análisis de Sonar para el frontend
             npx sonar-scanner \
-              -D"sonar.projectKey=ucv.app_inventory:frontAppDev" \
-              -D"sonar.sources=src" \
-              -D"sonar.host.url=https://sonarcloud.io" \
-              -D"sonar.organization=ucv.app_inventory" \
-              -D"sonar.token=${{ secrets.SONAR_TOKEN }}"
+              -Dsonar.projectKey=ucv.app_inventory:frontAppDev \
+              -Dsonar.sources=src \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -Dsonar.organization=ucv.app_inventory \
+              -Dsonar.token=${{ secrets.SONAR_TOKEN }}
           else
-            # Ejecutar pruebas con Jacoco y análisis de SonarCloud para el backend
+            # Comando para el análisis de backend con Jacoco y SonarCloud
             mvn clean verify org.jacoco:jacoco-maven-plugin:prepare-agent org.sonarsource.scanner.maven:sonar-maven-plugin:5.0.0.4389:sonar \
-              -D"sonar.projectKey=ucv.app_inventory:${{ env.service_dir }}" \
-              -D"sonar.host.url=https://sonarcloud.io" \
-              -D"sonar.token=${{ secrets.SONAR_TOKEN }}" \
-              -D"sonar.java.binaries=target/classes" \
-              -D"sonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml"
+              -Dsonar.projectKey=ucv.app_inventory:${{ env.service_dir }} \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -Dsonar.token=${{ secrets.SONAR_TOKEN} \
+              -Dsonar.java.binaries=target/classes \
+              -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
