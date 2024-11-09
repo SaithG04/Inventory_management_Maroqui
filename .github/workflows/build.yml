@@ -69,9 +69,16 @@ jobs:
               -Dsonar.token=${{ secrets.SONAR_TOKEN }}
           else
             # Comando para el análisis de backend con Jacoco y SonarCloud
-            mvn clean verify org.jacoco:jacoco-maven-plugin:prepare-agent org.sonarsource.scanner.maven:sonar-maven-plugin:5.0.0.4389:sonar \
-              "-Dsonar.projectKey=ucv.app_inventory:${{ env.service_dir }}" \
-              "-Dsonar.host.url=https://sonarcloud.io" \
-              "-Dsonar.token=${{ secrets.SONAR_TOKEN }}" \
-              "-Dsonar.java.binaries=target/classes" \
-              "-Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml"
+            mvn clean verify org.jacoco:jacoco-maven-plugin:prepare-agent org.jacoco:jacoco-maven-plugin:report \
+              org.sonarsource.scanner.maven:sonar-maven-plugin:5.0.0.4389:sonar \
+              -D"sonar.projectKey=ucv.app_inventory:${{ env.service_dir }}" \
+              -D"sonar.host.url=https://sonarcloud.io" \
+              -D"sonar.token=${{ secrets.SONAR_TOKEN }}" \
+              -D"sonar.java.binaries=target/classes" \
+              -D"sonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml"
+
+          # Verifica si el archivo de cobertura Jacoco existe después de ejecutar el análisis
+          if [ ! -f "target/site/jacoco/jacoco.xml" ]; then
+            echo "El archivo de reporte de cobertura Jacoco no se generó en 'target/site/jacoco/jacoco.xml'."
+            exit 1
+          fi
