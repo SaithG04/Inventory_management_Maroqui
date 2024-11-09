@@ -69,7 +69,7 @@ jobs:
               -D"sonar.token=${{ secrets.SONAR_TOKEN }}"
           else
             # Comando para el análisis de backend con projectKey dinámico
-            mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:5.0.0.4389:sonar \
               -D"sonar.projectKey=ucv.app_inventory:${{ env.service_dir }}" \
               -D"sonar.host.url=https://sonarcloud.io" \
               -D"sonar.token=${{ secrets.SONAR_TOKEN }}"
