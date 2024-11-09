@@ -42,16 +42,16 @@ jobs:
         run: |
           # Extrae el nombre del servicio o frontend a partir de la rama
           case "${GITHUB_HEAD_REF}" in
-            feature/moduloAutenticacion) echo "service_dir=backend/authentication_service" >> $GITHUB_ENV ;;
-            feature/moduloPedidos) echo "service_dir=backend/order_service" >> $GITHUB_ENV ;;
-            feature/moduloProductos) echo "service_dir=backend/product_service" >> $GITHUB_ENV ;;
-            feature/moduloProveedores) echo "service_dir=backend/provider_service" >> $GITHUB_ENV ;;
+            feature/moduloAutenticacion) echo "service_dir=authentication_service" >> $GITHUB_ENV ;;
+            feature/moduloPedidos) echo "service_dir=order_service" >> $GITHUB_ENV ;;
+            feature/moduloProductos) echo "service_dir=product_service" >> $GITHUB_ENV ;;
+            feature/moduloProveedores) echo "service_dir=provider_service" >> $GITHUB_ENV ;;
             feature/frontAppDev) echo "service_dir=frontend" >> $GITHUB_ENV ;;
             *) echo "Service not recognized"; exit 1 ;;
           esac
 
       - name: Build and analyze
-        working-directory: "${{ env.service_dir }}"
+        working-directory: "backend/${{ env.service_dir }}"
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
@@ -65,7 +65,7 @@ jobs:
               -D"sonar.projectKey=ucv.app_inventory:frontAppDev" \
               -D"sonar.sources=src" \
               -D"sonar.host.url=https://sonarcloud.io" \
-              -D"sonar.organization=ucv.app_inventory" \
+              -D"sonar.organization=saithg04" \
               -D"sonar.token=${{ secrets.SONAR_TOKEN }}"
           else
             # Comando para el análisis de backend con projectKey dinámico
