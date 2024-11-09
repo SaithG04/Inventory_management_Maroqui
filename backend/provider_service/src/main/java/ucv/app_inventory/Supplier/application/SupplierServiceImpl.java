@@ -50,6 +50,6 @@ public class SupplierServiceImpl implements SupplierService {
 
     @Override
     public Supplier searchSupplierById(Long supplierId) {
-        return supplierRepository.findByIdSupplier(supplierId);
+        return supplierRepository.findBySupplierId(supplierId);
     }
 }
