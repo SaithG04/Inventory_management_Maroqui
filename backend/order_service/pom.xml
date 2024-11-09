@@ -15,7 +15,7 @@
 	<description>Módulo para la gestión de orders en app_inventory</description>
 
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
 		<sonar.organization>saithg04</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>

@@ -1,0 +1,6 @@
+ucv\app_inventory\Supplier\application\SupplierService.class
+ucv\app_inventory\AppInventoryApplication.class
+ucv\app_inventory\Supplier\application\SupplierServiceImpl.class
+ucv\app_inventory\Supplier\domain\Supplier.class
+ucv\app_inventory\Supplier\domain\SupplierRepository.class
+ucv\app_inventory\Supplier\infraestructure\controller\SupplierController.class
