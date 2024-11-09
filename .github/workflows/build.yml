@@ -26,51 +26,53 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: |
-            ${{ runner.os }}-sonar
+          key: "${{ runner.os }}-sonar"
+          restore-keys: "${{ runner.os }}-sonar"
 
-      - name: Cache Node.js packages (for React)
+      - name: Cache Node.js packages (para React)
         uses: actions/cache@v4
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          key: "${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}"
           restore-keys: |
-            ${{ runner.os }}-npm-
+            "${{ runner.os }}-npm-"
 
       - name: Determine service or frontend directory
         id: service_dir
         run: |
-          # Extract the service or frontend directory name based on the branch
+          # Extrae el nombre del servicio o frontend a partir de la rama
           case "${GITHUB_HEAD_REF}" in
-            feature/moduloAutenticacion) echo "service_dir=backend/authentication_service" >> $GITHUB_ENV ;;
-            feature/moduloPedidos) echo "service_dir=backend/order_service" >> $GITHUB_ENV ;;
-            feature/moduloProductos) echo "service_dir=backend/product_service" >> $GITHUB_ENV ;;
-            feature/moduloProveedores) echo "service_dir=backend/provider_service" >> $GITHUB_ENV ;;
+            feature/moduloAutenticacion) echo "service_dir=authentication_service" >> $GITHUB_ENV ;;
+            feature/moduloPedidos) echo "service_dir=order_service" >> $GITHUB_ENV ;;
+            feature/moduloProductos) echo "service_dir=product_service" >> $GITHUB_ENV ;;
+            feature/moduloProveedores) echo "service_dir=provider_service" >> $GITHUB_ENV ;;
             feature/frontAppDev) echo "service_dir=frontend" >> $GITHUB_ENV ;;
             *) echo "Service not recognized"; exit 1 ;;
           esac
 
       - name: Build and analyze
-        working-directory: ${{ env.service_dir }}
+        working-directory: "backend/${{ env.service_dir }}"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
         run: |
           if [ "${{ env.service_dir }}" == "frontend" ]; then
-            # Specific commands for analyzing the frontend in React
+            # Comandos específicos para analizar el frontend en React
             npm install
             npm run build
-            # Run Sonar analysis for the frontend
+            # Ejecutar el análisis de Sonar para el frontend
             npx sonar-scanner \
-              -Dsonar.projectKey=ucv.app_inventory:frontAppDev \
-              -Dsonar.sources=src \
-              -Dsonar.host.url=https://sonarcloud.io \
-              -Dsonar.organization=ucv.app_inventory \
-              -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+              -D"sonar.projectKey=ucv.app_inventory:frontAppDev" \
+              -D"sonar.sources=src" \
+              -D"sonar.host.url=https://sonarcloud.io" \
+              -D"sonar.organization=saithg04" \
+              -D"sonar.token=${{ secrets.SONAR_TOKEN }}"
           else
-            # Command for backend analysis with SonarCloud
-            mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:5.0.0.4389:sonar \
-              -Dsonar.projectKey=ucv.app_inventory:${{ env.service_dir }} \
-              -Dsonar.host.url=https://sonarcloud.io \
-              -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+            # Comando para el análisis de backend con JaCoCo y SonarCloud
+            mvn clean verify org.jacoco:jacoco-maven-plugin:prepare-agent \
+              org.sonarsource.scanner.maven:sonar-maven-plugin:5.0.0.4389:sonar \
+              -D"sonar.projectKey=ucv.app_inventory:${{ env.service_dir }}" \
+              -D"sonar.host.url=https://sonarcloud.io" \
+              -D"sonar.token=${{ secrets.SONAR_TOKEN }}" \
+              -D"sonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml"
+          fi
