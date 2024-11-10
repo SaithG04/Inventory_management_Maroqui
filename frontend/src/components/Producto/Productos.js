@@ -299,7 +299,7 @@ const Productos = ({ userRole }) => {
                             label="Agregar Categoría"
                             icon="pi pi-check"
                             onClick={handleAddCategory}
-                            className="p-button-success"
+                            className="p-button-agproduct"
                             style={{ marginLeft: '10px' }}
                         />
                     </div>
@@ -500,7 +500,7 @@ const AddProductForm = ({ newProduct, categoryOptions = [], handleInputChange, h
                     label={isEditing ? 'Actualizar Producto' : 'Agregar Producto'}
                     icon="pi pi-check"
                     onClick={handleAddOrEditProduct}
-                    className={isEditing ? 'p-button-update' : 'p-button-success'}
+                    className={isEditing ? 'p-button-update' : 'p-button-agproduct'}
                 />
             </div>
         </div>

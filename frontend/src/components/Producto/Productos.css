@@ -1,4 +1,15 @@
 /* ============================
+   Variables de Colores
+============================ */
+:root {
+    --color-verde: #668a67;
+    --color-verde-oscuro: #355537;
+    --color-rojo: #9b6a67;
+    --color-rojo-oscuro: #7f3736;
+    --color-borde-focus: #007bff;
+}
+
+/* ============================
    Estilos Generales
 ============================ */
 /* src/Productos.css */
@@ -55,19 +66,19 @@
 }
 
 .search-button {
-    background-color: #668a67; /* Verde */
+    background-color: var(--color-verde);
 }
 
 .clear-button {
-    background-color: #9b6a67; /* Rojo */
+    background-color: var(--color-rojo);
 }
 
 .search-button:hover {
-    background-color: #355537; /* Verde más oscuro al pasar el mouse */
+    background-color: var(--color-verde-oscuro);
 }
 
 .clear-button:hover {
-    background-color: #7f3736; /* Rojo más oscuro al pasar el mouse */
+    background-color: var(--color-rojo-oscuro);
 }
 
 /* Grupo de checkboxes */
@@ -102,11 +113,11 @@
 }
 
 .product-toggle-form .p-button-success {
-    background-color: #668a67; /* Verde para el botón de crear */
+    background-color: var(--color-verde) !important;
 }
 
 .product-toggle-form .p-button-danger {
-    background-color: #9b6a67; /* Rojo para el botón de cancelar */
+    background-color: var(--color-rojo);
 }
 
 .product-toggle-form .p-button:hover {
@@ -157,7 +168,7 @@
 .add-product-form input:focus,
 .category-dropdown:focus,
 .status-dropdown:focus {
-    border-color: #007bff;
+    border-color: var(--color-borde-focus);
     outline: none;
 }
 
@@ -180,17 +191,77 @@
 }
 
 .add-button.add {
-    background-color: #668a67;
+    background-color: var(--color-verde);
 }
 
 .add-button.add:hover {
-    background-color: #355537;
+    background-color: var(--color-verde-oscuro);
 }
 
 .p-button-update {
-    background-color: #668a67;
+    background-color: var(--color-verde);
     color: white;
     border: none;
+}
+
+/* ============================
+   Estilos para el Formulario Crear Categoría
+============================ */
+.add-category-form {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    margin: 0 auto 20px;
+    max-width: 800px;
+    font-family: Arial, sans-serif;
+}
+
+/* Títulos del formulario */
+.add-category-form h3 {
+    font-size: 24px;
+    color: #444;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+/* Contenedor para los campos de entrada */
+.add-category-form .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* Estilos para los campos de entrada */
+.input-category-name {
+    flex: 1;
+    min-width: 200px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 15px;
+}
+
+.input-category-name:focus {
+    border-color: var(--color-borde-focus);
+    outline: none;
+}
+
+/* Contenedor para el botón de agregar categoría */
+.p-button-agproduct {
+    background-color: var(--color-verde);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.p-button-agproduct:hover {
+    background-color: var(--color-verde-oscuro);
 }
 
 /* ============================
@@ -227,21 +298,21 @@
 
 /* Botón Editar */
 .products-button-edit {
-    background-color: #668a67;
+    background-color: var(--color-verde);
 }
 
 .products-button-edit:hover {
-    background-color: #355537;
+    background-color: var(--color-verde-oscuro);
     transform: scale(1.05);
 }
 
 /* Botón Eliminar */
 .products-button-delete {
-    background-color: #9b6a67;
+    background-color: var(--color-rojo);
 }
 
 .products-button-delete:hover {
-    background-color: #7f3736;
+    background-color: var(--color-rojo-oscuro);
     transform: scale(1.05);
 }
 
@@ -259,6 +330,7 @@
     text-overflow: ellipsis;
     white-space: normal;
     display: -webkit-box;
+    line-clamp: 2;
     -webkit-line-clamp: 2; /* Limita el texto a dos líneas */
     -webkit-box-orient: vertical;
 }
@@ -337,7 +409,7 @@
 
 /* Estilo para el botón Aceptar */
 .custom-accept-button {
-    background-color: #668a67;    /* Verde similar al botón de éxito */
+    background-color: var(--color-verde);
     border: none;
     color: white;
     padding: 12px;                /* Espaciado interno */
@@ -354,7 +426,7 @@
 
 /* Estilo para el botón Cancelar */
 .custom-reject-button {
-    background-color: #9b6a67;    /* Rojo similar al botón de cancelar */
+    background-color: var(--color-rojo);
     border: none;
     color: white;
     padding: 12px;                /* Espaciado interno */
