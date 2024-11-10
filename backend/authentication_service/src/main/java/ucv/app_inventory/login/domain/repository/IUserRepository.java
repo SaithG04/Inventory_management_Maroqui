@@ -1,23 +1,26 @@
 package ucv.app_inventory.login.domain.repository;
 
 import ucv.app_inventory.login.domain.model.Usuario;
+import ucv.app_inventory.login.domain.model.Status;
 import java.util.List;
 import java.util.Optional;
 import java.time.LocalDateTime;
 
-public interface IUsuarioRepositorio {
+public interface IUserRepository {
 
     Optional<Usuario> findByEmail(String email);
 
-    List<Usuario> findByStatus(String status);
+    List<Usuario> findByStatus(Status status);
 
     List<Usuario> findByFullname(String fullname);
 
-    List<Usuario> findByRole(String role);
+    List<Usuario> findByRoles_Name(String name);
 
-    long countByStatus(String status);
+    long countByStatus(Status status);
 
-    Optional<Usuario> findByEmailAndStatus(String email, String status);
+    Optional<Usuario> findByEmailAndStatus(String email, Status status);
 
     List<Usuario> findByCreatedAtAfter(LocalDateTime date);
+
+    void invalidateRefreshTokenByEmail(String email);
 }

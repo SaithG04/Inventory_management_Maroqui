@@ -1,6 +1,6 @@
 package ucv.app_inventory.excepciones;
 
-import ucv.app_inventory.login.domain.exceptions.DetalleExcepcion;
+import ucv.app_inventory.login.adapters.controller.exception.DetalleExcepcion;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

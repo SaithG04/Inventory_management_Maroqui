@@ -1,4 +1,4 @@
-package ucv.app_inventory.login.domain.exceptions;
+package ucv.app_inventory.login.domain.exception;
 
 public class CredencialesInvalidas extends RuntimeException {
 
