@@ -1,44 +1,58 @@
 /* Header.css */
 
-
-
-/* Contenedor principal del header */
+/* Contenedor principal del header con efecto 3D */
 .header-container {
   display: flex;
   align-items: center;
-  padding: 10px 20px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15); /* Sombra sutil hacia abajo */
-  background: linear-gradient(135deg, #eef1bf, #8ab0d9); /* Fondo degradado para que se integre */
-  border-bottom: 2px solid rgba(0, 0, 0, 0.1); /* Borde inferior */
+  padding: 15px 30px; /* Espaciado aumentado para mayor aire */
+  background: linear-gradient(145deg, #e9f1c1, #90c2e7); /* Fondo degradado para agregar volumen */
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1); /* Borde inferior sutil */
+  border-radius: 12px; /* Bordes redondeados para suavizar */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2), inset 2px 2px 5px rgba(255, 255, 255, 0.3); /* Sombra externa e interna para dar volumen */
+  transition: box-shadow 0.3s ease, transform 0.3s ease; /* Transición suave para mejorar el efecto 3D */
+}
+
+.header-container:hover {
+  transform: translateY(-3px); /* Elevar ligeramente al pasar el ratón */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3), inset 2px 2px 8px rgba(255, 255, 255, 0.2); /* Sombras más profundas al pasar el ratón */
 }
 
 .header {
   width: 100%; /* Asegura que el header se expanda completamente */
 }
 
-
-
-/* Estilos para el logo con efecto de movimiento y giro */
+/* Estilos para el logo */
 .header-logo {
-  width: 70px;
+  width: 80px; /* Aumentar ligeramente el tamaño del logo */
   height: auto;
-  margin-right: 10px;
-  animation: walkAndFlip 10s infinite ease-in-out;
+  margin-right: 15px;
+  transition: transform 0.5s ease, box-shadow 0.5s ease; /* Añadir una transición suave al logo */
   transform-origin: center;
 }
 
-/* Animación de "caminar" hacia la derecha, girar, y volver a la izquierda */
+/* Efecto interactivo en el logo al pasar el ratón */
+.header-logo:hover {
+  transform: scale(1.1) rotate(5deg); /* Escalar y rotar ligeramente */
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2); /* Sombra al pasar el ratón para un efecto "flotante" */
+}
+
+/* Animación de movimiento del logo */
 @keyframes walkAndFlip {
   0%, 100% {
-      transform: translateX(0) rotateY(0deg); /* Inicio y fin en la izquierda sin rotación */
+    transform: translateX(0) rotateY(0deg);
   }
   25% {
-      transform: translateX(100px) rotateY(0deg); /* Moverse a la derecha sin rotación */
+    transform: translateX(50px);
   }
   50% {
-      transform: translateX(100px) rotateY(360deg); /* Girar en el lugar */
+    transform: translateX(50px) rotateY(180deg);
   }
   75% {
-      transform: translateX(0) rotateY(360deg); /* Moverse hacia la izquierda después del giro */
+    transform: translateX(0) rotateY(180deg);
   }
+}
+
+/* Aplicación de la animación mejorada al logo */
+.header-logo {
+  animation: walkAndFlip 12s infinite ease-in-out alternate;
 }
