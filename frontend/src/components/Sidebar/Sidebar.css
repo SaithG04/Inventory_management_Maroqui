@@ -1,83 +1,172 @@
-/* src/components/Sidebar/Sidebar.css */
+/* Estilos para el sidebar con efecto 3D */
+.sidebar {
+  width: 100px; /* Ancho inicial contraído */
+  height: 100vh; /* Altura completa de la pantalla */
+  background: #2c3e50; /* Fondo oscuro */
+  transition: width 0.3s ease; /* Transición suave al expandir/contraer */
+  overflow: hidden; /* Ocultar el contenido excedente */
+  border-top-right-radius: 20px; /* Redondear esquina superior derecha */
+  border-bottom-right-radius: 20px; /* Redondear esquina inferior derecha */
+  box-shadow: 10px 0 20px rgba(0, 0, 0, 0.5), 0 10px 15px rgba(0, 0, 0, 0.3); /* Sombras para dar efecto de proyección 3D */
+}
 
-
+.sidebar.expanded {
+  width: 250px; /* Ancho expandido */
+}
 
 /* Sección del perfil */
 .profile-section {
-  margin-bottom: 20px; /* Espacio inferior */
-  font-size: 18px; /* Tamaño de fuente para el perfil */
-  text-align: center; /* Centra el texto del perfil */
+  margin-bottom: 20px;
+  font-size: 18px;
+  text-align: center;
+  padding: 15px;
+  color: white;
+  display: none; /* Ocultar por defecto en estado contraído */
+  background: linear-gradient(145deg, #3b4e61, #243240); /* Gradiente que ayuda a dar sensación de relieve */
+  border-radius: 10px; /* Bordes suaves */
+  box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.5), inset -5px -5px 10px rgba(255, 255, 255, 0.1); /* Sombras internas para efecto de profundidad */
 }
+
+.sidebar.expanded .profile-section {
+  display: block; /* Mostrar el perfil cuando está expandido */
+}
+
 
 
 /* Estilos para la lista de menú */
 .menu-list {
-  list-style-type: none; /* Sin viñetas */
-  padding: 0; /* Sin padding */
+  list-style-type: none;
+  padding: 0;
 }
 
-/* Estilos específicos para el nombre del usuario */
-.user-name {
-  font-size: 16px; /* Tamaño de fuente ligeramente más pequeño */
-  color: #d2d081; /* Azul suave para diferenciarlo */
-  font-weight: bold;
-  margin-top: 8px; /* Espacio superior */
-  display: inline-block;
-  background-color: rgba(255, 255, 255, 0.1); /* Fondo semi-transparente */
-  padding: 5px 10px; /* Espaciado alrededor del nombre */
-  border-radius: 4px; /* Bordes redondeados para suavizar */
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3); /* Sombra para efecto de profundidad */
-}
-
-
-/* Estilos para los elementos de la lista del menú */
 .menu-list li {
-  margin: 15px 0; /* Margen entre los elementos */
-  cursor: pointer; /* Cambia el cursor al pasar sobre el elemento */
-  padding: 15px; /* Espaciado interno en los elementos */
-  border-radius: 5px; /* Bordes redondeados */
-  font-size: 18px; /* Aumentar el tamaño de la fuente */
-  font-weight: bold; /* Hacer el texto en negrita */
-  transition: background-color 0.3s, transform 0.3s; /* Transición para el fondo y transformación */
-  display: flex; /* Usar flexbox para alinear icono y texto */
-  align-items: center; /* Centra verticalmente el contenido */
+  margin: 15px 0;
+  cursor: pointer;
+  padding: 15px;
+  border-radius: 5px;
+  font-size: 18px;
+  font-weight: bold;
+  transition: background-color 0.3s, transform 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Centrar los íconos y texto cuando está colapsado */
 }
 
-/* Efecto hover en los elementos del menú, excluyendo el botón "Salir" */
-.menu-list li:not(.logout-button):hover {
-  background-color: #ced7df8d; /* Fondo gris suave al pasar el cursor */
-  transform: translateY(-2px); /* Levanta el elemento ligeramente */
+.sidebar.expanded .menu-list li {
+  justify-content: flex-start; /* Alinear el contenido a la izquierda cuando el sidebar está expandido */
+  padding-left: 20px; /* Añadir un pequeño padding izquierdo para separar el ícono del borde */
+}
+
+.menu-list li span {
+  display: none; /* Ocultar texto del menú por defecto */
+}
+
+.sidebar.expanded .menu-list li span {
+  display: inline; /* Mostrar texto cuando el sidebar está expandido */
+  margin-left: 15px; /* Espacio entre el icono y el texto */
+}
+
+.menu-list li:hover {
+  background-color: #34495e;
+  transform: translateY(-2px);
 }
 
 /* Estilos para el icono */
 .icon {
-  color: #00aeff; /* Cambia el color de los íconos a azul suave */
-  margin-right: 15px; /* Espacio entre el ícono y el texto */
-  transition: color 0.3s; /* Transición suave para el color */
+  color: #f0e68c; /* Amarillo pálido para complementar el degradado del fondo */
+  transition: color 0.3s;
+  font-size: 25px; /* Aumentar el tamaño del ícono */
 }
 
-/* Efecto hover en los elementos del menú */
 .menu-list li:hover .icon {
-  color: #ffffff; /* Cambia el color del ícono a blanco al pasar el cursor */
+  color: #ffffff; /* Blanco para resaltar el ícono al pasar el mouse */
 }
-
 
 /* Estilos específicos para el botón de salir */
 .logout-button {
-  background-color: #994d4a; /* Rojo para destacar */
+  background-color: #994d4a;
   color: white;
-  padding: 10px 15px; /* Espaciado interno */
-  border-radius: 4px; /* Bordes redondeados */
-  font-size: 16px; /* Tamaño de fuente */
+  padding: 10px 15px;
+  border-radius: 4px;
+  font-size: 16px;
   font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.3s ease, transform 0.3s ease; /* Transiciones suaves */
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-/* Efecto hover específico para el botón de salir */
+.sidebar.expanded .logout-button {
+  justify-content: flex-start; /* Alinear a la izquierda el botón de salir cuando el sidebar está expandido */
+  padding-left: 20px; /* Añadir un pequeño padding izquierdo para separar el ícono del borde */
+}
+
 .logout-button:hover {
-  background-color: #c9302c; /* Rojo más oscuro al hacer hover */
-  transform: scale(1.05); /* Ligeramente más grande al pasar el cursor */
+  background-color: #c9302c;
+  transform: scale(1.05);
+}
+
+/* Estilos para el módulo activo */
+.menu-list li.active {
+  background-color: #537c8f; /* Fondo azul para el elemento activo */
+  color: white; /* Texto en blanco para contraste */
+  transform: none; /* Sin transformación al estar activo */
+}
+
+/* Estilo para el ícono dentro del módulo activo */
+.menu-list li.active .icon {
+  color: #ffffff; /* El ícono también debe ser blanco en el módulo activo */
+}
+
+/* Estilos para la sección del perfil */
+.profile-section {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #2f3e4d; /* Fondo ligeramente más oscuro para más contraste */
+  border-radius: 10px; /* Bordes más suaves para apariencia más moderna */
+  color: white;
+  text-align: left;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15); /* Sombra más suave y profunda para resaltar */
+}
+
+/* Estilos para la información del usuario */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espacio entre el ícono y el texto */
+  margin-bottom: 10px; /* Espacio inferior para separar del nombre */
+}
+
+.user-icon {
+  font-size: 40px; /* Tamaño del ícono de usuario */
+  color: #f0e68c; /* Amarillo pálido para coincidir con el degradado del fondo */
+}
+
+/* Estilo para el rol del usuario */
+.user-info p {
+  font-size: 14px; /* Tamaño de fuente más pequeño para que no compita con el nombre */
+  margin: 0;
+}
+
+/* Contenedor del nombre del usuario */
+.user-name-container {
+  margin-top: 10px; /* Espacio superior para separar del rol */
+}
+
+/* Estilo específico para el nombre del usuario */
+.user-name {
+  display: block;
+  font-size: 18px; /* Tamaño mayor para resaltar el nombre */
+  color: #87ceeb; /* Azul claro para coincidir con el degradado del fondo */
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+/* Estilo específico para el rol del usuario */
+.user-role {
+  display: block;
+  font-size: 18px; /* Tamaño mayor para resaltar el nombre */
+  color: #87ceeb; /* Azul claro para coincidir con el degradado del fondo */
+  font-weight: bold;
+  margin-top: 4px;
 }

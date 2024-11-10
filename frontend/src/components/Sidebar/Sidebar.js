@@ -1,9 +1,11 @@
-// src/components/Sidebar/Sidebar.js
-import React from 'react';
-import { FaChartLine, FaClipboardList, FaShoppingCart, FaSignOutAlt, FaUsers } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { FaChartLine, FaClipboardList, FaShoppingCart, FaSignOutAlt, FaUsers, FaUser } from 'react-icons/fa'; // Agregamos FaUser aquí
 import './Sidebar.css';
 
 const Sidebar = ({ onButtonClick, userRole, userName }) => {
+  const [activeModule, setActiveModule] = useState('');
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const modulesByRole = {
     Administrador: ['dashboard', 'producto', 'ventas', 'empleados', 'suppliers'],
     Almacenero: ['producto'],
@@ -12,41 +14,71 @@ const Sidebar = ({ onButtonClick, userRole, userName }) => {
 
   const allowedModules = modulesByRole[userRole] || [];
 
+  const handleClick = (module) => {
+    setActiveModule(module);
+    onButtonClick(module);
+  };
+
   return (
-    <div className="sidebar">
-       <div className="profile-section">
-        <p>Usuario: <strong>{userRole}</strong></p>
-        <p>Nombre: <span className="user-name">{userName}</span></p> {/* Nombre en la misma línea */}
+    <div
+      className={`sidebar ${isExpanded ? 'expanded' : 'collapsed'}`}
+      onMouseEnter={() => setIsExpanded(true)}
+      onMouseLeave={() => setIsExpanded(false)}
+    >
+      <div className="profile-section">
+        <div className="user-info">
+          <FaUser className="user-icon" /> {/* Aquí usamos el ícono de usuario */}
+          <p>Usuario: <strong className="user-role">{userRole}</strong></p>
+          </div>
+        <div className="user-name-container">
+          <p>Nombre:</p>
+          <span className="user-name">{userName}</span>
+        </div>
       </div>
 
       <ul className="menu-list">
         {allowedModules.includes('dashboard') && (
-          <li onClick={() => onButtonClick('dashboard')}>
-            <FaChartLine className="icon" /> Dashboard
+          <li
+            className={activeModule === 'dashboard' ? 'active' : ''}
+            onClick={() => handleClick('dashboard')}
+          >
+            <FaChartLine className="icon" /> {isExpanded && <span>Dashboard</span>}
           </li>
         )}
         {allowedModules.includes('producto') && (
-          <li onClick={() => onButtonClick('producto')}>
-            <FaClipboardList className="icon" /> Productos
+          <li
+            className={activeModule === 'producto' ? 'active' : ''}
+            onClick={() => handleClick('producto')}
+          >
+            <FaClipboardList className="icon" /> {isExpanded && <span>Productos</span>}
           </li>
         )}
         {allowedModules.includes('ventas') && (
-          <li onClick={() => onButtonClick('ventas')}>
-            <FaShoppingCart className="icon" /> Ventas
+          <li
+            className={activeModule === 'ventas' ? 'active' : ''}
+            onClick={() => handleClick('ventas')}
+          >
+            <FaShoppingCart className="icon" /> {isExpanded && <span>Ventas</span>}
           </li>
         )}
         {allowedModules.includes('empleados') && (
-          <li onClick={() => onButtonClick('empleados')}>
-            <FaUsers className="icon" /> Empleados
+          <li
+            className={activeModule === 'empleados' ? 'active' : ''}
+            onClick={() => handleClick('empleados')}
+          >
+            <FaUsers className="icon" /> {isExpanded && <span>Empleados</span>}
           </li>
         )}
         {allowedModules.includes('suppliers') && (
-          <li onClick={() => onButtonClick('suppliers')}>
-            <FaUsers className="icon" /> Proveedores
+          <li
+            className={activeModule === 'suppliers' ? 'active' : ''}
+            onClick={() => handleClick('suppliers')}
+          >
+            <FaUsers className="icon" /> {isExpanded && <span>Proveedores</span>}
           </li>
         )}
-        <li onClick={() => onButtonClick('salir')} className="logout-button">
-        <FaSignOutAlt className="icon" /> Salir
+        <li onClick={() => handleClick('salir')} className="logout-button">
+          <FaSignOutAlt className="icon" /> {isExpanded && <span>Salir</span>}
         </li>
       </ul>
     </div>
