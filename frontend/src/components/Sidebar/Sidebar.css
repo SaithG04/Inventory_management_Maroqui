@@ -1,7 +1,7 @@
 /* Estilos para el sidebar con efecto 3D */
 .sidebar {
   width: 100px; /* Ancho inicial contraído */
-  height: 100vh; /* Altura completa de la pantalla */
+  height: auto; /* Altura completa de la pantalla */
   background: #2c3e50; /* Fondo oscuro */
   transition: width 0.3s ease; /* Transición suave al expandir/contraer */
   overflow: hidden; /* Ocultar el contenido excedente */

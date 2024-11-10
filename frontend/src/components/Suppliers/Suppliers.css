@@ -4,7 +4,7 @@
 /* src/Suppliers.css */
 
 .suppliers-container {
-  max-width: 1150px;
+  max-width: auto;
   margin: 0 auto;
   padding: 20px;
   background-color: #f9f9f9;
@@ -18,31 +18,35 @@
  Estilos de la Sección de Búsqueda
 ============================ */
 .suppliers-search-section {
-  display: flex; 
-  align-items: center; 
-  gap: 15px; 
-  padding: 10px 20px; 
-  background-color: #f0f4f8; 
-  border-radius: 6px; 
-  margin-bottom: 20px; 
+  display: flex; /* Alinea los elementos en fila */
+  align-items: center; /* Centra verticalmente los elementos */
+  gap: 10px; /* Espacio entre los elementos */
+  padding: 10px 20px; /* Espaciado interno */
+  background-color: #f0f4f8; /* Color de fondo */
+  border-radius: 6px; /* Bordes redondeados */
+  margin-bottom: 20px; /* Espaciado inferior */
+  width: 100%; /* Ocupa todo el ancho disponible */
+  box-sizing: border-box; /* Incluye el padding en el ancho total */
 }
 
 .suppliers-search-input {
-  width: 500px;
+  flex: 1; /* Deja que el input ocupe todo el espacio disponible */
+  display: flex;
+  align-items: center; /* Asegúrate de que el input se alinee bien */
 }
 
 .suppliers-search-input .p-inputtext {
-  width: 100%;
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+  width: 100%; /* Asegura que el input ocupe todo el ancho del contenedor */
+  padding: 10px;
+  border-radius: 4px; /* Bordes redondeados */
   font-size: 14px;
-  background-color: #ffffff;
+  box-sizing: border-box; /* Incluye el padding en el ancho */
 }
 
 .suppliers-search-buttons {
-  display: flex; 
-  gap: 20px;
+  display: flex; /* Alinea botones en fila */
+  gap: 10px; /* Añade espacio entre los botones */
+  margin-right: 10px; /* Añade espacio a la derecha para los checkboxes */
 }
 
 .suppliers-search-buttons .p-button {
@@ -71,9 +75,11 @@
 }
 
 .suppliers-checkbox-group {
-  display: flex; 
-  gap: 15px; 
-  margin-left: 10px;
+  display: flex;          /* Coloca todos los elementos en una sola fila */
+  flex-wrap: wrap;        /* Permite el ajuste en caso de ser necesario */
+  gap: 15px;              /* Espacio entre cada uno de los elementos */
+  align-items: center;    /* Alinea verticalmente los elementos */
+  margin-left: 20px;      /* Añade un margen izquierdo para separarlos de los botones */
 }
 
 .suppliers-checkbox-item {

@@ -1,319 +1,15 @@
 /* ============================
-   Estilos Generales
-============================ */
-/* src/Suppliers.css */
-
-.suppliers-container {
-  max-width: 1150px;
+ Contenedor Principal de Ventas
+============================= */
+.sales-container {
+  max-width: auto;
   margin: 0 auto;
   padding: 20px;
   background-color: #f9f9f9;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  overflow-y: auto; 
-  max-height: 80vh; 
 }
 
-/* ============================
- Estilos de la Sección de Búsqueda
-============================ */
-.suppliers-search-section {
-  display: flex; 
-  align-items: center; 
-  gap: 15px; 
-  padding: 10px 20px; 
-  background-color: #f0f4f8; 
-  border-radius: 6px; 
-  margin-bottom: 20px; 
-}
-
-.suppliers-search-input {
-  width: 500px;
-}
-
-.suppliers-search-input .p-inputtext {
-  width: 100%;
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  background-color: #ffffff;
-}
-
-.suppliers-search-buttons {
-  display: flex; 
-  gap: 20px;
-}
-
-.suppliers-search-buttons .p-button {
-  padding: 10px 25px; 
-  border-radius: 6px; 
-  font-size: 14px; 
-  cursor: pointer; 
-  width: 150px; 
-  margin-left: 10px; 
-}
-
-.suppliers-search-buttons .p-button-primary {
-  background-color: #668a67 !important; 
-  border: none; 
-  color: #fff; 
-}
-
-.suppliers-search-buttons .p-button-secondary {
-  background-color: #9b6a67; 
-  border: none;
-  color: #fff; 
-}
-
-.suppliers-search-buttons .p-button:hover {
-  opacity: 0.9; 
-}
-
-.suppliers-checkbox-group {
-  display: flex; 
-  gap: 15px; 
-  margin-left: 10px;
-}
-
-.suppliers-checkbox-item {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.suppliers-checkbox-item label {
-  font-size: 14px;
-  margin: 0;
-}
-
-/* ================================================================
- Estilos para el Botón Mostrar/Ocultar Formulario
-=================================================================== */
-.suppliers-toggle-form {
-  text-align: left;
-  margin: 20px 0; 
-}
-
-.suppliers-toggle-form .p-button {
-  padding: 12px 20px;
-  font-size: 16px;
-  border-radius: 5px;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  width: 250px;
-  color: #fff;
-}
-
-.suppliers-toggle-form .p-button-success {
-  background-color: #668a67;
-  border: none;
-  color: #fff;
-}
-
-.suppliers-toggle-form .p-button-danger {
-  background-color: #9b6a67;
-  border: none;
-  color: #fff;
-}
-
-.suppliers-toggle-form .p-button:hover {
-  opacity: 0.9;
-}
-
-/* ============================================
- Estilos para el Formulario Crear/Editar Proveedor
-=============================================== */
-.suppliers-form {
-  background-color: #fff;
-  padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  margin: 0 auto 20px;
-  max-width: 800px;
-  font-family: Arial, sans-serif;
-}
-
-.suppliers-form-title {
-  font-size: 24px;
-  color: #444;
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.suppliers-form-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  margin-bottom: 20px;
-  align-items: center;
-}
-
-.suppliers-input {
-  flex: 1;
-  min-width: 200px;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 15px;
-  background-color: #f9f9f9;
-}
-
-.suppliers-input:focus {
-  border-color: #007bff;
-  outline: none;
-}
-
-.suppliers-button-submit {
-  width: 100%;
-  padding: 15px;
-  font-size: 16px;
-  background-color: #668a67;
-  border: none;
-  color: #fff;
-  text-align: center;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  max-width: 300px;
-}
-
-.suppliers-button-submit:hover {
-  background-color: #557857;
-}
-
-/* ============================
- Estilo de la Tabla de Proveedores
-============================ */
-.suppliers-table-container {
-  margin-top: 2rem;
-}
-
-.suppliers-datatable .p-datatable-tbody > tr > td {
-  text-align: center;
-}
-
-/* =============================
- Estilos de los Botones en la Tabla
-============================= */
-.suppliers-button-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.suppliers-button-edit,
-.suppliers-button-delete,
-.suppliers-button-toggle {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.3s, transform 0.3s ease;
-  color: #ffffff;
-  text-align: center;
-}
-
-.suppliers-button-edit {
-  background-color: #668a67;
-}
-
-.suppliers-button-edit:hover {
-  background-color: #2b5c2b;
-}
-
-.suppliers-button-delete {
-  background-color: #9b6a67;
-}
-
-.suppliers-button-delete:hover {
-  background-color: #4e1e1e;
-}
-
-.suppliers-button-toggle {
-  background-color: #e7c775;
-  color: #fff;
-}
-
-.suppliers-button-toggle:hover {
-  background-color: #e6a700;
-}
-
-/* ============================
- Estilo Personalizado de Dialog Confirmación
-============================ */
-/* Estilos personalizados para los diálogos de confirmación */
-.p-confirm-dialog .p-dialog {
-  max-width: 500px;
-  width: 100%;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.p-confirm-dialog .p-dialog-header {
-  font-size: 22px;
-  font-weight: bold;
-  color: #444;
-  text-align: center;
-}
-
-.p-confirm-dialog .p-dialog-content {
-  font-size: 16px;
-  color: #555;
-  text-align: center;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* Icono de advertencia */
-.p-confirm-dialog .p-dialog-content .pi-exclamation-triangle {
-  color: #ffa726;
-  font-size: 24px;
-}
-
-/* Botones personalizados para Confirmación */
-.p-confirm-dialog .p-dialog-footer {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  padding: 20px;
-}
-
-.custom-accept-button {
-  background-color: #668a67;
-  border: none;
-  color: #fff;
-  padding: 12px 20px;
-  font-size: 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 100px;
-  transition: background-color 0.3s, transform 0.3s ease;
-}
-
-.custom-accept-button:hover {
-  background-color: #2b5c2b;
-  transform: scale(1.05);
-}
-
-.custom-reject-button {
-  background-color: #9b6a67;
-  border: none;
-  color: #fff;
-  padding: 12px 20px;
-  font-size: 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 100px;
-  transition: background-color 0.3s, transform 0.3s ease;
-}
-
-.custom-reject-button:hover {
-  background-color: #4e1e1e;
-  transform: scale(1.05);
-}
 
 /* ============================
  Estilos de los Botones en la Tabla de Ventas
@@ -321,11 +17,15 @@
 .sales-button-container {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
 }
 
 .sales-button-edit,
-.sales-button-delete {
+.sales-button-delete,
+.sales-btn-primary,
+.sales-btn-success,
+.sales-btn-delete {
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 4px;
@@ -336,220 +36,151 @@
   text-align: center;
 }
 
-.sales-button-edit {
+.sales-button-edit,
+.sales-btn-primary {
   background-color: #668a67;
 }
 
-.sales-button-edit:hover {
-  background-color: #2b5c2b;
+.sales-button-edit:hover,
+.sales-btn-primary:hover {
+  background-color: #355537;
 }
 
-.sales-button-delete {
+.sales-button-delete,
+.sales-btn-delete {
   background-color: #9b6a67;
 }
 
-.sales-button-delete:hover {
-  background-color: #4e1e1e;
+.sales-button-delete:hover,
+.sales-btn-delete:hover {
+  background-color: #7f3736;
 }
-  .sales-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .sales-header {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .sales-header h2 {
-    font-size: 32px;
-    color: #444;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .client-form,
-  .sales-form {
-    background-color: #fff;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-  }
-  
-  .client-form h3,
-  .sales-form h3 {
-    font-size: 24px;
-    color: #444;
-    margin-bottom: 20px;
-  }
-  
-  .form-group {
-    margin-bottom: 20px;
-  }
-  
-  .form-group label {
-    display: block;
-    font-size: 16px;
-    color: #333;
-    margin-bottom: 8px;
-  }
-  
-  .client-input,
-  .search-input,
-  .quantity-input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 15px;
-    transition: border-color 0.3s ease-in-out;
-  }
-  
-  .client-input:focus,
-  .search-input:focus,
-  .quantity-input:focus {
-    border-color: #007bff;
-    outline: none;
-  }
-  
-  .product-list {
-    list-style: none;
-    padding: 0;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    max-height: 150px;
-    overflow-y: auto;
-  }
-  
-  .product-item {
-    padding: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s ease-in-out;
-  }
-  
-  .product-item:hover {
-    background-color: #f2f2f2;
-  }
-  
-  .btn-primary {
-    background-color: #668a67 !important;
-    border: none;
-    color: #fff;
-    font-size: 16px;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .btn-primary:hover {
-    background-color: #355537 !important;
-  }
-  
-  .btn-success {
-    background-color: #4CAF50 !important;
-    border: none;
-    color: #fff;
-    font-size: 16px;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 10px;
-  }
-  
-  .btn-success:hover {
-    background-color: #388E3C !important;
-  }
-  
-  .btn-delete {
-    background-color: #9b6a67 !important;
-    border: none;
-    color: #fff;
-    font-size: 16px;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .btn-delete:hover {
-    background-color: #7f3736 !important;
-  }
-  
-  .sales-table .p-datatable-tbody > tr > td {
-    padding: 10px;
-    text-align: center;
-  }
-  
-  .sales-button-container {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-  }
-  
-  .sales-table .p-datatable-header {
-    font-size: 18px;
-    font-weight: bold;
-    text-align: center;
-  }
-  
-  .sales-table .p-datatable-tbody > tr > td {
-    padding: 10px;
-    text-align: center;
-    vertical-align: middle;
-  }
-  
-  .sales-table .p-datatable-tbody > tr > td .p-button {
-    margin-right: 5px;
-  }
-  
-  .sales-table .p-paginator {
-    justify-content: center;
-  }
-  
-  .product-list {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    max-height: 150px;
-    overflow-y: auto;
-  }
-  
-  .product-item {
-    padding: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .product-item:hover {
-    background-color: #f0f0f0;
-  }
-  
-  .p-button {
-    margin: 0;
-    font-size: 14px;
-  }
-  
-  .btn-register {
-    margin-top: 20px;
-    width: 100%;
-  }
-  
-  .client-input {
-    width: calc(100% - 20px);
-  }
-  
-  .sales-table {
-    margin-top: 20px;
-  }
+
+.sales-btn-success {
+  background-color: #4CAF50 !important;
+  margin-top: 10px;
+}
+
+.sales-btn-success:hover {
+  background-color: #388E3C !important;
+}
 
 
-  
+/* ============================
+ Encabezado de Ventas
+============================= */
+.sales-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.sales-header h2 {
+  font-size: 32px;
+  color: #444;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================
+ Formularios de Clientes y Ventas
+============================= */
+.sales-client-form,
+.sales-sales-form {
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.sales-client-form h3,
+.sales-sales-form h3 {
+  font-size: 24px;
+  color: #444;
+  margin-bottom: 20px;
+}
+
+.sales-form-group {
+  margin-bottom: 20px;
+}
+
+.sales-form-group label {
+  display: block;
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+/* ============================
+ Entradas de Formularios
+============================= */
+.sales-client-input,
+.sales-search-input,
+.sales-quantity-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 15px;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.sales-client-input:focus,
+.sales-search-input:focus,
+.sales-quantity-input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* ============================
+ Listas de Productos
+============================= */
+.sales-product-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.sales-product-item {
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.sales-product-item:hover {
+  background-color: #f2f2f2;
+}
+
+/* ============================
+ Tablas de Ventas
+============================= */
+.sales-sales-table {
+  margin-top: 20px;
+}
+
+.sales-sales-table .p-datatable-tbody > tr > td {
+  padding: 10px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.sales-sales-table .p-datatable-header {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.sales-sales-table .p-paginator {
+  justify-content: center;
+}
+
+/* ============================
+ Botones Primereact
+============================= */
+.sales-p-button {
+  margin: 0;
+  font-size: 14px;
+}

@@ -4,9 +4,9 @@
 /* src/Productos.css */
 
 .productos-container {
-    max-width: 1150px;
+    max-width: auto;
     margin: 0 auto;
-    padding: 20px;
+    padding: 15px;
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -19,21 +19,26 @@
 ============================ */
 /* General de la sección de búsqueda */
 .search-section {
-    display: flex;
-    align-items: center;
-    gap: 15px; /* Espacio entre los elementos */
-    padding: 10px 20px;
-    background-color: #f0f4f8;
-    border-radius: 6px;
+    display: flex; /* Alinea elementos en fila */
+    align-items: center; /* Centra verticalmente los elementos */
+    gap: 10px; /* Espacio entre los elementos */
+    padding: 10px 20px; /* Espaciado interno */
+    background-color: #f0f4f8; /* Color de fondo */
+    border-radius: 6px; /* Bordes redondeados */
     margin-bottom: 20px; /* Espaciado inferior */
+    flex-wrap: wrap; /* Permite que los elementos se ajusten si hay poco espacio */
 }
 
 /* Estilo de Input */
 .search-input {
+    width: 400px;
     padding: 8px;
     border-radius: 4px;
     border: 1px solid #ccc;
     font-size: 14px;
+    flex: 1; /* Ocupa todo el espacio disponible */
+    min-width: 200px; /* Ancho mínimo para evitar que se haga demasiado pequeño */
+    margin-right: 10px; /* Espacio a la derecha para separar del botón de búsqueda */
 }
 
 /* Botones de búsqueda y limpieza */

@@ -257,40 +257,40 @@ const Sales = () => {
             <h2>Gestión de Ventas</h2>
 
             {/* Formulario para los datos del cliente */}
-            <div className="client-form">
+            <div className="sales-client-form">
                 <h3>Datos del Cliente</h3>
-                <div className="form-group">
+                <div className="sales-form-group">
                     <label>Nombre del Cliente / Colegio / Empresa</label>
                     <input
                         type="text"
                         placeholder="Nombre del cliente..."
                         value={clientName}
                         onChange={(e) => setClientName(e.target.value)}
-                        className="client-input"
+                        className="sales-client-input"
                     />
                 </div>
             </div>
 
             {/* Formulario para realizar la venta */}
-            <div className="sales-form">
+            <div className=".sales-sales-form">
                 <h3>Registrar Nueva Venta</h3>
 
-                <div className="form-group">
+                <div className="sales-form-group">
                     <label>Buscar Producto</label>
                     <input
                         type="text"
                         placeholder="Buscar por nombre o código..."
                         value={searchTerm}
                         onChange={handleSearchChange}
-                        className="search-input"
+                        className="sales-search-input"
                     />
                     {searchTerm.trim() !== '' && filteredProducts.length > 0 && (
-                        <ul className="product-list">
+                        <ul className="sales-product-list">
                             {filteredProducts.map(product => (
                                 <li
                                     key={product.id}
                                     onClick={() => handleProductSelect(product)}
-                                    className="product-item"
+                                    className="sales-product-item"
                                 >
                                     {product.name} - S/{product.price} (Stock: {product.stock})
                                 </li>
@@ -299,14 +299,14 @@ const Sales = () => {
                     )}
                 </div>
 
-                <div className="form-group">
+                <div className="sales-form-group">
                     <label>Cantidad</label>
                     <input
                         type="number"
                         placeholder="Cantidad"
                         value={quantity}
                         onChange={handleQuantityChange}
-                        className="quantity-input"
+                        className="sales-quantity-input"
                     />
                 </div>
 
@@ -314,22 +314,22 @@ const Sales = () => {
                     label={isEditing ? "Guardar Cambios" : "Agregar Producto"}
                     icon="pi pi-check"
                     onClick={isEditing ? handleSaveEdit : handleAddSale}
-                    className="btn-primary"
+                    className="sales-btn-primary"
                 />
                 <Button
                     label="Cancelar Venta"
                     icon="pi pi-times"
                     onClick={handleCancelSale}
-                    className="btn-delete"
+                    className="sales-btn-delete"
                     style={{ marginLeft: '10px' }}
                     disabled={isCancelDisabled}
                 />
             </div>
 
-            <Button label="Registrar Venta" icon="pi pi-save" onClick={handleRegisterSale} className="btn-success" disabled={sales.length === 0} />
+            <Button label="Registrar Venta" icon="pi pi-save" onClick={handleRegisterSale} className="sales-btn-success" disabled={sales.length === 0} />
 
             {/* Lista de ventas realizadas */}
-            <DataTable value={sales} paginator rows={5} className="sales-table" responsiveLayout="scroll">
+            <DataTable value={sales} paginator rows={5} className="sales-sales-table" responsiveLayout="scroll">
                 <Column field="product" header="Producto" headerStyle={{ textAlign: 'center' }} bodyStyle={{ textAlign: 'center' }} />
                 <Column field="quantity" header="Cantidad" headerStyle={{ textAlign: 'center' }} bodyStyle={{ textAlign: 'center' }} />
                 <Column field="price" header="Precio Unitario (S/)" headerStyle={{ textAlign: 'center' }} bodyStyle={{ textAlign: 'center' }} />
@@ -340,13 +340,13 @@ const Sales = () => {
                             <Button
                                 icon="pi pi-pencil"
                                 label="Editar"
-                                className="btn-primary"
+                                className="sales-button-edit"
                                 onClick={() => handleEditSale(rowData)}
                             />
                             <Button
                                 icon="pi pi-trash"
                                 label="Eliminar"
-                                className="btn-delete"
+                                className="sales-btn-delete"
                                 onClick={() => handleDeleteSale(rowData.id)}
                             />
                         </div>

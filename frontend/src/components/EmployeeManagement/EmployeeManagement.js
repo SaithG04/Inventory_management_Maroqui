@@ -344,6 +344,7 @@ const EmployeeManagement = () => {
             placeholder="Buscar por nombre"
             value={searchTerm}
             onChange={handleSearchInputChange}
+            className="p-inputtext"
           />
         </div>
         <div className="employee-search-buttons">
