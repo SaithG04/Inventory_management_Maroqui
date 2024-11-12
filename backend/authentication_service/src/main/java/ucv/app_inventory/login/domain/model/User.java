@@ -18,15 +18,12 @@ import org.hibernate.annotations.UpdateTimestamp;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-public class Usuario implements UserDetails {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_user")
     private Long idUser;
-
-    @Column(nullable = false)
-    private String fullname;
 
     @Column(nullable = false, unique = true)
     private String email;

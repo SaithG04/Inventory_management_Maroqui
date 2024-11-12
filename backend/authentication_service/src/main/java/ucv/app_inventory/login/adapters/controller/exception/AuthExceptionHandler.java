@@ -16,8 +16,8 @@ public class AuthExceptionHandler {
 
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<DetalleExcepcion> handleUsernameNotFoundException(UsernameNotFoundException e) {
-        logger.error("Usuario no encontrado: {}", e.getMessage());
-        var detalle = new DetalleExcepcion("Usuario no encontrado", e.getMessage());
+        logger.error("User no encontrado: {}", e.getMessage());
+        var detalle = new DetalleExcepcion("User no encontrado", e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(detalle);
     }
 

@@ -1,16 +1,20 @@
 package ucv.app_inventory.login.domain.auth;
 
+import io.jsonwebtoken.security.SignatureException;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Service;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import ucv.app_inventory.login.domain.model.Usuario;
+import ucv.app_inventory.login.domain.model.Role;
+import ucv.app_inventory.login.domain.model.User;
 
 /**
  * Clase utilitaria para manejar operaciones JWT como generación y validación de
@@ -26,7 +30,7 @@ public class TokenManagementService {
     private final JwtParser jwtParser;
 
     public TokenManagementService(
-            @Value("${generartoken}") String claveSecreta,
+            @Value("${jwt.key}") String claveSecreta,
             @Value("${jwt.expiration.time:3600}") long tiempoExp) {
         if (claveSecreta.length() >= 64) {
             this.claveSecreta = Keys.hmacShaKeyFor(claveSecreta.getBytes(StandardCharsets.UTF_8));
@@ -40,15 +44,15 @@ public class TokenManagementService {
                 .build();
     }
 
-    public String generarToken(Usuario usuario) {
-        String roles = usuario.getRoles().stream()
-                .map(role -> role.getName())
+    public String generarToken(User user) {
+        String roles = user.getRoles().stream()
+                .map(Role::getName)
                 .collect(Collectors.joining(","));
 
         return Jwts.builder()
-                .setSubject(usuario.getEmail())
-                .claim("name", usuario.getFullname())
-                .claim("email", usuario.getEmail())
+                .setSubject(user.getEmail())
+                //.claim("name", user.getFullname())
+                .claim("email", user.getEmail())
                 .claim("roles", roles)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + tiempoExp))
@@ -56,29 +60,21 @@ public class TokenManagementService {
                 .compact();
     }
 
-    /**
-     * Valida el token JWT proporcionado.
-     *
-     * @param token Token JWT a validar.
-     * @return {@code true} si el token es válido, {@code false} en caso
-     * contrario.
-     */
-    public boolean validarToken(String token) {
+    public void validarToken(String token) {
         try {
             jwtParser.parseClaimsJws(token);
-            return true;
         } catch (MalformedJwtException e) {
             logger.error("Token JWT malformado: {}", e.getMessage());
-            throw e;
+            throw new JwtException("Token malformado.");
         } catch (ExpiredJwtException e) {
             logger.error("Token JWT expirado: {}", e.getMessage());
-            throw e;
+            throw new JwtException("Token expirado.");
         } catch (SignatureException e) {
             logger.error("Firma del Token JWT no válida: {}", e.getMessage());
-            throw e;
-        } catch (JwtException e) {
+            throw new JwtException("Firma no válida.");
+        } catch (UnsupportedJwtException e) {
             logger.error("Token JWT inválido: {}", e.getMessage());
-            throw e;
+            throw new JwtException("Token inválido.");
         }
     }
 

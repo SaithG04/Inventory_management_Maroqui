@@ -37,13 +37,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
 
-            if (tokenManagementService.validarToken(jwt)) {
-                try {
-                    email = tokenManagementService.getUsuarioToken(jwt);
-                } catch (JwtException e) {
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token JWT inválido");
-                    return;
-                }
+            try {
+                tokenManagementService.validarToken(jwt);
+            } catch (JwtException e) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+                return; // Salir si el token no es válido
+            }
+
+            try {
+                email = tokenManagementService.getUsuarioToken(jwt);
+            } catch (JwtException e) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token JWT inválido");
+                return;
             }
         }
 

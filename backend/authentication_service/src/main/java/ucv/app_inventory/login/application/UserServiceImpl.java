@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ucv.app_inventory.login.adapters.persistance.JpaUserRepository;
 import ucv.app_inventory.login.domain.model.Status;
-import ucv.app_inventory.login.domain.model.Usuario;
+import ucv.app_inventory.login.domain.model.User;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -20,19 +20,19 @@ public class UserServiceImpl implements UserService{
         this.jpaUsuarioRepositorio = jpaUsuarioRepositorio;
     }
 
-    public Optional<Usuario> findByEmail(String email) {
+    public Optional<User> findByEmail(String email) {
         return jpaUsuarioRepositorio.findByEmail(email);
     }
 
-    public List<Usuario> findByStatus(Status status) {
+    public List<User> findByStatus(Status status) {
         return jpaUsuarioRepositorio.findByStatus(status);
     }
 
-    public List<Usuario> findByFullname(String fullname) {
+    /*public List<User> findByFullname(String fullname) {
         return jpaUsuarioRepositorio.findByFullname(fullname);
-    }
+    }*/
 
-    public List<Usuario> findByRoles_Name(String name) {
+    public List<User> findByRoles_Name(String name) {
         return jpaUsuarioRepositorio.findByRoles_Name(name);
     }
 
@@ -40,11 +40,11 @@ public class UserServiceImpl implements UserService{
         return jpaUsuarioRepositorio.countByStatus(status);
     }
 
-    public Optional<Usuario> findByEmailAndStatus(String email, Status status) {
+    public Optional<User> findByEmailAndStatus(String email, Status status) {
         return jpaUsuarioRepositorio.findByEmailAndStatus(email, status);
     }
 
-    public List<Usuario> findByCreatedAtAfter(LocalDateTime date) {
+    public List<User> findByCreatedAtAfter(LocalDateTime date) {
         return jpaUsuarioRepositorio.findByCreatedAtAfter(date);
     }
 
