@@ -1,9 +1,6 @@
 # Ignorar archivos .env
 *.env
 
-# Ignorar los archivos y carpetas generados por Docker en cada servicio
-**/Dockerfile
-
 # Ignorar logs
 *.log
 
