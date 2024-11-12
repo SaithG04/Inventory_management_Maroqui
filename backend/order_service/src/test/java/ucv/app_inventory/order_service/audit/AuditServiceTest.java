@@ -11,50 +11,54 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for the AuditServiceImpl class, verifying the correct functionality of
+ * audit event creation and retrieval.
+ */
 public class AuditServiceTest {
 
     @Mock
     private AuditRepository auditRepository;
 
     @InjectMocks
-    private AuditServiceImpl auditoriaServiceImpl;
+    private AuditServiceImpl auditServiceImpl;
 
     @BeforeEach
     public void setUp() {
-        // Inicializa los mocks y la clase a probar
+        // Initialize mocks and the class under test
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void registrarAuditoria_deberiaGuardarEnRepositorio() {
-        // Configurar datos de prueba
-        String entidad = "Order";
-        String accion = "CREAR";
-        String usuario = "defaultUser";
-        String detalle = "Order creado";
+    public void recordAudit_shouldSaveToRepository() {
+        // Set up test data
+        String entity = "Order";
+        String action = "CREATE";
+        String user = "defaultUser";
+        String details = "Order created";
 
-        // Invocar el método de servicio
-        auditoriaServiceImpl.registrarAuditoria(entidad, accion, usuario, detalle);
+        // Invoke the service method
+        auditServiceImpl.recordAudit(entity, action, user, details);
 
-        // Verificar que el repositorio ha guardado el evento de auditoría
+        // Verify that the repository has saved the audit event
         verify(auditRepository, times(1)).save(any(Audit.class));
     }
 
     @Test
-    public void buscarPorId_deberiaRetornarAuditoria() {
-        // Datos de prueba
-        Audit audit = new Audit("Order", "CREAR", "defaultUser", "Order creado");
+    public void findById_shouldReturnAudit() {
+        // Test data
+        Audit audit = new Audit("Order", "CREATE", "defaultUser", "Order created");
         when(auditRepository.findById(1L)).thenReturn(Optional.of(audit));
 
-        // Invocar el método de servicio
-        Optional<Audit> resultado = auditoriaServiceImpl.buscarPorId(1L);
+        // Invoke the service method
+        Optional<Audit> result = auditServiceImpl.findById(1L);
 
-        // Verificar que el valor retornado es correcto
-        assertThat(resultado).isPresent();
-        assertThat(resultado.get().getEntidad()).isEqualTo("Order");
-        assertThat(resultado.get().getTipoAccion()).isEqualTo("CREAR");
+        // Verify that the returned value is correct
+        assertThat(result).isPresent();
+        assertThat(result.get().getEntity()).isEqualTo("Order");
+        assertThat(result.get().getActionType()).isEqualTo("CREATE");
 
-        // Verificar que se ha invocado el método findById del repositorio
+        // Verify that the repository's findById method was called
         verify(auditRepository, times(1)).findById(1L);
     }
 }

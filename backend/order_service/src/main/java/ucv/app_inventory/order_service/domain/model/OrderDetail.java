@@ -1,10 +1,16 @@
 package ucv.app_inventory.order_service.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
+/**
+ * Represents the details of an order, including the product ID, quantity, and unit price.
+ * This entity is used to store each item in an order, allowing for the calculation of
+ * individual totals per item.
+ */
 @Entity
-@Table(name = "detalle_pedidos")
+@Table(name = "order_details")
 @Data
 public class OrderDetail {
 
@@ -12,18 +18,21 @@ public class OrderDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Almacenar el ID del producto, lo que permite obtener información del producto de otro microservicio
-    @Column(name = "producto_id", nullable = false)
-    private Long productoId;
+    @ManyToOne
+    @JoinColumn(name = "order_id", nullable = false)
+    @JsonBackReference
+    private Order order;
 
-    @Column(name = "cantidad", nullable = false)
-    private Integer cantidad;
+    @Column(name = "product_id", nullable = false)
+    private Long productId;
 
-    @Column(name = "precio_unitario", nullable = false)
-    private Double precioUnitario;
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity;
 
-    // Este campo te permite calcular el total por cada detalle del pedido
-    public Double calcularTotal() {
-        return this.cantidad * this.precioUnitario;
+    @Column(name = "unit_price", nullable = false)
+    private Double unitPrice;
+
+    public Double calculateTotal() {
+        return this.quantity * this.unitPrice;
     }
 }

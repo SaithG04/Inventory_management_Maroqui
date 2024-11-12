@@ -5,8 +5,8 @@ import lombok.Data;
 @Data
 public class ProviderDTO {
     private Long id;
-    private String nombre;
-    private String contacto;
+    private String name;
+    private String contact;
     private String email;
-    private String telefono;
+    private String phone;
 }

@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Repositorio de auditoría encargado de la persistencia de los eventos de auditoría en la base de datos.
+ * Audit repository responsible for persisting audit events in the database.
  */
 @Repository
 public interface AuditRepository extends JpaRepository<Audit, Long> {

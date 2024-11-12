@@ -9,56 +9,76 @@ import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import ucv.app_inventory.order_service.audit.AuditServiceImpl;
+import ucv.app_inventory.order_service.audit.AuditService;
 
+/**
+ * Aspect for auditing actions on entities, such as creation, update, and deletion.
+ * Automatically records audit logs based on method execution in the application layer.
+ */
 @Aspect
 @Component
 public class AuditAspect {
 
     private static final Logger logger = LoggerFactory.getLogger(AuditAspect.class);
-    private final AuditServiceImpl auditoriaServiceImpl;
+    private final AuditService auditService;
 
-    public AuditAspect(AuditServiceImpl auditoriaServiceImpl) {
-        this.auditoriaServiceImpl = auditoriaServiceImpl;
+    public AuditAspect(AuditService auditService) {
+        this.auditService = auditService;
     }
 
     /**
-     * Obtiene el nombre de usuario desde el contexto de seguridad.
+     * Retrieves the username from the security context.
      *
-     * @return El nombre del usuario autenticado, o "defaultUser" si no está autenticado.
+     * @return The name of the authenticated user, or "Unknown User" if not authenticated.
      */
-    public String obtenerUsuarioAutenticado() {
+    public String getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            return "Usuario desconocido"; // Devuelve un valor por defecto si no hay usuario autenticado
+            return "Unknown User"; // Returns a default value if no user is authenticated
         }
-        return authentication.getName(); // O getPrincipal() si es necesario obtener más información
+        return authentication.getName(); // Use getPrincipal() if more information is needed
     }
 
-    @AfterReturning(value = "execution(* ucv.app_inventory.order_service.application.*.crear*(..))", returning = "result")
-    public void auditarCreacion(JoinPoint joinPoint, Object result) {
-        String usuario = obtenerUsuarioAutenticado();
-        String entidad = result.getClass().getSimpleName();
-        logger.info("Registrando auditoría para creación en la entidad: {}", entidad);
-        auditoriaServiceImpl.registrarAuditoria(entidad, "CREAR", usuario, result.toString());
+    /**
+     * Audits entity creation by logging the creation action, user, and created entity details.
+     *
+     * @param joinPoint the join point for the creation method.
+     * @param result    the result of the method execution (the created entity).
+     */
+    @AfterReturning(value = "execution(* ucv.app_inventory.order_service.application.*.create*(..))", returning = "result")
+    public void auditCreation(JoinPoint joinPoint, Object result) {
+        String user = getAuthenticatedUser();
+        String entity = result.getClass().getSimpleName();
+        logger.info("Recording audit for creation in entity: {}", entity);
+        auditService.recordAudit(entity, "CREATE", user, result.toString());
     }
 
-    @AfterReturning(value = "execution(* ucv.app_inventory.order_service.application.*.actualizar*(..))", returning = "result")
-    public void auditarActualizacion(JoinPoint joinPoint, Object result) {
-
-        String usuario = obtenerUsuarioAutenticado();
-        String entidad = result.getClass().getSimpleName();
-        logger.info("Registrando auditoría para actualización en la entidad: {}", entidad);
-        logger.info("Auditoría registrada para el usuario: " + usuario);
-        auditoriaServiceImpl.registrarAuditoria(entidad, "ACTUALIZAR", usuario, result.toString());
+    /**
+     * Audits entity updates by logging the update action, user, and updated entity details.
+     *
+     * @param joinPoint the join point for the update method.
+     * @param result    the result of the method execution (the updated entity).
+     */
+    @AfterReturning(value = "execution(* ucv.app_inventory.order_service.application.*.update*(..))", returning = "result")
+    public void auditUpdate(JoinPoint joinPoint, Object result) {
+        String user = getAuthenticatedUser();
+        String entity = result.getClass().getSimpleName();
+        logger.info("Recording audit for update in entity: {}", entity);
+        logger.info("Audit recorded for user: {}", user);
+        auditService.recordAudit(entity, "UPDATE", user, result.toString());
     }
 
-    @Before("execution(* ucv.app_inventory.order_service.application.*.eliminar*(..))")
-    public void auditarEliminacion(JoinPoint joinPoint) {
-        String entidad = joinPoint.getSignature().getDeclaringTypeName();
-        String usuario = obtenerUsuarioAutenticado();
+    /**
+     * Audits entity deletions by logging the deletion action, user, and ID of the deleted entity.
+     *
+     * @param joinPoint the join point for the delete method.
+     */
+    @Before("execution(* ucv.app_inventory.order_service.application.*.delete*(..))")
+    public void auditDeletion(JoinPoint joinPoint) {
+        String entity = joinPoint.getSignature().getDeclaringTypeName();
+        String user = getAuthenticatedUser();
         Object[] args = joinPoint.getArgs();
-        logger.info("Registrando auditoría para eliminación en la entidad: {}", entidad);
-        auditoriaServiceImpl.registrarAuditoria(entidad, "ELIMINAR", usuario, "ID eliminado: " + args[0]);
+        logger.info("Recording audit for deletion in entity: {}", entity);
+        auditService.recordAudit(entity, "DELETE", user, "Deleted ID: " + args[0]);
     }
 }
