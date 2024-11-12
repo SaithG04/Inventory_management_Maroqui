@@ -12,7 +12,9 @@ const Sidebar = ({ onButtonClick, userRole, userName }) => {
     Vendedor: ['producto', 'ventas']
   };
 
-  const allowedModules = modulesByRole[userRole] || [];
+  // Normalizar el rol para asegurar la coincidencia
+  const normalizedRole = userRole.charAt(0).toUpperCase() + userRole.slice(1).toLowerCase();
+  const allowedModules = modulesByRole[normalizedRole] || [];
 
   const handleClick = (module) => {
     setActiveModule(module);
@@ -27,9 +29,9 @@ const Sidebar = ({ onButtonClick, userRole, userName }) => {
     >
       <div className="profile-section">
         <div className="user-info">
-          <FaUser className="user-icon" /> {/* Aquí usamos el ícono de usuario */}
+          <FaUser className="user-icon" /> 
           <p>Usuario: <strong className="user-role">{userRole}</strong></p>
-          </div>
+        </div>
         <div className="user-name-container">
           <p>Nombre:</p>
           <span className="user-name">{userName}</span>

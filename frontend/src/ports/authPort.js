@@ -1,4 +1,5 @@
 import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode';
 
 export const AuthPort = {
   loginUser: async (email, clave) => {
@@ -9,7 +10,7 @@ export const AuthPort = {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, clave }),
-        credentials: 'include', // Si necesitas enviar credenciales (cookies)
+        credentials: 'include', // Para manejar cookies
       });
 
       if (!response.ok) {
@@ -20,10 +21,15 @@ export const AuthPort = {
 
       if (data.data && data.data.token) {
         // Guardamos el token en una cookie
-        Cookies.set('jwtToken', data.data.token, { expires: 1, secure: true, sameSite: 'Strict' });
+        const token = data.data.token;
+        Cookies.set('jwtToken', token, { expires: 1, secure: true, sameSite: 'Strict' });
 
-        // Devolvemos el estado de autenticación y el rol del usuario
-        return { success: true, email: data.data.email, role: data.data.role, message: 'Autenticación exitosa' };
+        // Decodificamos el token
+        const decodedToken = jwtDecode(token);
+        console.log("Decoded Token:", decodedToken); // Para verificar el contenido del token
+
+        // Puedes acceder a los datos decodificados del token, como nombre, roles, etc.
+        return { success: true, email: decodedToken.email, role: decodedToken.roles, message: 'Autenticación exitosa' };
       } else {
         return { success: false, message: data.message || 'Error de autenticación' };
       }

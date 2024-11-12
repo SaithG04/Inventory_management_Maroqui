@@ -1,4 +1,3 @@
-// src/App.js
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import Header from './components/Header/Header';
@@ -12,6 +11,8 @@ import Suppliers from './components/Suppliers/Suppliers';
 import LoginForm from './components/Login/LoginForm';
 import { AuthPort } from './ports/authPort';
 import { ProductProvider } from './context/ProductContext';
+import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode';
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -20,32 +21,30 @@ function App() {
     const [activeSection, setActiveSection] = useState('');
 
     useEffect(() => {
-        const isAuthenticated = localStorage.getItem('isAuthenticated');
-        if (isAuthenticated === 'true') {
-            setIsAuthenticated(true);
-            const role = localStorage.getItem('userRole');
-            setUserRole(role);
-            setUserName(localStorage.getItem('userName'));
-            setDefaultSection(role);
-        }
-
-        const initialEmployees = [
-            { id: 1, fullName: 'Teddy Alexander', email: 'admin@miroqui.es', password: 'password123', role: 'Administrador', status: 'Activo' },
-            { id: 2, fullName: 'María López', email: 'vendedor@miroqui.es', password: 'vendedor123', role: 'Vendedor', status: 'Activo' },
-            { id: 3, fullName: 'Carlos Sánchez', email: 'almacenero@miroqui.es', password: 'almacenero123', role: 'Almacenero', status: 'Activo' },
-        ];
-
-        if (!localStorage.getItem('employees')) {
-            localStorage.setItem('employees', JSON.stringify(initialEmployees));
+        const token = Cookies.get('jwtToken');
+        if (token) {
+            try {
+                const decodedToken = jwtDecode(token);
+                const role = decodedToken.roles;
+                const formattedRole = role.charAt(0).toUpperCase() + role.slice(1).toLowerCase(); // Convierte la primera letra en mayúscula
+                setIsAuthenticated(true);
+                setUserRole(formattedRole);
+                setUserName(decodedToken.name);
+                setDefaultSection(formattedRole);
+            } catch (error) {
+                console.error('Error decodificando el token:', error);
+                setIsAuthenticated(false);
+                Cookies.remove('jwtToken');
+            }
         }
     }, []);
 
-    const setDefaultSection = (role) => {
-        if (role === 'Administrador') {
+    const setDefaultSection = (roles) => {
+        if (roles === 'Administrador') {
             setActiveSection('dashboard');
-        } else if (role === 'Vendedor') {
+        } else if (roles === 'Vendedor') {
             setActiveSection('ventas');
-        } else if (role === 'Almacenero') {
+        } else if (roles === 'Almacenero') {
             setActiveSection('producto');
         }
     };
@@ -54,18 +53,28 @@ function App() {
         const result = await AuthPort.loginUser(email, password);
         if (result.success) {
             setIsAuthenticated(true);
-            setUserRole(result.role);
-            setUserName(result.fullName);
 
-            localStorage.setItem('isAuthenticated', 'true');
-            localStorage.setItem('userRole', result.role);
-            localStorage.setItem('userName', result.fullName);
+            // Decodificar el token inmediatamente para actualizar el estado
+            const token = Cookies.get('jwtToken');
+            if (token) {
+                try {
+                    const decodedToken = jwtDecode(token);
+                    setUserRole(decodedToken.roles);
+                    setUserName(decodedToken.name);
+                } catch (error) {
+                    console.error('Error decodificando el token:', error);
+                    setIsAuthenticated(false);
+                    Cookies.remove('jwtToken');
+                }
+            }
 
             setDefaultSection(result.role);
         } else {
             alert(result.message);
         }
     };
+    
+
 
     const handleButtonClick = (action) => {
         if (action === 'salir') {
@@ -74,9 +83,8 @@ function App() {
             setUserName('');
             setActiveSection('');
 
-            localStorage.removeItem('isAuthenticated');
-            localStorage.removeItem('userRole');
-            localStorage.removeItem('userName');
+            // Remover el token al cerrar sesión
+            Cookies.remove('jwtToken');
         } else {
             setActiveSection(action);
         }
@@ -100,7 +108,7 @@ function App() {
     };
 
     return (
-        <ProductProvider> {/* Envuelve toda la aplicación con ProductProvider */}
+        <ProductProvider>
             <div className="app-container">
                 {isAuthenticated ? (
                     <>
