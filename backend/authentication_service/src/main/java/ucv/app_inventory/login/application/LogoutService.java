@@ -2,17 +2,16 @@ package ucv.app_inventory.login.application;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ucv.app_inventory.login.domain.repository.IUserRepository;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @Service
 public class LogoutService {
 
-    private final IUserRepository usuarioRepositorio;
+    private final UserService usuarioService;
 
     @Autowired
-    public LogoutService(IUserRepository usuarioRepositorio) {
-        this.usuarioRepositorio = usuarioRepositorio;
+    public LogoutService(UserService usuarioRepositorio) {
+        this.usuarioService = usuarioRepositorio;
     }
 
     /**
@@ -21,9 +20,9 @@ public class LogoutService {
      * @param email del usuario para el que se desea realizar el logout.
      */
     public void logoutUser(String email) {
-        if (usuarioRepositorio.findByEmail(email).isEmpty()) {
+        if (usuarioService.findByEmail(email).isEmpty()) {
             throw new UsernameNotFoundException("Usuario no encontrado con el email: " + email);
         }
-        usuarioRepositorio.invalidateRefreshTokenByEmail(email);
+        usuarioService.invalidateRefreshTokenByEmail(email);
     }
 }

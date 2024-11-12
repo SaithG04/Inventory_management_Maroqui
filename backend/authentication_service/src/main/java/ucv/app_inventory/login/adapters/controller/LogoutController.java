@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import ucv.app_inventory.login.adapters.controller.dto.LogoutRequest;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/auth")
 public class LogoutController {
 
     private static final Logger logger = LoggerFactory.getLogger(LogoutController.class);

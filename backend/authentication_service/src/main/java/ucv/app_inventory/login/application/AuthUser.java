@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ucv.app_inventory.login.domain.exception.CredencialesInvalidas;
 import ucv.app_inventory.login.domain.model.Usuario;
-import ucv.app_inventory.login.domain.repository.IUserRepository;
 import ucv.app_inventory.login.domain.model.Status;
 
 @Service
@@ -17,13 +16,13 @@ public class AuthUser {
 
     private final AuthenticationManager authenticationManager;
     private final TokenManagementService jwtTokenUsuario;
-    private final IUserRepository userRepository;
+    private final UserService userService;
 
     @Autowired
-    public AuthUser(AuthenticationManager authenticationManager, TokenManagementService jwtTokenUsuario, IUserRepository userRepository) {
+    public AuthUser(AuthenticationManager authenticationManager, TokenManagementService jwtTokenUsuario, UserService userService) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenUsuario = jwtTokenUsuario;
-        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     public String autenticarUsuario(String email, String clave) {
@@ -33,7 +32,7 @@ public class AuthUser {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, clave));
 
-            Usuario usuario = userRepository.findByEmailAndStatus(email, Status.ACTIVE)
+            Usuario usuario = userService.findByEmailAndStatus(email, Status.ACTIVE)
                     .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado o no activo"));
 
             return jwtTokenUsuario.generarToken(usuario);
