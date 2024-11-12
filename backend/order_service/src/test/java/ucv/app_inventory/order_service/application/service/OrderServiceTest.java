@@ -26,6 +26,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for the OrderFindUseCase service, covering methods to find orders by various criteria.
+ * Uses Mockito to mock dependencies and Spring Data's Page for pagination.
+ */
 class OrderServiceTest {
 
     @Mock
@@ -42,69 +46,66 @@ class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Inicializar los mocks
+        // Initialize mocks before each test
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void buscarPorId_deberiaDevolverPedido() {
-        // Datos de prueba
+    void findById_shouldReturnOrder() {
+        // Test data
         Order order = new Order();
         order.setId(1L);
 
-        // Simulación
+        // Mock behavior
         when(orderMySqlRepository.findById(1L)).thenReturn(Optional.of(order));
 
-        // Invocar método a probar
-        Optional<Order> resultado = orderFindUseCase.buscarPorId(1L);
+        // Invoke method under test
+        Optional<Order> result = orderFindUseCase.findById(1L);
 
-        // Verificar el resultado
-        assertThat(resultado).isPresent();
-        assertThat(resultado.get().getId()).isEqualTo(1L);
+        // Verify results
+        assertThat(result).isPresent();
+        assertThat(result.get().getId()).isEqualTo(1L);
         verify(orderMySqlRepository, times(1)).findById(1L);
     }
 
     @Test
-    void buscarPorProveedorYEstado_deberiaDevolverListaFiltrada() {
-        // Datos de prueba
-        Page<Order> pedidos = new PageImpl<>(Arrays.asList(new Order(), new Order()));
-        when(orderMySqlRepository.findByProveedorIdAndEstado(any(Long.class), any(OrderState.class), any(PageRequest.class)))
-                .thenReturn(pedidos);
+    void findOrdersBySupplierAndStatus_shouldReturnFilteredList() {
+        // Test data
+        Page<Order> orders = new PageImpl<>(Arrays.asList(new Order(), new Order()));
+        when(orderMySqlRepository.findBySupplierIdAndStatus(any(Long.class), any(OrderState.class), any(PageRequest.class)))
+                .thenReturn(orders);
 
-        // Invocar método a probar
-        Page<Order> resultado = orderFindUseCase.buscarPedidosPorProveedorYEstado(1L, OrderState.PROCESADO, PageRequest.of(0, 10));
+        // Invoke method under test
+        Page<Order> result = orderFindUseCase.findOrdersBySupplierAndStatus(1L, OrderState.PROCESSED, PageRequest.of(0, 10));
 
-        // Verificar el resultado
-        assertThat(resultado.getContent().size()).isEqualTo(2);
-        verify(orderMySqlRepository, times(1)).findByProveedorIdAndEstado(1L, OrderState.PROCESADO, PageRequest.of(0, 10));
+        // Verify results
+        assertThat(result.getContent().size()).isEqualTo(2);
+        verify(orderMySqlRepository, times(1)).findBySupplierIdAndStatus(1L, OrderState.PROCESSED, PageRequest.of(0, 10));
     }
 
     @Test
-    void paginarPedidos_deberiaDevolverPaginaDePedidos() {
-        // Datos de prueba: crear una lista de orders y envolverla en un objeto Page
+    void paginateOrders_shouldReturnPageOfOrders() {
+        // Test data: create a list of orders and wrap in a Page object
         List<Order> orders = Arrays.asList(new Order(), new Order());
-        Page<Order> paginaDePedidos = new PageImpl<>(orders);
+        Page<Order> pageOfOrders = new PageImpl<>(orders);
 
-        // Simular el comportamiento del repositorio
-        when(orderMySqlRepository.findByFechaBetween(any(Date.class), any(Date.class), any(PageRequest.class)))
-                .thenReturn(paginaDePedidos);
+        // Mock repository behavior
+        when(orderMySqlRepository.findByOrderDateBetween(any(LocalDate.class), any(LocalDate.class), any(PageRequest.class)))
+                .thenReturn(pageOfOrders);
 
-        // Usamos LocalDate para trabajar con las fechas
-        LocalDate hoy = LocalDate.now();
-        LocalDate manana = hoy.plusDays(1);
+        // Use LocalDate for date handling
+        LocalDate today = LocalDate.now();
+        LocalDate tomorrow = today.plusDays(1);
 
-        // Convertimos LocalDate a Date
-        Date fechaInicio = Date.from(hoy.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        Date fechaFin = Date.from(manana.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        // Invoke method under test
+        Page<Order> result = orderFindUseCase.findOrdersByDate(today, tomorrow, PageRequest.of(0, 10));
 
-        // Invocar el método a probar
-        Page<Order> resultado = orderFindUseCase.buscarPedidosPorFecha(fechaInicio, fechaFin, PageRequest.of(0, 10));
+        // Verify that the result is not null and contains expected elements
+        assertThat(result).isNotNull();
+        assertThat(result.getContent().size()).isEqualTo(2);  // Contains 2 orders in the list
 
-        // Verificar que el resultado no es nulo y contiene los elementos esperados
-        assertThat(resultado).isNotNull();
-        assertThat(resultado.getContent().size()).isEqualTo(2);  // Hay 2 orders en la lista
-
-        // Verificar que se llamó al repositorio con los argumentos correctos
-        verify(orderMySqlRepository, times(1)).findByFechaBetween(any(Date.class), any(Date.class), any(PageRequest.class));
+        // Verify the repository was called with correct arguments
+        verify(orderMySqlRepository, times(1)).findByOrderDateBetween(today, tomorrow, PageRequest.of(0, 10));
     }
+
 }

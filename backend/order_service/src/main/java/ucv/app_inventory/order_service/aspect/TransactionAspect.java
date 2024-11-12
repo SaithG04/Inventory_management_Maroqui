@@ -10,77 +10,77 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * TransactionAspect es un aspecto que intercepta métodos transaccionales anotados con
- * {@code @Transactional}. Su propósito es:
- * 1. Registrar la información antes de que comience la transacción.
- * 2. Registrar el tiempo de inicio de la transacción.
- * 3. Manejar excepciones que ocurren dentro de los métodos transaccionales.
- * 4. Registrar la finalización exitosa de las transacciones.
+ * TransactionAspect is an aspect that intercepts transactional methods annotated with
+ * {@code @Transactional}. Its purpose is to:
+ * 1. Log information before the transaction begins.
+ * 2. Record the transaction start time.
+ * 3. Handle exceptions that occur within transactional methods.
+ * 4. Log the successful completion of transactions.
  */
 @Aspect
 @Component
 public class TransactionAspect {
 
-    // Logger para registrar información de las transacciones.
+    // Logger to record transaction information
     private static final Logger logger = LoggerFactory.getLogger(TransactionAspect.class);
 
     /**
-     * Intercepta cualquier método anotado con {@code @Transactional} antes de que se ejecute.
-     * Registra el nombre del método y los argumentos que se pasan a él, así como la hora en que comienza.
+     * Intercepts any method annotated with {@code @Transactional} before it executes.
+     * Logs the method name, its arguments, and the start time.
      *
-     * @param joinPoint Punto de ejecución del método interceptado que contiene información del método.
+     * @param joinPoint Execution point of the intercepted method, containing method information.
      */
     @Before("@annotation(org.springframework.transaction.annotation.Transactional)")
     public void manageTransaction(JoinPoint joinPoint) {
-        // Obtener el nombre del método interceptado
+        // Get the name of the intercepted method
         String methodName = joinPoint.getSignature().getName();
-        logger.info("Iniciando una transacción en el método: {}", methodName);
+        logger.info("Starting a transaction in method: {}", methodName);
 
-        // Loguear los argumentos del método interceptado
+        // Log the arguments of the intercepted method
         Object[] args = joinPoint.getArgs();
         if (args != null && args.length > 0) {
-            logger.info("Argumentos del método: ");
+            logger.info("Method arguments: ");
             for (Object arg : args) {
                 logger.info(" - {}", arg);
             }
         }
 
-        // Registrar el tiempo de inicio de la transacción
+        // Log the start time of the transaction
         long startTime = System.currentTimeMillis();
-        logger.info("La transacción comenzó a las: {}", startTime);
+        logger.info("Transaction started at: {}", startTime);
     }
 
     /**
-     * Intercepta cualquier excepción que ocurra en métodos anotados con {@code @Transactional}.
-     * Registra un mensaje de error con el detalle de la excepción lanzada.
+     * Intercepts any exception that occurs in methods annotated with {@code @Transactional}.
+     * Logs an error message with details of the thrown exception.
      *
-     * @param ex La excepción lanzada durante la ejecución de la transacción.
+     * @param ex The exception thrown during transaction execution.
      */
     @AfterThrowing(pointcut = "@annotation(org.springframework.transaction.annotation.Transactional)", throwing = "ex")
     public void handleTransactionException(Exception ex) {
-        logger.error("Ocurrió una excepción durante la transacción: ", ex);
+        logger.error("An exception occurred during the transaction: ", ex);
     }
 
     /**
-     * Intercepta la salida de un método transaccional cuando este se ejecuta correctamente sin excepciones.
-     * Registra la finalización exitosa de la transacción y puede calcular el tiempo de ejecución.
+     * Intercepts the exit of a transactional method when it executes successfully without exceptions.
+     * Logs the successful completion of the transaction and can calculate execution time.
      *
-     * @param joinPoint Punto de ejecución del método interceptado.
-     * @param result    Resultado devuelto por el método transaccional (si lo hay).
+     * @param joinPoint Execution point of the intercepted method.
+     * @param result    Result returned by the transactional method (if any).
      */
     @AfterReturning(pointcut = "@annotation(org.springframework.transaction.annotation.Transactional)", returning = "result")
     public void logTransactionSuccess(JoinPoint joinPoint, Object result) {
-        // Obtener el nombre del método interceptado
+        // Get the name of the intercepted method
         String methodName = joinPoint.getSignature().getName();
-        logger.info("La transacción en el método '{}' finalizó exitosamente.", methodName);
+        logger.info("The transaction in method '{}' completed successfully.", methodName);
 
-        // Loguear el resultado del método (si lo hay)
+        // Log the result of the method (if any)
         if (result != null) {
-            logger.info("Resultado devuelto por el método: {}", result);
+            logger.info("Result returned by the method: {}", result);
         }
 
-        // Registrar el tiempo de finalización de la transacción (opcionalmente se puede medir el tiempo transcurrido)
+        // Log the end time of the transaction (optionally calculate elapsed time)
         long endTime = System.currentTimeMillis();
-        logger.info("La transacción finalizó a las: {}", endTime);
+        logger.info("Transaction ended at: {}", endTime);
     }
 }

@@ -9,6 +9,7 @@ import ucv.app_inventory.order_service.domain.model.OrderState;
 import ucv.app_inventory.order_service.domain.model.Order;
 import ucv.app_inventory.order_service.infrastructure.outbound.database.OrderMySqlRepository;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Optional;
 
@@ -18,31 +19,40 @@ public class OrderFindUseCase {
 
     private final OrderMySqlRepository orderMySqlRepository;
 
-    public Optional<Order> buscarPorId(Long id) {
+    public Optional<Order> findById(Long id) {
         return orderMySqlRepository.findById(id);
     }
 
-    public Page<Order> listarPedidosPaginados(Pageable pageable) {
+    public Page<Order> listOrdersPaginated(Pageable pageable) {
         return orderMySqlRepository.findAll(pageable);
     }
 
-    @Cacheable("pedidosPorFecha")
-    public Page<Order> buscarPedidosPorFecha(Date startDate, Date endDate, Pageable pageable) {
-        return orderMySqlRepository.findByFechaBetween(startDate, endDate, pageable);
+    @Cacheable("ordersByDate")
+    public Page<Order> findOrdersByDate(LocalDate startDate, LocalDate endDate, Pageable pageable) {
+        return orderMySqlRepository.findByOrderDateBetween(startDate, endDate, pageable);
     }
 
-    @Cacheable("pedidosPorProveedor")
-    public Page<Order> buscarPedidosPorProveedor(Long proveedorId, Pageable pageable) {
-        return orderMySqlRepository.findByProveedorId(proveedorId, pageable);
+    @Cacheable("ordersBySupplier")
+    public Page<Order> findOrdersBySupplier(Long supplierId, Pageable pageable) {
+        return orderMySqlRepository.findBySupplierId(supplierId, pageable);
     }
 
-    @Cacheable("pedidosPorEstado")
-    public Page<Order> buscarPedidosPorEstado(OrderState estado, Pageable pageable) {
-        return orderMySqlRepository.findByEstado(estado, pageable);
+    @Cacheable("ordersByStatus")
+    public Page<Order> findOrdersByStatus(OrderState status, Pageable pageable) {
+        return orderMySqlRepository.findByStatus(status, pageable);
     }
 
-    @Cacheable("pedidosPorProveedorYEstado")
-    public Page<Order> buscarPedidosPorProveedorYEstado(Long proveedorId, OrderState estado, Pageable pageable) {
-        return orderMySqlRepository.findByProveedorIdAndEstado(proveedorId, estado, pageable);
+    @Cacheable("ordersBySupplierAndStatus")
+    public Page<Order> findOrdersBySupplierAndStatus(Long supplierId, OrderState status, Pageable pageable) {
+        return orderMySqlRepository.findBySupplierIdAndStatus(supplierId, status, pageable);
+    }
+
+    @Cacheable("ordersByCreationDate")
+    public Page<Order> findOrdersByCreationDate(LocalDate creationDate, Pageable pageable) {
+        return orderMySqlRepository.findByCreationDate(creationDate, pageable);
+    }
+
+    public Page<Order> findOrdersByTotalRange(Double minTotal, Double maxTotal, Pageable pageable) {
+        return orderMySqlRepository.findByTotalBetween(minTotal, maxTotal, pageable);
     }
 }

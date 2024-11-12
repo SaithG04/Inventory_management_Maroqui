@@ -8,47 +8,47 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * Entidad que representa un evento de auditoría, almacenando detalles importantes como
- * la entidad afectada, el tipo de acción, el usuario que realiza la acción, y detalles adicionales.
+ * Entity representing an audit event, storing key details such as the affected entity,
+ * action type, user performing the action, and additional details.
  */
 @Entity
-@Table(name = "auditorias")
+@Table(name = "audits")
 @Data
-@NoArgsConstructor  // Constructor sin argumentos requerido por JPA
-@AllArgsConstructor  // Constructor con todos los campos
+@NoArgsConstructor  // No-args constructor required by JPA
+@AllArgsConstructor  // Constructor with all fields
 public class Audit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "entidad", nullable = false)
-    private String entidad;  // Ejemplo: Order, Cliente, etc.
+    @Column(name = "entity", nullable = false)
+    private String entity;  // Example: Order, Customer, etc.
 
-    @Column(name = "tipo_accion", nullable = false)
-    private String tipoAccion;  // Ejemplo: CREAR, ACTUALIZAR, ELIMINAR
+    @Column(name = "action_type", nullable = false)
+    private String actionType;  // Example: CREATE, UPDATE, DELETE
 
-    @Column(name = "usuario", nullable = false)
-    private String usuario;  // Usuario que realiza la acción
+    @Column(name = "user", nullable = false)
+    private String user;  // User performing the action
 
-    @Column(name = "fecha_hora", nullable = false)
-    private LocalDateTime fechaHora;  // Fecha y hora del evento
+    @Column(name = "timestamp", nullable = false)
+    private LocalDateTime timestamp;  // Date and time of the event
 
-    @Column(name = "detalle", nullable = true)
-    private String detalle;  // Detalles adicionales sobre el cambio
+    @Column(name = "details", nullable = true)
+    private String details;  // Additional details about the change
 
     /**
-     * Constructor adicional para facilitar la creación de objetos Audit con los campos clave.
-     * @param entidad La entidad afectada por la acción (Ej. Order, Cliente)
-     * @param tipoAccion El tipo de acción que se realizó (Ej. CREAR, ACTUALIZAR, ELIMINAR)
-     * @param usuario El nombre del usuario que realizó la acción
-     * @param detalle Detalles adicionales del evento (opcional)
+     * Additional constructor to facilitate creating Audit objects with key fields.
+     * @param entity The entity affected by the action (e.g., Order, Customer)
+     * @param actionType The type of action performed (e.g., CREATE, UPDATE, DELETE)
+     * @param user The name of the user who performed the action
+     * @param details Additional details of the event (optional)
      */
-    public Audit(String entidad, String tipoAccion, String usuario, String detalle) {
-        this.entidad = entidad;
-        this.tipoAccion = tipoAccion;
-        this.usuario = usuario;
-        this.detalle = detalle;
-        this.fechaHora = LocalDateTime.now();  // Se registra la fecha y hora actual
+    public Audit(String entity, String actionType, String user, String details) {
+        this.entity = entity;
+        this.actionType = actionType;
+        this.user = user;
+        this.details = details;
+        this.timestamp = LocalDateTime.now();  // Records the current date and time
     }
 }

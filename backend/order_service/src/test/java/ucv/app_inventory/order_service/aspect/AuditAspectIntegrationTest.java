@@ -8,8 +8,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import ucv.app_inventory.order_service.application.OrderCreateUseCase;
 import ucv.app_inventory.order_service.audit.Audit;
 import ucv.app_inventory.order_service.audit.AuditRepository;
-import ucv.app_inventory.order_service.domain.model.OrderState;
-import ucv.app_inventory.order_service.domain.model.Order;
+import ucv.app_inventory.order_service.application.dto.OrderDTO;
 
 import java.util.Date;
 import java.util.List;
@@ -29,28 +28,28 @@ public class AuditAspectIntegrationTest {
 
     @Test
     @WithMockUser(username = "testUser", roles = {"USER"})
-    public void cuandoSeCreaUnPedido_debeRegistrarAuditoria() {
-        // Datos de prueba
-        Order nuevoOrder = new Order();
-        nuevoOrder.setProveedorId(1L);
-        nuevoOrder.setEstado(OrderState.PENDIENTE);
-        nuevoOrder.setTotal(500.0);
-        nuevoOrder.setFecha(new Date());  // Asignar la fecha actual
+    public void whenOrderIsCreated_shouldRecordAuditEntry() {
+        // Test data for OrderDTO
+        OrderDTO newOrderDTO = new OrderDTO();
+        newOrderDTO.setSupplierId(1L);
+        newOrderDTO.setStatus("PENDING");
+        newOrderDTO.setTotalAmount(500.0);
+        newOrderDTO.setOrderDate(new Date());
 
-        // Crear pedido
-        orderCreateUseCase.crearPedido(nuevoOrder);
+        // Create order using OrderDTO
+        orderCreateUseCase.createOrder(newOrderDTO);
 
-        // Verificar que se ha registrado un evento de auditoría
+        // Verify that an audit event has been recorded
         List<Audit> audits = auditRepository.findAll();
         assertThat(audits).hasSize(1);
 
-        // Verificar detalles de la auditoría
-        Audit audit = audits.getFirst();
-        assertThat(audit.getEntidad()).isEqualTo("Order");
-        assertThat(audit.getTipoAccion()).isEqualTo("CREAR");
-        assertEquals("testUser", audit.getUsuario());
+        // Verify audit details
+        Audit audit = audits.get(0);
+        assertThat(audit.getEntity()).isEqualTo("Order");
+        assertThat(audit.getActionType()).isEqualTo("CREATE");
+        assertEquals("testUser", audit.getUser());
 
-        // Verificación más específica del detalle
-        assertThat(audit.getDetalle()).contains("proveedorId=1");
+        // More specific verification of audit details
+        assertThat(audit.getDetails()).contains("supplierId=1");
     }
 }

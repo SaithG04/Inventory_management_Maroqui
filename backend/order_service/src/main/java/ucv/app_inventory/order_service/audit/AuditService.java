@@ -1,14 +1,17 @@
 package ucv.app_inventory.order_service.audit;
 
+/**
+ * Interface for audit service, providing methods to log audit events in the database.
+ */
 public interface AuditService {
 
     /**
-     * Registra un nuevo evento de auditoría en la base de datos.
+     * Records a new audit event in the database.
      *
-     * @param entidad La entidad afectada (ej. Order, Usuario).
-     * @param accion  La acción realizada (ej. CREAR, ACTUALIZAR, ELIMINAR).
-     * @param usuario El usuario que realiza la acción.
-     * @param detalle Los detalles adicionales de la operación.
+     * @param entity  The affected entity (e.g., Order, User).
+     * @param action  The action performed (e.g., CREATE, UPDATE, DELETE).
+     * @param user    The user performing the action.
+     * @param details Additional details of the operation.
      */
-    void registrarAuditoria(String entidad, String accion, String usuario, String detalle);
+    void recordAudit(String entity, String action, String user, String details);
 }

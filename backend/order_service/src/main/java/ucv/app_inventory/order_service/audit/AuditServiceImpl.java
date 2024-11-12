@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 /**
- * Servicio encargado de gestionar las operaciones de auditoría.
+ * Service responsible for managing audit operations.
  */
 @Service
 public class AuditServiceImpl implements AuditService {
@@ -19,25 +19,26 @@ public class AuditServiceImpl implements AuditService {
     }
 
     /**
-     * Registra un nuevo evento de auditoría en la base de datos.
+     * Records a new audit event in the database.
      *
-     * @param entidad La entidad afectada (Ej: Order, Cliente)
-     * @param accion La acción realizada (Ej: CREAR, ACTUALIZAR, ELIMINAR)
-     * @param usuario El nombre del usuario que realizó la acción
-     * @param detalle Detalles adicionales del evento de auditoría
+     * @param entity  The affected entity (e.g., Order, Customer).
+     * @param action  The action performed (e.g., CREATE, UPDATE, DELETE).
+     * @param user    The name of the user who performed the action.
+     * @param details Additional details of the audit event.
      */
-    public void registrarAuditoria(String entidad, String accion, String usuario, String detalle) {
-        Audit audit = new Audit(entidad, accion, usuario, detalle);
-        auditRepository.save(audit); // Persistir el evento de auditoría
+    @Override
+    public void recordAudit(String entity, String action, String user, String details) {
+        Audit audit = new Audit(entity, action, user, details);
+        auditRepository.save(audit); // Persist the audit event
     }
 
     /**
-     * Busca una auditoría por su ID.
+     * Finds an audit record by its ID.
      *
-     * @param id El ID de la auditoría.
-     * @return Un Optional con la auditoría si se encuentra, o un Optional vacío si no.
+     * @param id The ID of the audit record.
+     * @return An Optional containing the audit record if found, or an empty Optional if not.
      */
-    public Optional<Audit> buscarPorId(Long id) {
+    public Optional<Audit> findById(Long id) {
         return auditRepository.findById(id);
     }
 }

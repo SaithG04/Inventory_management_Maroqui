@@ -1,49 +1,64 @@
 package ucv.app_inventory.order_service.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.time.LocalDateTime;  // Cambiar a LocalDateTime
 import java.util.List;
 
+/**
+ * Represents an order in the system. Each order is associated with a supplier, a list of order details,
+ * a status, a total amount, and additional observations. The order is automatically timestamped
+ * upon creation.
+ */
 @Entity
-@Table(name = "pedidos")
+@Table(name = "orders")
 @Data
 public class Order {
 
+    // Unique identifier for each order, auto-generated.
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Almacenar solo el ID del proveedor
-    @Column(name = "proveedor_id", nullable = false)
-    private Long proveedorId;
+    // Stores only the supplier's ID to associate the order with a specific supplier.
+    @Column(name = "supplier_id", nullable = false)
+    private Long supplierId;
 
-    @Column(name = "fecha", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date fecha;
+    // Stores the date of the order; only the date part (without time).
+    @Column(name = "date", nullable = false)
+    private LocalDate orderDate;  // Cambiado a LocalDate para solo fecha
 
+    // Stores the status of the order using an enumerated type for predefined states.
     @Enumerated(EnumType.STRING)
-    @Column(name = "estado", nullable = false)
-    private OrderState estado;
+    @Column(name = "status", nullable = false)
+    private OrderState status;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "pedido_id")
+    // List of details for each order item; each detail is cascaded and loaded lazily.
+    @JsonManagedReference
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<OrderDetail> orderDetails;
 
+    // Total amount for the order.
     @Column(name = "total", nullable = false)
     private Double total;
 
-    @Column(name = "observaciones")
-    private String observaciones;
+    // Additional observations or notes about the order, if any.
+    @Column(name = "observations")
+    private String observations;
 
-    @Column(name = "fecha_creacion", nullable = false)
-    private LocalDate fechaCreacion;
+    // The date and time when the order was created, automatically set on creation.
+    @Column(name = "creation_date", nullable = false)
+    private LocalDateTime creationDate;  // Cambiado a LocalDateTime para incluir hora
 
+    /**
+     * Sets the date and creationDate fields to the current date and time when the order is created.
+     * This method is automatically called before the entity is persisted.
+     */
     @PrePersist
     protected void onCreate() {
-        this.fecha = new Date();
-        this.fechaCreacion = LocalDate.now(); // Asignar la fecha actual
+        this.creationDate = LocalDateTime.now();  // Fecha y hora
     }
 }
