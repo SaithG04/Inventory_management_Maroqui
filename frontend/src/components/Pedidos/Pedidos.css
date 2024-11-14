@@ -1,7 +1,6 @@
 /* ============================
-   Estilos del Módulo Pedidos
+   Variables de Colores
 ============================ */
-
 :root {
     --color-verde: #668a67;
     --color-verde-oscuro: #355537;
@@ -29,13 +28,19 @@
 ============================ */
 .pedidos-search-section {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
+    gap: 15px;
     padding: 10px 20px;
     background-color: #f0f4f8;
     border-radius: 6px;
     margin-bottom: 20px;
-    flex-wrap: wrap;
+}
+
+.pedidos-search-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
 }
 
 .pedidos-search-input {
@@ -81,7 +86,6 @@
     display: flex;
     gap: 15px;
     align-items: center;
-    margin-left: 10px;
 }
 
 .pedidos-checkbox-item {
@@ -101,7 +105,7 @@
     padding: 12px 20px;
     font-size: 16px;
     border-radius: 5px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    transition: background-color 0.3s ease;
     color: #fff;
     background-color: var(--color-verde);
     border: none;
@@ -123,13 +127,50 @@
     max-width: 800px;
 }
 
+.pedidos-row {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.pedidos-column {
+    flex: 1;
+}
+
+.pedidos-column h3 {
+    font-size: 18px;
+    color: var(--color-verde-oscuro);
+    margin-bottom: 10px;
+}
+
+.pedidos-proveedor-input-container,
+.pedidos-status-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pedidos-status-select {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #444;
+    cursor: pointer;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pedidos-status-select:hover {
+    border-color: var(--color-verde);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
 .pedidos-proveedor-input,
-.pedidos-proveedor-telefono,
-.pedidos-proveedor-direccion,
-.pedidos-proveedor-email,
 .pedidos-producto-input,
 .pedidos-cantidad-input {
-    display: block;
     width: 100%;
     padding: 12px;
     margin-bottom: 15px;
@@ -138,17 +179,43 @@
     font-size: 15px;
 }
 
-.pedidos-proveedor-input:focus,
-.pedidos-proveedor-telefono:focus,
-.pedidos-proveedor-direccion:focus,
-.pedidos-proveedor-email:focus,
-.pedidos-producto-input:focus,
-.pedidos-cantidad-input:focus {
-    border-color: var(--color-borde-focus);
-    outline: none;
+.pedidos-autocomplete-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--color-verde);
+    border-radius: 5px;
+    background-color: #fff;
+    max-height: 150px;
+    overflow-y: auto;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.pedidos-agregar-producto-button {
+.pedidos-autocomplete-list li {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.pedidos-autocomplete-list li:hover {
+    background-color: var(--color-verde);
+    color: #fff;
+}
+
+/* ============================
+   Botones del Formulario
+============================ */
+.pedidos-boton-centrado {
+    display: flex;
+    justify-content: center; /* Centra el botón horizontalmente */
+    margin-top: 20px;        /* Espacio superior */
+  }
+  
+
+.pedidos-agregar-producto-button,
+.pedidos-registrar-pedido-button {
+    width: 300px; /* Aumenta este valor según el tamaño deseado */
+
     padding: 10px 20px;
     border-radius: 5px;
     background-color: var(--color-verde);
@@ -158,7 +225,8 @@
     transition: background-color 0.3s ease;
 }
 
-.pedidos-agregar-producto-button:hover {
+.pedidos-agregar-producto-button:hover,
+.pedidos-registrar-pedido-button:hover {
     background-color: var(--color-verde-oscuro);
 }
 
@@ -172,6 +240,8 @@
 .pedidos-editar-button,
 .pedidos-eliminar-button {
     padding: 10px;
+    width: 200px;
+    align-items: center;
     border-radius: 5px;
     border: none;
     cursor: pointer;
@@ -196,22 +266,6 @@
     background-color: var(--color-rojo-oscuro);
 }
 
-.pedidos-registrar-pedido-button {
-    margin-top: 20px;
-    padding: 12px 20px;
-    background-color: var(--color-verde);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.pedidos-registrar-pedido-button:hover {
-    background-color: var(--color-verde-oscuro);
-}
-
 /* ============================
    Lista de Pedidos Realizados
 ============================ */
@@ -225,57 +279,118 @@
     margin-bottom: 15px;
 }
 
-/* ============================
-   Autocompletado de Proveedores y Productos
-============================ */
-.pedidos-autocomplete-list {
-    position: absolute; /* Posiciona la lista de manera flotante */
-    top: 100%; /* Se coloca justo debajo del campo de entrada */
-    left: 0;
-    right: 0;
-    list-style: none;
-    padding: 0;
-    margin: 5px 0 0;
-    border: 1px solid var(--color-verde);
-    border-radius: 5px;
-    background-color: #fff;
-    max-height: 150px;
-    overflow-y: auto;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    z-index: 100; /* Asegura que la lista esté encima de otros elementos */
+/* Fondo personalizado del diálogo */
+.p-confirm-dialog {
+    background-color: #f0f4f8; /* Fondo claro */
+    border-radius: 8px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.pedidos-autocomplete-list li {
-    padding: 10px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+/* Títulos del diálogo */
+.p-confirm-dialog .p-dialog-title {
+    color: var(--color-verde-oscuro);
+    font-weight: bold;
+    font-size: 18px;
 }
 
-.pedidos-autocomplete-list li:hover {
-    background-color: #668a67; 
+/* Ancho personalizado para botones en el ConfirmDialog */
+.p-confirm-dialog .p-confirm-dialog-accept,
+.p-confirm-dialog .p-confirm-dialog-reject {
+    width: 150px; /* Ajusta el ancho según tus necesidades */
+    padding: 10px; /* Opcional: añade más relleno */
+    font-size: 16px; /* Ajusta el tamaño de la fuente */
+    border-radius: 5px; /* Opcional: bordes redondeados */
+}
+
+
+/* Hover personalizado (opcional) */
+.p-confirm-dialog .p-confirm-dialog-accept:hover {
+    background-color: var(--color-verde-oscuro);
+}
+
+.p-confirm-dialog .p-confirm-dialog-reject:hover {
+    background-color: var(--color-rojo-oscuro);
+}
+
+
+/* Botón de aceptar */
+.p-confirm-dialog .p-confirm-dialog-accept {
+    background-color: var(--color-verde);
     color: #fff;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    border: none;
 }
 
-.pedidos-autocomplete-list li.selected {
-    background-color: var(--color-borde-focus);
-    color: #fff;
+.p-confirm-dialog .p-confirm-dialog-accept:hover {
+    background-color: var(--color-verde-oscuro);
 }
+
+/* Botón de cancelar */
+.p-confirm-dialog .p-confirm-dialog-reject {
+    background-color: var(--color-rojo);
+    color: #fff;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    border: none;
+}
+
+.p-confirm-dialog .p-confirm-dialog-reject:hover {
+    background-color: var(--color-rojo-oscuro);
+}
+
 
 /* ============================
-   Inputs y Formularios con Autocompletado
+   Lista de Pedidos Realizados
 ============================ */
-.pedidos-proveedor-input-container,
-.pedidos-producto-input-container {
-    position: relative; /* Contenedor relativo para controlar la posición absoluta de la lista */
-    margin-bottom: 15px;
+
+.p-button-detalles,
+.p-button-editar,
+.p-button-enviar {
+    display: flex;
+    justify-content: center; /* Centrar horizontalmente */
+    align-items: center; /* Centrar verticalmente */
+    gap: 5px; /* Espacio entre el ícono y el texto */
+    padding: 10px 20px; /* Espaciado interno */
+    font-weight: bold; /* Opcional: para resaltar el texto */
+    text-align: center; /* Asegura que el texto esté centrado */
+    font-size: 14px; /* Tamaño de texto ajustable */
+    border-radius: 10px; /* Bordes redondeados */
+    transition: background-color 0.3s ease;
 }
 
-.pedidos-proveedor-input,
-.pedidos-producto-input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 15px;
-    box-sizing: border-box;
+/* Botón Detalles */
+.p-button-detalles {
+    background-color: #e7c775; /* Verde */
+    color: #fff; /* Blanco para el texto */
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+.p-button-detalles:hover {
+    background-color: #e6a700; /* Verde oscuro */
+}
+
+/* Botón Editar */
+.p-button-editar {
+    background-color: var(--color-rojo); /* Rojo */
+    color: #fff; /* Blanco para el texto */
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+.p-button-editar:hover {
+    background-color: var(--color-rojo-oscuro); /* Rojo oscuro */
+}
+
+/* Botón Enviar Pedido */
+.p-button-enviar {
+    background-color: var(--color-verde); /* Verde */
+    color: #fff; /* Blanco para el texto */
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+.p-button-enviar:hover {
+    background-color: var(--color-verde-oscuro); /* Verde oscuro */
 }
