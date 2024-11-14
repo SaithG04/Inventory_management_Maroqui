@@ -24,28 +24,45 @@ public class Product implements Serializable {
     @Column(nullable = false)
     private String name;
 
-    @Column
+    @Column(nullable = false)
     private String code;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column
-    private String unitMeasurement;
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "ENUM('UN', 'MT', 'CJ') DEFAULT 'UN'", nullable = false)
+    private UnitMeasurement unitMeasurement;
 
-    @Column
+    @Column(nullable = false)
     private Integer stock;
 
-    @Column
+    @Column(nullable = false)
     private Long categoryId;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('ACTIVE', 'DISCONTINUED', 'OUT_OF_STOCK') DEFAULT 'ACTIVE'")
+    @Column(columnDefinition = "ENUM('ACTIVE', 'DISCONTINUED', 'OUT_OF_STOCK') DEFAULT 'ACTIVE'", nullable = false)
     private Status status;
 
     public enum Status {
         ACTIVE,
         DISCONTINUED,
         OUT_OF_STOCK
+    }
+
+    public enum UnitMeasurement {
+        UN,
+        MT,
+        CJ
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (status == null) {
+            status = Status.ACTIVE;
+        }
+        if (unitMeasurement == null) {
+            unitMeasurement = UnitMeasurement.UN;
+        }
     }
 }
