@@ -3,12 +3,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
 public interface SupplierRepository extends JpaRepository<Supplier, Long> {
-
-    Supplier findBySupplierId(Long id);
 
     List<Supplier> findByName(String name);
 
@@ -24,5 +23,4 @@ public interface SupplierRepository extends JpaRepository<Supplier, Long> {
 
     List<Supplier> findByNameAndContactAndCategoryId(String name, String contact, Long categoryId);
 
-    Supplier findByIdSupplier(Long supplierId);
 }

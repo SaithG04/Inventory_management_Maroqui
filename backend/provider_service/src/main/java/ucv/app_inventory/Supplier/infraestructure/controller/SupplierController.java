@@ -9,50 +9,44 @@ import ucv.app_inventory.Supplier.application.SupplierServiceImpl;
 import ucv.app_inventory.Supplier.domain.Supplier;
 
 @RestController
-@RequestMapping("/api/suppliers")
+@RequestMapping("/api/supplier")
 public class SupplierController {
 
     @Autowired
     private SupplierServiceImpl supplierServiceImpl;
 
     // Add supplier
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<Supplier> addSupplier(@RequestBody Supplier supplier) {
         Supplier newSupplier = supplierServiceImpl.addSupplier(supplier);
         return ResponseEntity.ok(newSupplier);
     }
 
     // Get all suppliers
-    @GetMapping
+    @GetMapping("/listAll")
     public ResponseEntity<List<Supplier>> getAllSuppliers() {
         return ResponseEntity.ok(supplierServiceImpl.getAllSuppliers());
     }
 
     // Get supplier by ID
-    @GetMapping("/{id}")
+    @GetMapping("/getById/{id}")
     public ResponseEntity<Supplier> getSupplierById(@PathVariable Long id) {
         Optional<Supplier> supplier = supplierServiceImpl.getSupplierById(id);
         return supplier.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     // Update supplier
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Supplier> updateSupplier(@PathVariable Long id, @RequestBody Supplier supplier) {
         Supplier updatedSupplier = supplierServiceImpl.updateSupplier(id, supplier);
         return ResponseEntity.ok(updatedSupplier);
     }
 
     // Delete supplier
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteSupplier(@PathVariable Long id) {
         supplierServiceImpl.deleteSupplier(id);
         return ResponseEntity.noContent().build();
     }
 
-    // Search supplier by ID
-    @GetMapping("/searchById")
-    public ResponseEntity<Supplier> searchSupplierById(@RequestParam Long idSupplier) {
-        Optional<Supplier> supplier = supplierServiceImpl.getSupplierById(idSupplier);
-        return supplier.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
-    }
 }

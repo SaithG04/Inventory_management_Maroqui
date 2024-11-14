@@ -11,8 +11,12 @@ import java.util.Optional;
 @Service
 public class SupplierServiceImpl implements SupplierService {
 
+    private final SupplierRepository supplierRepository;
+
     @Autowired
-    private SupplierRepository supplierRepository;
+    public SupplierServiceImpl(SupplierRepository supplierRepository) {
+        this.supplierRepository = supplierRepository;
+    }
 
     @Override
     public Supplier addSupplier(Supplier supplier) {
@@ -46,10 +50,5 @@ public class SupplierServiceImpl implements SupplierService {
     @Override
     public void deleteSupplier(Long id) {
         supplierRepository.deleteById(id);
-    }
-
-    @Override
-    public Supplier searchSupplierById(Long supplierId) {
-        return supplierRepository.findByIdSupplier(supplierId);
     }
 }
