@@ -1,5 +1,6 @@
 // Importación de componentes y estilos
 import React, { useState, useEffect, useRef, useContext } from "react";
+import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { Checkbox } from 'primereact/checkbox';
 import { DataTable } from 'primereact/datatable';
@@ -377,6 +378,7 @@ const Productos = ({ userRole }) => {
 };
 
 // Componente de Sección de Búsqueda
+// Componente de Sección de Búsqueda
 const SearchSection = ({
     searchOptions,
     searchCriteria,
@@ -399,13 +401,19 @@ const SearchSection = ({
                 placeholder="Selecciona un criterio"
             />
 
-            <input
-                type="text"
-                className="search-input"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Buscar..."
-            />
+            <div className="p-inputgroup">
+                <span className="p-inputgroup-addon">
+                    <i className="pi pi-search" />
+                </span>
+                <InputText
+                    type="text"
+                    className="search-input"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Buscar..."
+                />
+            </div>
+            
             <button onClick={handleSearch} className="search-button">Buscar</button>
             <button onClick={handleClearSearch} className="clear-button">Limpiar</button>
 
@@ -430,6 +438,7 @@ const SearchSection = ({
         </div>
     );
 };
+
 
 // Componente de Formulario para Agregar o Editar Producto
 const AddProductForm = ({ newProduct, categoryOptions = [], handleInputChange, handleCategoryChange, handleStatusChange, handleAddOrEditProduct, isEditing }) => {

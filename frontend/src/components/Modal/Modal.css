@@ -1,1 +1,96 @@
+/* Modal.css */
 
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Fondo oscuro con menor opacidad */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-content {
+    background-color: #ffffff; /* Fondo blanco para mayor claridad */
+    padding: 3rem; /* Aumentar el padding para mayor espacio interno */
+    border-radius: 12px; /* Bordes más redondeados */
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    border: 1px solid #d1d1d1; /* Borde gris suave */
+    animation: slideDown 0.4s ease;
+}
+
+.modal-actions {
+    margin-top: 2rem; /* Mayor espacio entre el contenido y los botones */
+    display: flex;
+    justify-content: space-between; /* Espacio amplio entre los botones */
+    align-items: center;
+    gap: 30px; /* Aumentar el espacio entre los botones */
+    padding: 0 2rem; /* Añadir padding lateral para separar los botones de los bordes */
+}
+
+.modal-button.aceptar {
+    background-color: #668a67; /* Verde suave para botón Aceptar */
+    border: none;
+    color: white;
+    padding: 15px 20px; /* Aumentar el padding para mayor tamaño del botón */
+    font-size: 16px; /* Tamaño de fuente */
+    border-radius: 8px; /* Bordes más redondeados */
+    width: 160px; /* Ancho fijo ligeramente mayor */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    font-weight: bold;
+}
+
+.modal-button.aceptar:hover {
+    background-color: #355537; /* Un tono más oscuro al pasar el ratón */
+    transform: scale(1.08); /* Aumenta ligeramente el tamaño */
+}
+
+.modal-button.cancel {
+    background-color: #9b6a67; /* Rojo suave para botón de cancelar */
+    color: white;
+    font-weight: bold;
+    padding: 15px 20px; /* Aumentar el padding para mayor tamaño del botón */
+    font-size: 16px; /* Tamaño de fuente */
+    border: none;
+    border-radius: 8px; /* Bordes más redondeados */
+    width: 160px; /* Ancho fijo ligeramente mayor */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s ease;
+}
+
+.modal-button.cancel:hover {
+    background-color: #7f3736; /* Rojo más oscuro al hacer hover */
+    transform: scale(1.08); /* Aumenta ligeramente el tamaño */
+}
+
+.modal-title {
+    font-size: 1.75rem; /* Aumentar el tamaño del título */
+    font-weight: bold;
+    color: #333333; /* Color gris oscuro */
+    margin-bottom: 1.5rem; /* Mayor espacio debajo del título */
+}
+
+.modal-content p {
+    color: #555555; /* Color gris medio */
+    font-size: 1.1rem; /* Aumentar el tamaño de fuente para mejor legibilidad */
+    margin-bottom: 2.5rem; /* Mayor espacio debajo del texto */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}

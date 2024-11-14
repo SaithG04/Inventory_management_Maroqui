@@ -1,24 +1,64 @@
 import React, { useState } from 'react';
-import { FaChartLine, FaClipboardList, FaShoppingCart, FaSignOutAlt, FaUsers, FaUser } from 'react-icons/fa'; // Agregamos FaUser aquí
+import {
+  FaChartLine,
+  FaClipboardList,
+  FaShoppingCart,
+  FaSignOutAlt,
+  FaUsers,
+  FaUser,
+  FaBox,
+} from 'react-icons/fa';
 import './Sidebar.css';
+import '../Modal/Modal.css'; // Ajustar la ruta según la estructura de carpetas
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+import Modal from '../Modal/Modal';
 
-const Sidebar = ({ onButtonClick, userRole, userName }) => {
+const Sidebar = ({ onButtonClick, userRole, userName, onLogout }) => {
   const [activeModule, setActiveModule] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const modulesByRole = {
-    Administrador: ['dashboard', 'producto', 'ventas', 'empleados', 'suppliers'],
-    Almacenero: ['producto'],
-    Vendedor: ['producto', 'ventas']
+    Administrator: [
+      { key: 'dashboard', label: 'Dashboard', icon: <FaChartLine className="sidebar-icon" /> },
+      { key: 'pedidos', label: 'Pedidos', icon: <FaBox className="sidebar-icon" /> },
+      { key: 'producto', label: 'Productos', icon: <FaClipboardList className="sidebar-icon" /> },
+      { key: 'ventas', label: 'Ventas', icon: <FaShoppingCart className="sidebar-icon" /> },
+      { key: 'empleados', label: 'Empleados', icon: <FaUsers className="sidebar-icon" /> },
+      { key: 'suppliers', label: 'Proveedores', icon: <FaUser className="sidebar-icon" /> },
+    ],
+    Almacenero: [
+      { key: 'producto', label: 'Productos', icon: <FaClipboardList className="sidebar-icon" /> },
+    ],
+    Vendedor: [
+      { key: 'producto', label: 'Productos', icon: <FaClipboardList className="sidebar-icon" /> },
+      { key: 'ventas', label: 'Ventas', icon: <FaShoppingCart className="sidebar-icon" /> },
+    ],
   };
 
-  // Normalizar el rol para asegurar la coincidencia
-  const normalizedRole = userRole.charAt(0).toUpperCase() + userRole.slice(1).toLowerCase();
+  const normalizedRole =
+    userRole.charAt(0).toUpperCase() + userRole.slice(1).toLowerCase();
   const allowedModules = modulesByRole[normalizedRole] || [];
 
   const handleClick = (module) => {
-    setActiveModule(module);
-    onButtonClick(module);
+    if (module === 'salir') {
+      setShowLogoutModal(true);
+      console.log('Logout modal should be visible:', showLogoutModal);
+    } else {
+      setActiveModule(module);
+      onButtonClick(module);
+    }
+  };
+
+  const handleLogoutConfirm = () => {
+    setShowLogoutModal(false);
+    console.log('User confirmed logout');
+    if (typeof onLogout === 'function') {
+      onLogout(); // Aquí puedes redirigir al login o limpiar el estado del usuario
+    } else {
+      console.error('onLogout is not a function');
+    }
   };
 
   return (
@@ -27,10 +67,18 @@ const Sidebar = ({ onButtonClick, userRole, userName }) => {
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
     >
+      <ToastContainer />
+      <Modal
+        show={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleLogoutConfirm}
+      />
       <div className="profile-section">
         <div className="user-info">
-          <FaUser className="user-icon" /> 
-          <p>Usuario: <strong className="user-role">{userRole}</strong></p>
+          <FaUser className="user-icon" />
+          <p>
+            Usuario: <strong className="user-role">{userRole}</strong>
+          </p>
         </div>
         <div className="user-name-container">
           <p>Nombre:</p>
@@ -39,48 +87,17 @@ const Sidebar = ({ onButtonClick, userRole, userName }) => {
       </div>
 
       <ul className="menu-list">
-        {allowedModules.includes('dashboard') && (
+        {allowedModules.map((module) => (
           <li
-            className={activeModule === 'dashboard' ? 'active' : ''}
-            onClick={() => handleClick('dashboard')}
+            key={module.key}
+            className={activeModule === module.key ? 'active' : ''}
+            onClick={() => handleClick(module.key)}
           >
-            <FaChartLine className="icon" /> {isExpanded && <span>Dashboard</span>}
+            {module.icon} {isExpanded && <span>{module.label}</span>}
           </li>
-        )}
-        {allowedModules.includes('producto') && (
-          <li
-            className={activeModule === 'producto' ? 'active' : ''}
-            onClick={() => handleClick('producto')}
-          >
-            <FaClipboardList className="icon" /> {isExpanded && <span>Productos</span>}
-          </li>
-        )}
-        {allowedModules.includes('ventas') && (
-          <li
-            className={activeModule === 'ventas' ? 'active' : ''}
-            onClick={() => handleClick('ventas')}
-          >
-            <FaShoppingCart className="icon" /> {isExpanded && <span>Ventas</span>}
-          </li>
-        )}
-        {allowedModules.includes('empleados') && (
-          <li
-            className={activeModule === 'empleados' ? 'active' : ''}
-            onClick={() => handleClick('empleados')}
-          >
-            <FaUsers className="icon" /> {isExpanded && <span>Empleados</span>}
-          </li>
-        )}
-        {allowedModules.includes('suppliers') && (
-          <li
-            className={activeModule === 'suppliers' ? 'active' : ''}
-            onClick={() => handleClick('suppliers')}
-          >
-            <FaUsers className="icon" /> {isExpanded && <span>Proveedores</span>}
-          </li>
-        )}
+        ))}
         <li onClick={() => handleClick('salir')} className="logout-button">
-          <FaSignOutAlt className="icon" /> {isExpanded && <span>Salir</span>}
+          <FaSignOutAlt className="sidebar-icon" /> {isExpanded && <span>Salir</span>}
         </li>
       </ul>
     </div>

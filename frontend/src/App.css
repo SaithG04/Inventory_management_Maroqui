@@ -66,3 +66,28 @@
     text-align: center !important; /* Asegura que esté centrado */
     padding-left: 50px;
   }
+
+  /* ====================== */
+/* Loading Logo Styles */
+/* ====================== */
+
+/* Añade la animación de giro */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Clase para el logo de carga */
+.loading-logo {
+  width: 300px;
+  height: 300px;
+  animation: spin 1.5s linear infinite;
+}
+
+/* Ocultar login-container durante la carga */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}

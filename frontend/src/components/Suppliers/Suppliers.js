@@ -6,10 +6,10 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
-import 'primereact/resources/themes/saga-blue/theme.css'; // Importar el tema primero
-import 'primereact/resources/primereact.min.css'; // Importar componentes de PrimeReact después
+import 'primereact/resources/themes/saga-blue/theme.css';
+import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
-import './Suppliers.css'; // Finalmente, importar tus propios estilos
+import './Suppliers.css';
 
 const Suppliers = () => {
     const [proveedores, setProveedores] = useState([]);
@@ -36,7 +36,6 @@ const Suppliers = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Validación de campos
         if (!name || !contact || !phone || !email || !address || !status) {
             toast.current.show({
                 severity: 'warn',
@@ -59,14 +58,12 @@ const Suppliers = () => {
                 let updatedProveedores;
 
                 if (editingIndex !== null) {
-                    // Editar un proveedor existente
                     updatedProveedores = proveedores.map((proveedor, i) =>
                         i === editingIndex ? nuevoProveedor : proveedor
                     );
                     setEditingIndex(null);
                     toast.current.show({ severity: 'success', summary: 'Proveedor Actualizado', detail: 'Proveedor actualizado con éxito.', life: 3000 });
                 } else {
-                    // Agregar un nuevo proveedor
                     updatedProveedores = [...proveedores, nuevoProveedor];
                     toast.current.show({ severity: 'success', summary: 'Proveedor Agregado', detail: 'Proveedor agregado con éxito.', life: 3000 });
                 }
@@ -74,8 +71,6 @@ const Suppliers = () => {
                 setProveedores(updatedProveedores);
                 setFilteredProveedores(updatedProveedores);
                 localStorage.setItem('proveedores', JSON.stringify(updatedProveedores));
-
-                // Limpiar los campos del formulario
                 resetForm();
                 setIsFormVisible(false);
             },
@@ -117,15 +112,14 @@ const Suppliers = () => {
         toast.current.show({ severity: 'success', summary: 'Estado Actualizado', detail: 'Estado del proveedor actualizado con éxito.', life: 3000 });
     };
 
-    // Función para alternar la visibilidad del formulario (agregar/cancelar)
     const handleToggleForm = () => {
         if (isFormVisible && (name || contact || phone || email || address)) {
             confirmDialog({
                 message: 'Hay datos ingresados en el formulario. ¿Estás seguro de que deseas cancelar?',
                 header: 'Confirmación de Cancelación',
                 icon: 'pi pi-exclamation-triangle',
-                acceptClassName: 'custom-accept-button', // Añadir clase personalizada para aceptar
-                rejectClassName: 'custom-reject-button', // Añadir clase personalizada para rechazar
+                acceptClassName: 'custom-accept-button',
+                rejectClassName: 'custom-reject-button',
                 accept: () => {
                     resetForm();
                     setIsFormVisible(false);
@@ -137,8 +131,6 @@ const Suppliers = () => {
         }
     };
 
-
-    // Función para limpiar los campos del formulario
     const resetForm = () => {
         setName('');
         setContact('');
@@ -182,7 +174,10 @@ const Suppliers = () => {
 
             <h2>Proveedores</h2>
             <div className="suppliers-search-section">
-                <div className="suppliers-search-input">
+                <div className="p-inputgroup suppliers-search-input">
+                    <span className="p-inputgroup-addon">
+                        <i className="pi pi-search" />
+                    </span>
                     <InputText
                         placeholder="Buscar proveedores..."
                         value={searchTerm}
@@ -306,7 +301,7 @@ const Suppliers = () => {
                             type="submit"
                             label={editingIndex !== null ? 'Actualizar Proveedor' : 'Guardar Proveedor'}
                             icon="pi pi-check"
-                            className={editingIndex !== null ? 'custom-accept-button' : 'custom-accept-button'}
+                            className="custom-accept-button"
                             style={{ width: '250px' }}
                         />
                     </div>
@@ -324,9 +319,9 @@ const Suppliers = () => {
                 >
                     <Column field="name" header="Nombre" sortable headerClassName="suppliers-header" bodyClassName="suppliers-body" />
                     <Column field="contact" header="Contacto" sortable headerClassName="suppliers-header" bodyClassName="suppliers-body" />
-                    <Column field="phone" header="Teléfono"  headerClassName="suppliers-header" bodyClassName="suppliers-body" />
-                    <Column field="email" header="Email"  headerClassName="suppliers-header" bodyClassName="suppliers-body" />
-                    <Column field="address" header="Dirección"  headerClassName="suppliers-header" bodyClassName="suppliers-body" />
+                    <Column field="phone" header="Teléfono" headerClassName="suppliers-header" bodyClassName="suppliers-body" />
+                    <Column field="email" header="Email" headerClassName="suppliers-header" bodyClassName="suppliers-body" />
+                    <Column field="address" header="Dirección" headerClassName="suppliers-header" bodyClassName="suppliers-body" />
                     <Column field="status" header="Estado" sortable headerClassName="suppliers-header" bodyClassName="suppliers-body" />
                     <Column
                         body={(rowData, rowProps) => (
@@ -344,6 +339,7 @@ const Suppliers = () => {
                                     data-status={rowData.status}
                                     onClick={() => handleToggleStatus(rowProps.rowIndex)}
                                 />
+
                             </div>
                         )}
                     />

@@ -15,7 +15,7 @@
 }
 
 /* ============================
- Estilos de la Sección de Búsqueda
+   Estilos de la Sección de Búsqueda
 ============================ */
 .suppliers-search-section {
   display: flex; /* Alinea los elementos en fila */
@@ -35,12 +35,26 @@
   align-items: center; /* Asegúrate de que el input se alinee bien */
 }
 
-.suppliers-search-input .p-inputtext {
+.suppliers-search-input .p-inputgroup {
+  width: 100%;
+}
+
+.suppliers-search-input .p-inputgroup .p-inputtext {
   width: 100%; /* Asegura que el input ocupe todo el ancho del contenedor */
   padding: 10px;
   border-radius: 4px; /* Bordes redondeados */
   font-size: 14px;
   box-sizing: border-box; /* Incluye el padding en el ancho */
+}
+
+.suppliers-search-input .p-inputgroup-addon {
+  padding: 10px; /* Ajusta el padding para que coincida con el del input */
+  border-radius: 4px 0 0 4px; /* Bordes redondeados para la parte izquierda */
+  background-color: #e0e0e0; /* Fondo para el área del ícono */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: auto;
 }
 
 .suppliers-search-buttons {
@@ -73,6 +87,7 @@
 .suppliers-search-buttons .p-button:hover {
   opacity: 0.9; 
 }
+
 
 .suppliers-checkbox-group {
   display: flex;          /* Coloca todos los elementos en una sola fila */
@@ -230,16 +245,21 @@
   background-color: #2b5c2b;
 }
 
-
-
+/* Estilo para el botón cuando el proveedor está activo */
 .suppliers-button-toggle[data-status="ACTIVE"] {
-  background-color: #9f4343; /* Verde para el estado Activo */
+  background-color: #9b6a67; /* Verde para indicar que está activo */
+  color: white;
 }
 
+/* Estilo para el botón cuando el proveedor está inactivo */
 .suppliers-button-toggle[data-status="INACTIVE"] {
-  background-color: #e7c775; /* Amarillo para el estado Inactivo */
+  background-color: #668a67; /* Rojo para indicar que está inactivo */
+  color: white;
 }
 
+.suppliers-button-toggle:hover {
+  opacity: 0.9; /* Un poco más oscuro al hacer hover */
+}
 
 
 /* Botón Restablecer */

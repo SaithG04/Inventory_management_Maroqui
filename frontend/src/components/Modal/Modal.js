@@ -8,15 +8,17 @@ const Modal = ({ show, onClose, onConfirm }) => {
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <h3>Confirmación</h3>
+        <h3 className="modal-title">Confirmación</h3>
         <p>¿Estás seguro de que deseas salir?</p>
         <div className="modal-actions">
-          <button className="modal-button" onClick={onConfirm}>Sí</button>
-          <button className="modal-button" onClick={onClose}>No</button>
+          <button className="modal-button aceptar" onClick={onConfirm}>Aceptar</button>
+          <button className="modal-button cancel" onClick={onClose}>Cancelar</button>
+
         </div>
       </div>
     </div>
   );
 };
+
 
 export default Modal;

@@ -1,7 +1,7 @@
 // InputField.js
 import React from 'react';
 
-const InputField = ({ id, type, placeholder, iconClass, value, onChange, error }) => (
+const InputField = ({ id, type, placeholder, iconClass, value, onChange }) => (
     <div className="login-input-container">
         <div className="login-icon-container">
             <i className={iconClass}></i>
@@ -15,7 +15,6 @@ const InputField = ({ id, type, placeholder, iconClass, value, onChange, error }
             className="login-input-field"
             required
         />
-        {error && <div className="login-error-message">{error}</div>}
     </div>
 );
 

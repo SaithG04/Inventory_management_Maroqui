@@ -1,3 +1,5 @@
+/* Sidebar.css corregido */
+
 /* Estilos para el sidebar con efecto 3D */
 .sidebar {
   width: 100px; /* Ancho inicial contraído */
@@ -30,8 +32,6 @@
 .sidebar.expanded .profile-section {
   display: block; /* Mostrar el perfil cuando está expandido */
 }
-
-
 
 /* Estilos para la lista de menú */
 .menu-list {
@@ -72,14 +72,20 @@
 }
 
 /* Estilos para el icono */
-.icon {
-  color: #f0e68c; /* Amarillo pálido para complementar el degradado del fondo */
+.sidebar-icon {
+  color: #f0e68c; /* Amarillo pálido */
   transition: color 0.3s;
-  font-size: 25px; /* Aumentar el tamaño del ícono */
+  font-size: 25px; /* Tamaño de los íconos */
 }
 
-.menu-list li:hover .icon {
-  color: #ffffff; /* Blanco para resaltar el ícono al pasar el mouse */
+/* Cambia el color al pasar el mouse */
+.menu-list li:hover .sidebar-icon {
+  color: #ffffff; /* Blanco al pasar el mouse */
+}
+
+/* Íconos en el módulo activo */
+.menu-list li.active .sidebar-icon {
+  color: #ffffff; /* Blanco para el ícono activo */
 }
 
 /* Estilos específicos para el botón de salir */
@@ -114,7 +120,7 @@
 }
 
 /* Estilo para el ícono dentro del módulo activo */
-.menu-list li.active .icon {
+.menu-list li.active .sidebar-icon {
   color: #ffffff; /* El ícono también debe ser blanco en el módulo activo */
 }
 

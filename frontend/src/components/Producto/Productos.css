@@ -6,7 +6,7 @@
     --color-verde-oscuro: #355537;
     --color-rojo: #9b6a67;
     --color-rojo-oscuro: #7f3736;
-    --color-borde-focus: #007bff;
+    --color-borde-focus: #9fceff;
 }
 
 /* ============================
@@ -30,14 +30,19 @@
 ============================ */
 /* General de la sección de búsqueda */
 .search-section {
-    display: flex; /* Alinea elementos en fila */
-    align-items: center; /* Centra verticalmente los elementos */
-    gap: 10px; /* Espacio entre los elementos */
-    padding: 10px 20px; /* Espaciado interno */
-    background-color: #f0f4f8; /* Color de fondo */
-    border-radius: 6px; /* Bordes redondeados */
-    margin-bottom: 20px; /* Espaciado inferior */
-    flex-wrap: wrap; /* Permite que los elementos se ajusten si hay poco espacio */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    background-color: #f0f4f8;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.p-inputgroup {
+    flex: 1; /* Ajustar el tamaño del input */
 }
 
 /* Estilo de Input */

@@ -203,44 +203,10 @@ body, html {
     background-color: #2a605a; /* Color de fondo en hover */
 }
 
+
 /* ====================== */
-/* Message Styles (Error and Success) */
+/* Responsive Styles */
 /* ====================== */
-
-/* Estilos generales para mensajes de error y éxito */
-.login-error-message, .login-success-message {
-    font-size: 18px; /* Tamaño de texto */
-    font-weight: bold; /* Negrita */
-    text-align: center; /* Alineación central */
-    padding: 10px; /* Espaciado interno */
-    margin-top: 10px; /* Margen superior */
-    border-radius: 5px; /* Bordes redondeados */
-    animation: fadeOut 5s ease forwards; /* Animación de desaparición */
-}
-
-/* Estilos específicos para mensaje de error */
-.login-error-message {
-    color: #d9534f; /* Color de texto */
-    background-color: rgba(217, 83, 79, 0.1); /* Fondo semitransparente */
-    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1); /* Sombra del texto */
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra en el contenedor */
-}
-
-/* Estilos específicos para mensaje de éxito */
-.login-success-message {
-    color: #5cb85c; /* Color de texto */
-    background-color: rgba(92, 184, 92, 0.1); /* Fondo semitransparente */
-}
-
-/* Definición de la animación de fadeOut para los mensajes */
-@keyframes fadeOut {
-    0% {
-        opacity: 2; /* Comienza totalmente visible */
-    }
-    100% {
-        opacity: 0; /* Desvanece completamente */
-    }
-}
 
 @media (max-width: 768px) {
     .login-container {
@@ -291,7 +257,6 @@ body, html {
     .login-icon-container {
         width: 30px; /* Ajusta el ancho en móviles */
         height: 40px; /* Ajusta la altura en móviles */
-        
     }
 
     .login-icon-container i.fas {

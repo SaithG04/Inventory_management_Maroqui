@@ -1,0 +1,281 @@
+/* ============================
+   Estilos del Módulo Pedidos
+============================ */
+
+:root {
+    --color-verde: #668a67;
+    --color-verde-oscuro: #355537;
+    --color-rojo: #9b6a67;
+    --color-rojo-oscuro: #7f3736;
+    --color-borde-focus: #007bff;
+}
+
+/* ============================
+   Estilos Generales
+============================ */
+.pedidos-container {
+    max-width: auto;
+    margin: 0 auto;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    max-height: 80vh;
+}
+
+/* ============================
+   Estilos de la Sección de Búsqueda
+============================ */
+.pedidos-search-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    background-color: #f0f4f8;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.pedidos-search-input {
+    width: 400px;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    flex: 1;
+    min-width: 200px;
+    margin-right: 10px;
+}
+
+.pedidos-search-button,
+.pedidos-clear-button {
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #fff;
+    transition: background-color 0.3s;
+}
+
+.pedidos-search-button {
+    background-color: var(--color-verde);
+}
+
+.pedidos-clear-button {
+    background-color: var(--color-rojo);
+}
+
+.pedidos-search-button:hover {
+    background-color: var(--color-verde-oscuro);
+}
+
+.pedidos-clear-button:hover {
+    background-color: var(--color-rojo-oscuro);
+}
+
+.pedidos-checkbox-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.pedidos-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* ============================
+   Estilos para Crear Pedido
+============================ */
+.pedidos-crear-pedido-section {
+    margin: 20px 0;
+}
+
+.pedidos-crear-pedido-button {
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    color: #fff;
+    background-color: var(--color-verde);
+    border: none;
+}
+
+.pedidos-crear-pedido-button:hover {
+    background-color: var(--color-verde-oscuro);
+}
+
+/* ============================
+   Formulario Crear Pedido
+============================ */
+.pedidos-proveedor-section {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    margin: 0 auto 20px;
+    max-width: 800px;
+}
+
+.pedidos-proveedor-input,
+.pedidos-proveedor-telefono,
+.pedidos-proveedor-direccion,
+.pedidos-proveedor-email,
+.pedidos-producto-input,
+.pedidos-cantidad-input {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 15px;
+}
+
+.pedidos-proveedor-input:focus,
+.pedidos-proveedor-telefono:focus,
+.pedidos-proveedor-direccion:focus,
+.pedidos-proveedor-email:focus,
+.pedidos-producto-input:focus,
+.pedidos-cantidad-input:focus {
+    border-color: var(--color-borde-focus);
+    outline: none;
+}
+
+.pedidos-agregar-producto-button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: var(--color-verde);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.pedidos-agregar-producto-button:hover {
+    background-color: var(--color-verde-oscuro);
+}
+
+/* ============================
+   Lista de Productos del Pedido
+============================ */
+.pedidos-productos-pedido-section {
+    margin-top: 20px;
+}
+
+.pedidos-editar-button,
+.pedidos-eliminar-button {
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    transition: background-color 0.3s;
+    margin-right: 10px;
+}
+
+.pedidos-editar-button {
+    background-color: var(--color-verde);
+}
+
+.pedidos-editar-button:hover {
+    background-color: var(--color-verde-oscuro);
+}
+
+.pedidos-eliminar-button {
+    background-color: var(--color-rojo);
+}
+
+.pedidos-eliminar-button:hover {
+    background-color: var(--color-rojo-oscuro);
+}
+
+.pedidos-registrar-pedido-button {
+    margin-top: 20px;
+    padding: 12px 20px;
+    background-color: var(--color-verde);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.pedidos-registrar-pedido-button:hover {
+    background-color: var(--color-verde-oscuro);
+}
+
+/* ============================
+   Lista de Pedidos Realizados
+============================ */
+.pedidos-realizados-section {
+    margin-top: 30px;
+}
+
+.pedidos-realizados-section h3 {
+    font-size: 24px;
+    color: #444;
+    margin-bottom: 15px;
+}
+
+/* ============================
+   Autocompletado de Proveedores y Productos
+============================ */
+.pedidos-autocomplete-list {
+    position: absolute; /* Posiciona la lista de manera flotante */
+    top: 100%; /* Se coloca justo debajo del campo de entrada */
+    left: 0;
+    right: 0;
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0;
+    border: 1px solid var(--color-verde);
+    border-radius: 5px;
+    background-color: #fff;
+    max-height: 150px;
+    overflow-y: auto;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 100; /* Asegura que la lista esté encima de otros elementos */
+}
+
+.pedidos-autocomplete-list li {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.pedidos-autocomplete-list li:hover {
+    background-color: #668a67; 
+    color: #fff;
+}
+
+.pedidos-autocomplete-list li.selected {
+    background-color: var(--color-borde-focus);
+    color: #fff;
+}
+
+/* ============================
+   Inputs y Formularios con Autocompletado
+============================ */
+.pedidos-proveedor-input-container,
+.pedidos-producto-input-container {
+    position: relative; /* Contenedor relativo para controlar la posición absoluta de la lista */
+    margin-bottom: 15px;
+}
+
+.pedidos-proveedor-input,
+.pedidos-producto-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 15px;
+    box-sizing: border-box;
+}
