@@ -1,9 +1,9 @@
 // App.js
 import React, { useState, useEffect, useMemo } from 'react';
 import './App.css';
-import Header from './components/Header/Header';
-import Sidebar from './components/Sidebar/Sidebar';
-import MainContent from './components/MainContent/MainContent';
+import Header from './components/layout/header/Header';
+import Sidebar from './components/layout/sidebar/Sidebar';
+import MainContent from './components/layout/maincontent/MainContent';
 import Dashboard from './components/DashboardCard/DashboardCard';
 import Pedidos from './components/Pedidos/Pedidos';
 import Productos from './components/Producto/Productos';
@@ -19,6 +19,8 @@ import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import 'primeicons/primeicons.css'; // Asegúrate de tener esta importación
+
 
 const SidebarMemo = React.memo(Sidebar);
 

@@ -1,19 +1,7 @@
-/* ============================
-   Variables de Colores
-============================ */
-:root {
-    --color-verde: #668a67;
-    --color-verde-oscuro: #355537;
-    --color-rojo: #9b6a67;
-    --color-rojo-oscuro: #7f3736;
-    --color-borde-focus: #9fceff;
-}
 
 /* ============================
-   Estilos Generales
+   Estilos Generales del Contenedor
 ============================ */
-/* src/Productos.css */
-
 .productos-container {
     max-width: auto;
     margin: 0 auto;
@@ -21,93 +9,11 @@
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow-y: auto; /* Permite el desplazamiento en el contenedor */
-    max-height: 80vh; /* Limita la altura máxima al 80% de la pantalla */
+    overflow-y: auto;
+    max-height: 80vh;
 }
 
-/* ============================
-   Estilos de la Sección de Búsqueda
-============================ */
-/* General de la sección de búsqueda */
-.search-section {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 20px;
-    background-color: #f0f4f8;
-    border-radius: 6px;
-    margin-bottom: 20px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.p-inputgroup {
-    flex: 1; /* Ajustar el tamaño del input */
-}
-
-/* Estilo de Input */
-.search-input {
-    width: 400px;
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-    flex: 1; /* Ocupa todo el espacio disponible */
-    min-width: 200px; /* Ancho mínimo para evitar que se haga demasiado pequeño */
-    margin-right: 10px; /* Espacio a la derecha para separar del botón de búsqueda */
-}
-
-/* Botones de búsqueda y limpieza */
-.search-button,
-.clear-button {
-    padding: 10px 20px;
-    border-radius: 6px;
-    border: none;
-    font-size: 14px;
-    cursor: pointer;
-    font-weight: bold;
-    color: #fff;
-    transition: background-color 0.3s;
-}
-
-.search-button {
-    background-color: var(--color-verde);
-}
-
-.clear-button {
-    background-color: var(--color-rojo);
-}
-
-.search-button:hover {
-    background-color: var(--color-verde-oscuro);
-}
-
-.clear-button:hover {
-    background-color: var(--color-rojo-oscuro);
-}
-
-/* Grupo de checkboxes */
-.checkbox-group {
-    display: flex;
-    gap: 15px; /* Espacio entre cada checkbox-item */
-    align-items: center;
-    margin-left: 10px; /* Ajusta este valor para mover los checkboxes hacia la derecha */
-}
-
-.checkbox-item {
-    display: flex;
-    align-items: center;
-    gap: 5px; /* Espacio entre el checkbox y su label */
-}
-
-/* ============================
-   Estilos para el Botón Ocultar/Mostrar Formulario
-============================ */
-.product-toggle-form {
-    text-align: left;
-    margin: 20px 0;
-}
-
+/* Botones generales para el formulario de toggle */
 .product-toggle-form .p-button {
     padding: 12px 20px;
     font-size: 16px;
@@ -129,319 +35,96 @@
     opacity: 0.9;
 }
 
-/* ============================
-   Estilos para el Formulario Crear Producto
-============================ */
-.add-product-form {
-    background-color: #fff;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-    margin: 0 auto 20px;
-    max-width: 800px;
-    font-family: Arial, sans-serif;
-}
-
-/* Títulos del formulario */
-.add-product-form h3 {
-    font-size: 24px;
-    color: #444;
-    margin-bottom: 20px;
-    text-align: left;
-}
-
-/* Contenedor para los campos de entrada */
-.form-row {
+/* ============================ Estilos Generales para los Botones ============================ */
+.button-container {
     display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin-bottom: 20px;
-}
-
-/* Estilos para los campos de entrada */
-.add-product-form input,
-.category-dropdown,
-.status-dropdown {
-    flex: 1;
-    min-width: 200px;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 15px;
-}
-
-.add-product-form input:focus,
-.category-dropdown:focus,
-.status-dropdown:focus {
-    border-color: var(--color-borde-focus);
-    outline: none;
-}
-
-/* Contenedor para el botón de agregar/actualizar */
-.add-product-section {
+    justify-content: left; /* Cambia de 'space-evenly' a 'center' para centrar sin mucha separación */
+    gap: 20px; /* Reduce el espacio entre los botones */
     margin-top: 20px;
-    text-align: center;
 }
 
-.add-button {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
-    max-width: 250px;
-    font-size: 16px;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-    color: white;
-}
-
-.add-button.add {
-    background-color: var(--color-verde);
-}
-
-.add-button.add:hover {
-    background-color: var(--color-verde-oscuro);
-}
-
-.p-button-update {
-    background-color: var(--color-verde);
-    color: white;
-    border: none;
-}
-
-/* ============================
-   Estilos para el Formulario Crear Categoría
-============================ */
-.add-category-form {
-    background-color: #fff;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-    margin: 0 auto 20px;
-    max-width: 800px;
-    font-family: Arial, sans-serif;
-}
-
-/* Títulos del formulario */
-.add-category-form h3 {
-    font-size: 24px;
-    color: #444;
-    margin-bottom: 20px;
-    text-align: left;
-}
-
-/* Contenedor para los campos de entrada */
-.add-category-form .form-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin-bottom: 20px;
-}
-
-/* Estilos para los campos de entrada */
-.input-category-name {
-    flex: 1;
-    min-width: 200px;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 15px;
-}
-
-.input-category-name:focus {
-    border-color: var(--color-borde-focus);
-    outline: none;
-}
-
-/* Contenedor para el botón de agregar categoría */
-.p-button-agproduct {
-    background-color: var(--color-verde);
-    color: white;
-    border: none;
-    padding: 12px 20px;
+/* Botones Generales */
+.button-container .p-button {
     font-size: 16px;
     border-radius: 5px;
+    padding: 10px 20px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.p-button-agproduct:hover {
-    background-color: var(--color-verde-oscuro);
-}
-
-/* ============================
-   Estilo de la Tabla de Productos
-============================ */
-/* Centrado del contenido de las celdas */
-.p-datatable .p-datatable-tbody > tr > td {
-    text-align: center;
-}
-
-/* ============================
-   Estilos de la Tabla para los botones
-============================ */
-/* Contenedor de los botones de acción */
-.products-button-container {
-    display: flex;
-    align-items: center;
-    justify-content: center; /* Asegura que los botones estén centrados horizontalmente */
-    gap: 10px; /* Espacio entre los botones */
-    flex-wrap: nowrap; /* Evita que los botones se apilen si el contenedor es estrecho */
-}
-
-/* Botones generales */
-.products-button-edit,
-.products-button-delete {
-    padding: 0.3rem 0.8rem; /* Ajustar el padding para reducir el tamaño del botón */
-    font-size: 14px; /* Reducir el tamaño de la fuente si es necesario */
+/* Botón de "Agregar Producto" */
+.add-product-button {
+    background-color: var(--color-verde); /* Usa la variable de verde */
+    color: white;
     border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s ease;
-    color: #fff;
 }
 
-/* Botón Editar */
-.products-button-edit {
-    background-color: var(--color-verde);
+.add-product-button:hover {
+    background-color: var(--color-verde-oscuro); /* Verde oscuro */
+    transform: scale(1.05); /* Agranda ligeramente el botón */
 }
 
-.products-button-edit:hover {
-    background-color: var(--color-verde-oscuro);
-    transform: scale(1.05);
+/* Botón de "Cancelar Producto" */
+.cancel-product-button {
+    background-color: var(--color-rojo); /* Usa la variable de rojo */
+    color: white;
+    border: none;
 }
 
-/* Botón Eliminar */
-.products-button-delete {
-    background-color: var(--color-rojo);
+.cancel-product-button:hover {
+    background-color: var(--color-rojo-oscuro); /* Rojo oscuro */
+    transform: scale(1.05); /* Agranda ligeramente el botón */
 }
 
-.products-button-delete:hover {
-    background-color: var(--color-rojo-oscuro);
-    transform: scale(1.05);
+/* Botón de "Crear Categoría" */
+.add-category-button {
+    background-color: var(--color-verde); /* Usa la variable de verde */
+    color: white;
+    border: none;
 }
 
-/* ============================
-   Estilos de Tooltip para la Descripción
-============================ */
-.description-wrapper {
-    position: relative;
-    display: inline-block;
+.add-category-button:hover {
+    background-color: var(--color-verde-oscuro); /* Verde oscuro */
+    transform: scale(1.05); /* Agranda ligeramente el botón */
 }
 
-.description-cell {
-    max-width: 120px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: normal;
-    display: -webkit-box;
-    line-clamp: 2;
-    -webkit-line-clamp: 2; /* Limita el texto a dos líneas */
-    -webkit-box-orient: vertical;
-}
-
-.custom-tooltip {
-    visibility: hidden;
-    background-color: rgba(0, 0, 0, 0.8);
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 8px;
-    position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 200px;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.custom-tooltip::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 6px;
-    border-style: solid;
-    border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
-}
-
-.description-wrapper:hover .custom-tooltip {
-    visibility: visible;
-    opacity: 1;
-}
-
-/* ============================
-   Estilo de los diálogos de confirmación
-============================ */
-
-/* Contenedor de botones en el diálogo de confirmación */
-/* Diseño personalizado para los diálogos de confirmación */
-
-/* Estilo general del diálogo de confirmación */
-.p-confirm-dialog .p-dialog {
-    max-width: 500px;   /* Ancho máximo del diálogo */
-    width: 100%;        /* Asegura que se ajuste al contenedor */
-    border-radius: 8px; /* Bordes redondeados para una apariencia uniforme */
-}
-
-/* Encabezado del diálogo */
-.p-confirm-dialog .p-dialog-header {
-    font-size: 20px;
+/* ============================ Estilos adicionales para los Botones ============================ */
+.p-button {
     font-weight: bold;
-    color: #444; /* Color del texto del encabezado */
-    text-align: center; /* Centra el texto del encabezado */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Añade sombra ligera */
 }
 
-/* Contenido del diálogo */
-.p-confirm-dialog .p-dialog-content {
-    font-size: 16px;
-    color: #555; /* Color del texto del mensaje */
-    text-align: center; /* Centrar el contenido del mensaje */
-    padding: 20px; /* Aumentar el padding para espaciar el contenido */
+.p-button:hover {
+    opacity: 0.9; /* Reducir ligeramente la opacidad al pasar el ratón */
 }
 
-/* Contenedor de botones en el diálogo de confirmación */
-.p-confirm-dialog .p-dialog-footer {
-    padding: 20px;                /* Aumentar el padding del pie de diálogo */
-    display: flex;                /* Alinea los botones en fila */
-    justify-content: space-around; /* Distribuye el espacio entre los botones */
-    align-items: center;           /* Centra los botones verticalmente */
-    gap: 20px;                     /* Añade espacio entre los botones */
+/* ============================
+   Estilos para separar las secciones
+============================ */
+
+/* Separación entre el formulario de agregar producto y la tabla de productos */
+.add-product-form,
+.add-category-form {
+    margin-bottom: 40px; /* Aumenta el espacio debajo del formulario */
 }
 
-/* Estilo para el botón Aceptar */
-.custom-accept-button {
-    background-color: var(--color-verde);
-    border: none;
-    color: white;
-    padding: 12px;                /* Espaciado interno */
-    font-size: 16px;              /* Tamaño de fuente */
-    border-radius: 5px;           /* Bordes redondeados */
-    width: 150px;                 /* Ancho fijo para los botones */
-    transition: background-color 0.3s, transform 0.3s; /* Transición suave */
+/* Contenedor general para los productos (debería separarse de las secciones de formulario) */
+.productos-container {
+    max-width: auto;
+    margin: 0 auto;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    max-height: 80vh;
+    margin-top: 40px; /* Añadir más espacio arriba para separar de otras secciones */
 }
 
-.custom-accept-button:hover {
-    background-color: #2b5c2b;    /* Un tono más oscuro al pasar el ratón */
-    transform: scale(1.05);       /* Aumenta ligeramente el tamaño */
-}
 
-/* Estilo para el botón Cancelar */
-.custom-reject-button {
-    background-color: var(--color-rojo);
-    border: none;
-    color: white;
-    padding: 12px;                /* Espaciado interno */
-    font-size: 16px;              /* Tamaño de fuente */
-    border-radius: 5px;           /* Bordes redondeados */
-    width: 150px;                 /* Ancho fijo para los botones */
-    transition: background-color 0.3s, transform 0.3s; /* Transición suave */
-}
-
-.custom-reject-button:hover {
-    background-color: #4e1e1e;    /* Un tono más oscuro al pasar el ratón */
-    transform: scale(1.05);       /* Aumenta ligeramente el tamaño */
+/* Sección de botones de la tabla (Agregar producto, Cancelar, Crear categoría) */
+.add-product-button,
+.add-category-button,
+.cancel-product-button {
+    margin-bottom: 15px; /* Aseguramos que haya separación en la parte inferior de los botones */
 }

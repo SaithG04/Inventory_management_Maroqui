@@ -16,3 +16,4 @@ code {
 @tailwind components;
 @tailwind utilities;
 @import '~@fortawesome/fontawesome-free/css/all.min.css';
+@import './assets/variables.css';

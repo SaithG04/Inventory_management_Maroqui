@@ -1,18 +1,10 @@
+// src/components/Sidebar/Sidebar.js
 import React, { useState } from 'react';
-import {
-  FaChartLine,
-  FaClipboardList,
-  FaShoppingCart,
-  FaSignOutAlt,
-  FaUsers,
-  FaUser,
-  FaBox,
-} from 'react-icons/fa';
+import { FaChartLine, FaClipboardList, FaShoppingCart, FaSignOutAlt, FaUsers, FaUser, FaBox } from 'react-icons/fa';
 import './Sidebar.css';
-import '../Modal/Modal.css'; // Ajustar la ruta según la estructura de carpetas
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
-import Modal from '../Modal/Modal';
+import Modal from '../../shared/modal/Modal';
 
 const Sidebar = ({ onButtonClick, userRole, userName, onLogout }) => {
   const [activeModule, setActiveModule] = useState('');
@@ -37,14 +29,12 @@ const Sidebar = ({ onButtonClick, userRole, userName, onLogout }) => {
     ],
   };
 
-  const normalizedRole =
-    userRole.charAt(0).toUpperCase() + userRole.slice(1).toLowerCase();
+  const normalizedRole = userRole.charAt(0).toUpperCase() + userRole.slice(1).toLowerCase();
   const allowedModules = modulesByRole[normalizedRole] || [];
 
   const handleClick = (module) => {
     if (module === 'salir') {
-      setShowLogoutModal(true);
-      console.log('Logout modal should be visible:', showLogoutModal);
+      setShowLogoutModal(true); // Mostrar el modal cuando se haga clic en "Salir"
     } else {
       setActiveModule(module);
       onButtonClick(module);
@@ -53,11 +43,8 @@ const Sidebar = ({ onButtonClick, userRole, userName, onLogout }) => {
 
   const handleLogoutConfirm = () => {
     setShowLogoutModal(false);
-    console.log('User confirmed logout');
     if (typeof onLogout === 'function') {
       onLogout(); // Aquí puedes redirigir al login o limpiar el estado del usuario
-    } else {
-      console.error('onLogout is not a function');
     }
   };
 
@@ -68,11 +55,15 @@ const Sidebar = ({ onButtonClick, userRole, userName, onLogout }) => {
       onMouseLeave={() => setIsExpanded(false)}
     >
       <ToastContainer />
+      {/* Modal para confirmar salida */}
       <Modal
         show={showLogoutModal}
         onClose={() => setShowLogoutModal(false)}
         onConfirm={handleLogoutConfirm}
+        title="Confirmación de Cierre de Sesión"
+        message="¿Estás seguro de que deseas cerrar sesión?"
       />
+      
       <div className="profile-section">
         <div className="user-info">
           <FaUser className="user-icon" />
