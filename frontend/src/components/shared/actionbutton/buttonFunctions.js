@@ -70,44 +70,31 @@ export const messages = {
     editDetail: 'El producto ha sido actualizado con éxito.'
 };
 
-// Función global para agregar o editar un producto
-// Función global para agregar o editar un producto
-export const handleAddOrEditProduct = (newProduct, isEditing, addProduct, updateProduct, toast, setShowForm) => {
-    // Asegúrate de que todos los campos obligatorios están completos
-    if (
-        !newProduct ||
-        typeof newProduct.name !== 'string' ||
-        newProduct.name.trim() === '' ||
-        !newProduct.unit ||
-        newProduct.unit.trim() === '' ||
-        !newProduct.category ||
-        (typeof newProduct.category !== 'string' && typeof newProduct.category.name !== 'string') ||
-        isNaN(newProduct.stock) ||
-        newProduct.stock <= 0
-    ) {
-        toast.current.show({
-            severity: 'warn',
-            summary: 'Error',
-            detail: messages.incomplete,
-            life: 3000,
-        });
-        return;
-    }
+
+// En buttonFunctions.js
+export const handleAddOrEditItem = (item, isEditing, addItem, updateItem, toast, setShowForm, successMessages) => {
+    const updatedItem = {
+        ...item,
+        description: item.description || "Sin descripción", // Agregar una descripción por defecto si no tiene
+    };
 
     if (isEditing) {
-        updateProduct(newProduct);
+        updateItem(updatedItem);
+        toast.current.show({ 
+            severity: 'success', 
+            summary: successMessages.editSummary || 'Elemento editado', 
+            detail: successMessages.editDetail || 'Los datos fueron actualizados correctamente.' 
+        });
     } else {
-        addProduct(newProduct);
+        addItem(updatedItem);
+        toast.current.show({ 
+            severity: 'success', 
+            summary: successMessages.addSummary || 'Elemento agregado', 
+            detail: successMessages.addDetail || 'El nuevo elemento fue agregado correctamente.' 
+        });
     }
 
-    toast.current.show({
-        severity: 'success',
-        summary: isEditing ? messages.editSummary : messages.addSummary,
-        detail: isEditing ? messages.editDetail : messages.addDetail,
-        life: 3000,
-    });
-
-    setShowForm(false);
+    setShowForm(false); // Ocultar el formulario después de la acción
 };
 
 // Función para manejar el botón de Eliminar Item

@@ -7,7 +7,7 @@ import CreateCategoryForm from './components/add-category-form/CreateCategoryFor
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import './Productos.css';
-import { handleAddOrEditProduct, handleDeleteItem } from '../shared/actionbutton/buttonFunctions';
+import { handleAddOrEditItem, handleDeleteItem } from '../shared/actionbutton/buttonFunctions';
 
 const Productos = ({ userRole }) => {
     const { products, addProduct, updateProduct, deleteProduct, categoryOptions, addCategory } = useContext(ProductContext);
@@ -43,7 +43,6 @@ const Productos = ({ userRole }) => {
     };
 
     const handleAddProductClick = () => {
-        // Si el formulario de producto ya está visible, ocultarlo
         if (showAddProductForm) {
             setShowAddProductForm(false);
             setIsEditing(false);
@@ -85,20 +84,27 @@ const Productos = ({ userRole }) => {
             description: newProduct.description ? newProduct.description : "Sin descripción"
         };
     
+        const successMessages = {
+            addSummary: "Producto agregado",
+            addDetail: "El nuevo producto ha sido agregado correctamente.",
+            editSummary: "Producto editado",
+            editDetail: "Los detalles del producto han sido actualizados correctamente."
+        };
+    
         console.log("Datos del producto antes de agregar/editar:", updatedProduct); // Log para depurar y verificar datos
     
-        handleAddOrEditProduct(
+        // Cambié aquí handleAddOrEditProduct por handleAddOrEditItem
+        handleAddOrEditItem(
             updatedProduct,
             isEditing,
             addProduct,
             updateProduct,
             toast,
-            setShowAddProductForm
+            setShowAddProductForm,
+            successMessages // Pasamos los mensajes personalizados
         );
     };
     
-    
-
     const handleEditItem = (product) => {
         const selectedCategory = categoryOptions.find(cat => cat.name === product.category) || null;
         setNewProduct({
@@ -121,11 +127,7 @@ const Productos = ({ userRole }) => {
 
             {/* Sección de búsqueda */}
             <SearchSection
-                searchOptions={[
-                    { name: 'Nombre', code: 'name' },
-                    { name: 'Categoría', code: 'category' },
-                    { name: 'Descripción', code: 'description' },
-                ]}
+                searchOptions={[{ name: 'Nombre', code: 'name' }, { name: 'Categoría', code: 'category' }, { name: 'Descripción', code: 'description' }]}
                 searchCriteria={searchCriteria}
                 setSearchCriteria={setSearchCriteria}
                 searchTerm={searchTerm}
@@ -176,7 +178,7 @@ const Productos = ({ userRole }) => {
                             status: e.value,
                         }))
                     }
-                    handleAddOrEditProduct={handleAddOrEditProductLocal} 
+                    handleAddOrEditProduct={handleAddOrEditProductLocal}
                     isEditing={isEditing}
                 />
             )}
@@ -196,10 +198,11 @@ const Productos = ({ userRole }) => {
                 onPageChange={handlePageChange}
                 handleEdit={(product) => handleEditItem(product)}
                 handleDelete={(productId) => {
-                    handleDeleteItem(productId, deleteProduct, toast, {
+                    const successMessages = {
                         deleteSummary: 'Producto Eliminado',
-                        deleteDetail: 'El producto ha sido eliminado con éxito.',
-                    });
+                        deleteDetail: 'El producto ha sido eliminado con éxito.'
+                    };
+                    handleDeleteItem(productId, deleteProduct, toast, successMessages);
                 }}
                 isVendedor={userRole === 'Vendedor'}
             />
