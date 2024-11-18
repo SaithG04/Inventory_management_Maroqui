@@ -9,6 +9,7 @@ import { Button } from 'primereact/button';
 import './Productos.css';
 import { handleAddOrEditItem, handleDeleteItem } from '../shared/actionbutton/buttonFunctions';
 
+
 const Productos = ({ userRole }) => {
     const { products, addProduct, updateProduct, deleteProduct, categoryOptions, addCategory } = useContext(ProductContext);
     const toast = useRef(null);
@@ -83,16 +84,16 @@ const Productos = ({ userRole }) => {
             category: typeof newProduct.category === 'object' ? newProduct.category?.name : newProduct.category,
             description: newProduct.description ? newProduct.description : "Sin descripción"
         };
-    
+
         const successMessages = {
             addSummary: "Producto agregado",
             addDetail: "El nuevo producto ha sido agregado correctamente.",
             editSummary: "Producto editado",
             editDetail: "Los detalles del producto han sido actualizados correctamente."
         };
-    
+
         console.log("Datos del producto antes de agregar/editar:", updatedProduct); // Log para depurar y verificar datos
-    
+
         // Cambié aquí handleAddOrEditProduct por handleAddOrEditItem
         handleAddOrEditItem(
             updatedProduct,
@@ -104,7 +105,7 @@ const Productos = ({ userRole }) => {
             successMessages // Pasamos los mensajes personalizados
         );
     };
-    
+
     const handleEditItem = (product) => {
         const selectedCategory = categoryOptions.find(cat => cat.name === product.category) || null;
         setNewProduct({
@@ -120,6 +121,8 @@ const Productos = ({ userRole }) => {
         setIsEditing(true);
         setShowAddProductForm(true);
     };
+
+
 
     return (
         <div className="productos-container">
@@ -139,7 +142,7 @@ const Productos = ({ userRole }) => {
                 toast={toast}
             />
 
-            <div className="button-container">
+            <div className="button-container products-and-categories">
                 <Button
                     label={showAddProductForm ? "Cancelar" : "Agregar Producto"}
                     icon={showAddProductForm ? "pi pi-times" : "pi pi-plus"}
@@ -151,9 +154,11 @@ const Productos = ({ userRole }) => {
                     label={showCreateCategoryForm ? "Cancelar" : "Crear Categoría"}
                     icon={showCreateCategoryForm ? "pi pi-times" : "pi pi-plus"}
                     onClick={handleCreateCategoryClick}
-                    className="add-category-button"
+                    className={showCreateCategoryForm ? "cancel-category-button" : "add-category-button"}
                 />
             </div>
+
+
 
             {showAddProductForm && (
                 <AddProductForm

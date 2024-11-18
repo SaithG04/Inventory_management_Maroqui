@@ -36,57 +36,83 @@
 }
 
 /* ============================ Estilos Generales para los Botones ============================ */
-.button-container {
+/* Contenedor de botones */
+.button-container.products-and-categories {
     display: flex;
-    justify-content: left; /* Cambia de 'space-evenly' a 'center' para centrar sin mucha separación */
-    gap: 20px; /* Reduce el espacio entre los botones */
+    justify-content: flex-start;
+    align-items: center; /* Asegura la alineación vertical */
+    gap: 20px; /* Espacio entre los botones */
+    margin-bottom: 30px; /* Espaciado entre los botones y el formulario */
     margin-top: 20px;
 }
 
-/* Botones Generales */
-.button-container .p-button {
-    font-size: 16px;
-    border-radius: 5px;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+/* Botones uniformes */
+.button-container.products-and-categories .p-button {
+    height: 40px; /* Tamaño uniforme */
+    padding: 10px 20px; /* Padding uniforme */
+    font-size: 16px; /* Tamaño del texto uniforme */
+    display: flex;
+    align-items: center; /* Alinea texto e íconos verticalmente */
+    justify-content: center; /* Centra el contenido horizontalmente */
+    margin: 0; /* Elimina márgenes adicionales */
 }
 
+/* Íconos uniformes */
+.button-container.products-and-categories .p-button .pi {
+    font-size: 1rem; /* Tamaño uniforme para los íconos */
+    vertical-align: middle; /* Asegura la alineación vertical */
+    margin-right: 8px; /* Espaciado uniforme entre el ícono y el texto */
+}
+
+
 /* Botón de "Agregar Producto" */
-.add-product-button {
+.button-container.products-and-categories .add-product-button {
     background-color: var(--color-verde); /* Usa la variable de verde */
     color: white;
     border: none;
 }
 
-.add-product-button:hover {
+.button-container.products-and-categories .add-product-button:hover {
     background-color: var(--color-verde-oscuro); /* Verde oscuro */
     transform: scale(1.05); /* Agranda ligeramente el botón */
 }
 
 /* Botón de "Cancelar Producto" */
-.cancel-product-button {
+.button-container.products-and-categories .cancel-product-button {
     background-color: var(--color-rojo); /* Usa la variable de rojo */
     color: white;
     border: none;
 }
 
-.cancel-product-button:hover {
+.button-container.products-and-categories .cancel-product-button:hover {
     background-color: var(--color-rojo-oscuro); /* Rojo oscuro */
     transform: scale(1.05); /* Agranda ligeramente el botón */
 }
 
 /* Botón de "Crear Categoría" */
-.add-category-button {
+.button-container.products-and-categories .add-category-button {
     background-color: var(--color-verde); /* Usa la variable de verde */
     color: white;
     border: none;
 }
 
-.add-category-button:hover {
+.button-container.products-and-categories .add-category-button:hover {
     background-color: var(--color-verde-oscuro); /* Verde oscuro */
     transform: scale(1.05); /* Agranda ligeramente el botón */
 }
+
+/* Botón de "Cancelar Categoría" */
+.button-container.products-and-categories .cancel-category-button {
+    background-color: var(--color-rojo); /* Usa la misma variable de rojo */
+    color: white;
+    border: none;
+}
+
+.button-container.products-and-categories .cancel-category-button:hover {
+    background-color: var(--color-rojo-oscuro); /* Rojo oscuro */
+    transform: scale(1.05); /* Agranda ligeramente el botón */
+}
+
 
 /* ============================ Estilos adicionales para los Botones ============================ */
 .p-button {

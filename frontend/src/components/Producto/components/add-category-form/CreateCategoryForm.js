@@ -2,6 +2,7 @@ import React, { useState, useRef, useContext } from 'react';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
+import Modal from '../../../shared/modal/Modal'; // Importa el modal global
 import { ProductContext } from '../../../../context/ProductContext';
 import './CreateCategoryForm.css';
 
@@ -11,6 +12,30 @@ const CreateCategoryForm = () => {
     const [isEditing, setIsEditing] = useState(false); // Controla si estamos en modo de edición
     const [oldCategoryName, setOldCategoryName] = useState(''); // Guarda el nombre anterior en caso de edición
     const toast = useRef(null);
+
+    // Estados para el modal
+    const [showModal, setShowModal] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState(null); // Categoría seleccionada para edición
+
+    // Función para abrir el modal
+    const openModal = (category) => {
+        setSelectedCategory(category);
+        setShowModal(true);
+    };
+
+    // Función para cerrar el modal
+    const closeModal = () => {
+        setShowModal(false);
+        setSelectedCategory(null);
+    };
+
+    // Función para confirmar la edición desde el modal
+    const confirmEdit = () => {
+        if (selectedCategory) {
+            handleEditCategoryClick(selectedCategory); // Configura la categoría seleccionada para edición
+        }
+        closeModal();
+    };
 
     const handleAddOrEditCategory = () => {
         if (!categoryName.trim()) {
@@ -45,6 +70,16 @@ const CreateCategoryForm = () => {
     return (
         <div className="add-category-form">
             <Toast ref={toast} />
+
+            {/* Modal Global */}
+            <Modal
+                show={showModal}
+                onClose={closeModal}
+                onConfirm={confirmEdit}
+                title="Editar Categoría"
+                message={`¿Estás seguro de que deseas editar la categoría "${selectedCategory?.name}"?`}
+            />
+
             <h3>{isEditing ? 'Editar Categoría' : 'Crear Categoría'}</h3>
             <div className="form-row">
                 <InputText
@@ -69,7 +104,7 @@ const CreateCategoryForm = () => {
                         <span>{category.name}</span>
                         <Button
                             icon="pi pi-pencil"
-                            onClick={() => handleEditCategoryClick(category)}
+                            onClick={() => openModal(category)} // Abre el modal para confirmar la edición
                             className="edit-category-button"
                         />
                     </div>
