@@ -128,6 +128,9 @@ const Productos = ({ userRole }) => {
         <div className="productos-container">
             <Toast ref={toast} />
 
+            {/* Título de la sección de Productos */}
+            <h2 className="productos-title">Gestión de Productos</h2>
+
             {/* Sección de búsqueda */}
             <SearchSection
                 searchOptions={[{ name: 'Nombre', code: 'name' }, { name: 'Categoría', code: 'category' }, { name: 'Descripción', code: 'description' }]}
