@@ -1,0 +1,92 @@
+/* ============================ Estilos para el Formulario Crear Categoría ============================ */
+.add-category-form {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    margin: 0 auto 20px;
+    max-width: 800px;
+    font-family: Arial, sans-serif;
+}
+
+/* Títulos del formulario */
+.add-category-form h3 {
+    font-size: 24px;
+    color: #444;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+/* Contenedor para los campos de entrada */
+.add-category-form .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* Estilos para el campo de nombre de categoría */
+.input-category-name {
+    flex: 1;
+    min-width: 200px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 15px;
+}
+
+.input-category-name:focus {
+    border-color: var(--color-borde-focus);
+    outline: none;
+}
+
+/* Botón de añadir categoría */
+.p-button-agproduct {
+    background-color: var(--color-verde);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.p-button-agproduct:hover {
+    background-color: var(--color-verde-oscuro);
+}
+
+
+.category-list {
+    margin-top: 20px;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.category-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.category-item span {
+    font-size: 16px;
+    color: #333;
+}
+
+.edit-category-button {
+    background-color: var(--color-verde);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.edit-category-button:hover {
+    background-color: var(--color-verde-oscuro);
+}
