@@ -27,7 +27,7 @@ public class ProductDTO implements Serializable {
     private String description;
 
     @JsonProperty("unidad_medida")
-    private String unitMeasurement;
+    private Product.UnitMeasurement unitMeasurement;
 
     @JsonProperty("stock")
     private Integer stock;

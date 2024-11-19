@@ -1,6 +1,7 @@
 package ucv.app_inventory.application.services;
 
 import org.springframework.data.domain.Page;
+import ucv.app_inventory.application.DTO.SupplierDTO;
 import ucv.app_inventory.domain.entities.Product;
 
 import java.util.List;
@@ -20,4 +21,8 @@ public interface ProductService {
     List<Product> findProductsByStatus(Product.Status status);
 
     List<Product> findProductsByCategoryName(String categoryName);
+
+    SupplierDTO getSupplierDetails(Long supplierId);
+
+    List<SupplierDTO> getSuppliersForProduct(Long productId);
 }
