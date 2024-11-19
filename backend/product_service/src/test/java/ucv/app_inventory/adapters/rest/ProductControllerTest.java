@@ -38,7 +38,7 @@ class ProductControllerTest {
 
     @Test
     void testListProduct() throws Exception {
-        ProductDTO productDto = new ProductDTO(1L, "Producto 1", "C001", "Descripción", "unidad", 100, 1L, Product.Status.ACTIVE);
+        ProductDTO productDto = new ProductDTO(1L, "Producto 1", "C001", "Descripción", Product.UnitMeasurement.UN, 100, 1L, Product.Status.ACTIVE);
         when(productApplicationService.listProducts(0, 15)).thenReturn(Arrays.asList(productDto));
 
         mockMvc.perform(get("/api/product/listProducts?page=0&size=15"))
@@ -50,8 +50,8 @@ class ProductControllerTest {
 
     @Test
     void testSaveProduct() throws Exception {
-        ProductDTO productDto = new ProductDTO(null, "Nuevo Producto", "C002", "Descripción nueva", "unidad", 50, 1L, Product.Status.ACTIVE);
-        ProductDTO savedProductDto = new ProductDTO(2L, "Nuevo Producto", "C002", "Descripción nueva", "unidad", 50, 1L, Product.Status.ACTIVE);
+        ProductDTO productDto = new ProductDTO(null, "Nuevo Producto", "C002", "Descripción nueva", Product.UnitMeasurement.UN, 50, 1L, Product.Status.ACTIVE);
+        ProductDTO savedProductDto = new ProductDTO(2L, "Nuevo Producto", "C002", "Descripción nueva", Product.UnitMeasurement.UN, 50, 1L, Product.Status.ACTIVE);
 
         when(productApplicationService.saveProduct(productDto)).thenReturn(savedProductDto);
 

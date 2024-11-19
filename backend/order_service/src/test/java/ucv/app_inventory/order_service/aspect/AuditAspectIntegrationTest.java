@@ -33,8 +33,7 @@ public class AuditAspectIntegrationTest {
         OrderDTO newOrderDTO = new OrderDTO();
         newOrderDTO.setSupplierId(1L);
         newOrderDTO.setStatus("PENDING");
-        newOrderDTO.setTotalAmount(500.0);
-        newOrderDTO.setOrderDate(new Date());
+        newOrderDTO.setOrderDate("2024-12-12");
 
         // Create order using OrderDTO
         orderCreateUseCase.createOrder(newOrderDTO);
