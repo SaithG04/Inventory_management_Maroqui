@@ -13,10 +13,10 @@ import ucv.app_inventory.domain.entities.Product;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static ucv.app_inventory.domain.entities.Product.UnitMeasurement.UN;
 
 class ProductApplicationServiceTest {
 
@@ -33,7 +33,7 @@ class ProductApplicationServiceTest {
 
     @Test
     void testListProducts() {
-        Product product = new Product(1L, "Producto 1", "C001", "Descripción", "unidad", 100, 1L, Product.Status.ACTIVE);
+        Product product = new Product(1L, "Producto 1", "C001", "Descripción", UN, 100, 1L, Product.Status.ACTIVE);
         List<Product> productList = Arrays.asList(product);
         Page<Product> productPage = new PageImpl<>(productList, PageRequest.of(0, 15), productList.size());
 
@@ -53,8 +53,8 @@ class ProductApplicationServiceTest {
     @Test
     void testSaveProduct() {
 
-        ProductDTO productDto = new ProductDTO(null, "Nuevo Producto", "C002", "Descripción nueva", "unidad", 50, 1L, Product.Status.ACTIVE);
-        Product product = new Product(2L, "Nuevo Producto", "C002", "Descripción nueva", "unidad", 50, 1L, Product.Status.ACTIVE);
+        ProductDTO productDto = new ProductDTO(null, "Nuevo Producto", "C002", "Descripción nueva", UN, 50, 1L, Product.Status.ACTIVE);
+        Product product = new Product(2L, "Nuevo Producto", "C002", "Descripción nueva", UN, 50, 1L, Product.Status.ACTIVE);
 
         when(productService.saveProduct(any(Product.class))).thenReturn(product);
 

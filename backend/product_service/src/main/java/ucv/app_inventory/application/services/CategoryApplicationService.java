@@ -16,8 +16,31 @@ public class CategoryApplicationService {
     }
 
     public List<CategoryDTO> listCategories() {
-        return categoryService.listCategories().stream().map(this::convertToDto).collect(Collectors.toList());
+        return categoryService.listCategories().stream().map(this::convertToDto).toList();
     }
+
+    public CategoryDTO updateCategory(Long id, CategoryDTO categoryDto) {
+        Category categoryToUpdate = categoryService.findCategoryById(id);
+        if (categoryToUpdate == null) {
+            return null;
+        }
+
+
+        if (categoryDto.getName() != null) {
+            categoryToUpdate.setName(categoryDto.getName());
+        }
+        if (categoryDto.getDescription() != null) {
+            categoryToUpdate.setDescription(categoryDto.getDescription());
+        }
+        if (categoryDto.getStatus() != null) {
+            categoryToUpdate.setStatus(categoryDto.getStatus());
+        }
+
+        Category updatedCategory = categoryService.saveCategory(categoryToUpdate);
+        return convertToDto(updatedCategory);
+    }
+
+
 
     public CategoryDTO saveCategory(CategoryDTO categoryDto) {
         Category category = convertToEntity(categoryDto);

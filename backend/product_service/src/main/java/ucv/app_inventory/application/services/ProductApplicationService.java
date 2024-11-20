@@ -10,6 +10,7 @@ import ucv.app_inventory.domain.entities.Product;
 import ucv.app_inventory.exception.ProductNotFoundException;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,32 +24,31 @@ public class ProductApplicationService {
     }
 
     public List<ProductDTO> listProducts(int page, int size) {
-        logger.info("Listing products with page: {}, size: {}", page, size);
+        logger.info("Listing products");
         Page<Product> productsPage = productService.listProducts(page, size);
         return productsPage.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
     public ProductDTO saveProduct(ProductDTO productDto) {
-        logger.info("Saving product: {}", productDto);
+        logger.info("Saving product");
         Product product = convertToEntity(productDto);
         Product savedProduct = productService.saveProduct(product);
-        logger.info("Product saved: {}", savedProduct);
+        logger.info("Product saved");
         return convertToDto(savedProduct);
     }
 
     public void deleteProduct(Long id) {
-        logger.info("Deleting product with id: {}", id);
+        logger.info("Deleting product");
         productService.deleteProduct(id);
-        logger.info("Product deleted with id: {}", id);
+        logger.info("Product deleted");
     }
 
     public ProductDTO findProductById(Long id) {
-        logger.info("Finding product by id: {}", id);
+        logger.info("Buscando producto por id: {}", id);
         Product product = productService.findProductById(id);
         if (product == null) {
-            logger.warn("Product not found with id: {}", id);
-            throw new ProductNotFoundException("El producto con id " + id + " no existe");
-
+            logger.warn("Producto no encontrado con id: {}", id);
+            throw new ProductNotFoundException("Producto no encontrado con id: " + id);
         }
         return convertToDto(product);
     }
@@ -70,48 +70,54 @@ public class ProductApplicationService {
     }
 
     public ProductDTO updateProduct(Long id, ProductDTO productDto) {
-        logger.info("Updating product with id: {}", id);
+        logger.info("Updating product");
+
         Product existingProduct = productService.findProductById(id);
         if (existingProduct == null) {
-            logger.warn("Product not found with id: {}", id);
+            logger.warn("Product not found");
             throw new ProductNotFoundException("Producto con id " + id + " no encontrado");
         }
 
-        existingProduct.setName(productDto.getName());
-        existingProduct.setCode(productDto.getCode());
-        existingProduct.setDescription(productDto.getDescription());
-        existingProduct.setUnitMeasurement(productDto.getUnitMeasurement());
-        existingProduct.setStock(productDto.getStock());
-        existingProduct.setCategoryId(productDto.getCategoryId());
-        existingProduct.setStatus(productDto.getStatus());
-
+        if (productDto.getName() != null) {
+            existingProduct.setName(productDto.getName());
+        }
+        if (productDto.getCode() != null) {
+            existingProduct.setCode(productDto.getCode());
+        }
+        if (productDto.getDescription() != null) {
+            existingProduct.setDescription(productDto.getDescription());
+        }
+        if (productDto.getUnitMeasurement() != null) {
+            existingProduct.setUnitMeasurement(productDto.getUnitMeasurement());
+        }
+        if (productDto.getStock() != null) {
+            existingProduct.setStock(productDto.getStock());
+        }
+        if (productDto.getCategoryId() != null) {
+            existingProduct.setCategoryId(productDto.getCategoryId());
+        }
+        if (productDto.getStatus() != null) {
+            existingProduct.setStatus(productDto.getStatus());
+        }
 
         Product updatedProduct = productService.saveProduct(existingProduct);
-        logger.info("Product updated: {}", updatedProduct);
+        logger.info("Product updated");
         return convertToDto(updatedProduct);
     }
 
-    public List<ProductDTO> findProductsByName(String name) {
-        logger.info("Finding products by name: {}", name);
-        List<Product> products = productService.findProductsByName(name);
-        if (products == null) {
-            logger.warn("Product not found with id: {}", name);
-            throw new ProductNotFoundException("El producto con el nombre " + name + " no existe");
 
-        }
-        return products.stream().map(this::convertToDto).collect(Collectors.toList());
+    public List<ProductDTO> findProductsByName(String name, int page, int size) {
+        Page<Product> productPage = productService.findProductsByName(name, page, size);
+        return productPage.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
-    public List<ProductDTO> findProductsByStatus(Product.Status status) {
-        logger.info("Finding products by status: {}", status);
-        List<Product> products = productService.findProductsByStatus(status);
-        return products.stream().map(this::convertToDto).collect(Collectors.toList());
+    public List<ProductDTO> findProductsByStatus(Product.Status status, int page, int size) {
+        Page<Product> productPage = productService.findProductsByStatus(status, page, size);
+        return productPage.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
-    public List<ProductDTO> findProductsByCategoryName(String categoryName) {
-        logger.info("Finding products by category name: {}", categoryName);
-        List<Product> products = productService.findProductsByCategoryName(categoryName);
-        return products.stream().map(this::convertToDto).collect(Collectors.toList());
+    public List<ProductDTO> findProductsByCategoryName(String categoryName, int page, int size) {
+        Page<Product> productPage = productService.findProductsByCategoryName(categoryName, page, size);
+        return productPage.stream().map(this::convertToDto).collect(Collectors.toList());
     }
-
 }

@@ -8,6 +8,8 @@ class AppInventoryApplicationTests {
 
 	@Test
 	void contextLoads() {
+		//Este método está intencionalmente vacío.
+		// Su propósito es verificar que el contexto de la aplicación Spring Boot se cargue correctamente.
 	}
 
 }

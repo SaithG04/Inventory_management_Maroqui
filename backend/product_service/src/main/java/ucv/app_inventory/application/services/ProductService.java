@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ProductService {
 
-    Page<Product> listProducts(int page, int size);;
+    Page<Product> listProducts(int page, int size);
 
     Product saveProduct(final Product product);
 
@@ -16,13 +16,14 @@ public interface ProductService {
 
     Product findProductById(final Long id);
 
-    List<Product> findProductsByName(String name);
+    Page<Product> findProductsByName(String name, int page, int size);
 
-    List<Product> findProductsByStatus(Product.Status status);
+    Page<Product> findProductsByStatus(Product.Status status, int page, int size);
 
-    List<Product> findProductsByCategoryName(String categoryName);
+    Page<Product> findProductsByCategoryName(String categoryName, int page, int size);
 
     SupplierDTO getSupplierDetails(Long supplierId);
 
     List<SupplierDTO> getSuppliersForProduct(Long productId);
+
 }

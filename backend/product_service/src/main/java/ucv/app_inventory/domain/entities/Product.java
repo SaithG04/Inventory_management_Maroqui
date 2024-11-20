@@ -24,17 +24,17 @@ public class Product implements Serializable {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false,  unique = true)
     private String code;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = true)
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('UN', 'MT', 'CJ') DEFAULT 'UN'", nullable = false)
+    @Column(columnDefinition = "ENUM('UN', 'MT', 'CJ') DEFAULT 'UN'", nullable = true)
     private UnitMeasurement unitMeasurement;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Integer stock;
 
     @Column(nullable = false)
@@ -64,5 +64,19 @@ public class Product implements Serializable {
         if (unitMeasurement == null) {
             unitMeasurement = UnitMeasurement.UN;
         }
+        if (stock == null) {
+            stock = 0;
+        }
+        if (code == null || code.isEmpty()) {
+            code = generateNextCode();
+        }
     }
+
+    @Transient
+    private String generateNextCode() {
+        // Este método será implementado en la clase ProductServiceImpl
+        return null;
+    }
+
+
 }
