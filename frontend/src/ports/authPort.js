@@ -1,11 +1,12 @@
-// AuthPort.js
-import { jwtDecode } from 'jwt-decode'; // Usa una exportación con nombre en lugar de una exportación por defecto
+import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie';
+
+const API_URL = process.env.REACT_APP_API_URL; // Usamos la URL desde .env
 
 export const AuthPort = {
   loginUser: async (email, clave) => {
     try {
-      const response = await fetch('http://10.8.0.1:8080/api/auth/login', {
+      const response = await fetch(`${API_URL}/api/auth/login`, { // Usa la variable de entorno
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -31,9 +32,8 @@ export const AuthPort = {
       if (data.data && data.data.token) {
         const token = data.data.token;
 
-        // Cambiar configuración de la cookie
-        Cookies.set('jwtToken', token, { expires: 1, sameSite: 'Lax' }); // Quitar `secure: true` para entorno de pruebas HTTP
-        console.log("Token guardado en cookies:", Cookies.get('jwtToken')); // Verificar si se almacena correctamente
+        Cookies.set('jwtToken', token, { expires: 1, sameSite: 'Lax' });
+        console.log("Token guardado en cookies:", Cookies.get('jwtToken'));
 
         const decodedToken = jwtDecode(token);
         console.log("Decoded Token:", decodedToken);
@@ -46,5 +46,5 @@ export const AuthPort = {
       console.error('Error de conexión:', error);
       return { success: false, message: 'Error de conexión con el servidor' };
     }
-  }
+  },
 };

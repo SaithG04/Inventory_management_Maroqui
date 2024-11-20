@@ -122,8 +122,6 @@ const Productos = ({ userRole }) => {
         setShowAddProductForm(true);
     };
 
-
-
     return (
         <div className="productos-container">
             <Toast ref={toast} />
@@ -135,7 +133,7 @@ const Productos = ({ userRole }) => {
             <SearchSection
                 searchOptions={[{ name: 'Nombre', code: 'name' }, { name: 'Categoría', code: 'category' }, { name: 'Descripción', code: 'description' }]}
                 searchCriteria={searchCriteria}
-                setSearchCriteria={setSearchCriteria}
+                setSearchCriteria={setSearchCriteria} // Esto actualiza searchCriteria
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
                 isAvailable={isAvailable}

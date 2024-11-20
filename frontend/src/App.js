@@ -1,4 +1,3 @@
-// App.js
 import React, { useState, useEffect, useMemo } from 'react';
 import './App.css';
 import Header from './components/layout/header/Header';
@@ -14,146 +13,121 @@ import LoginForm from './components/Login/LoginForm';
 import { AuthPort } from './ports/authPort';
 import { ProductProvider } from './context/ProductContext';
 import Cookies from 'js-cookie';
-import Logo from './assets/logo.png';
-import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import 'primeicons/primeicons.css'; // Asegúrate de tener esta importación
 
-
-const SidebarMemo = React.memo(Sidebar);
+// Obtenemos el rol predeterminado desde .env
+const DEFAULT_ROLE = process.env.REACT_APP_DEFAULT_ROLE || 'User';
 
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [userRole, setUserRole] = useState('');
-    const [userName, setUserName] = useState('');
-    const [activeSection, setActiveSection] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userRole, setUserRole] = useState(DEFAULT_ROLE);
+  const [userName, setUserName] = useState('');
+  const [activeSection, setActiveSection] = useState('dashboard'); // Inicio por defecto
+  const [isLoading, setIsLoading] = useState(false);
 
-    useEffect(() => {
-        const token = Cookies.get('jwtToken');
-        if (token) {
-            try {
-                const decodedToken = jwtDecode(token);
-                const role = decodedToken.roles;
-                const formattedRole = role.charAt(0).toUpperCase() + role.substring(1).toLowerCase();
-                setIsAuthenticated(true);
-                setUserRole(formattedRole);
-                setUserName(decodedToken.name);
-                setDefaultSection(formattedRole);
-            } catch (error) {
-                console.error('Error decodificando el token:', error);
-                setIsAuthenticated(false);
-                Cookies.remove('jwtToken');
-            }
-        }
-    }, []);
-
-    const setDefaultSection = (roles) => {
-        if (roles === 'Administrator') {
-            setActiveSection('dashboard');
-        } else if (roles === 'Vendedor') {
-            setActiveSection('ventas');
-        } else if (roles === 'Almacenero') {
-            setActiveSection('producto');
-        }
-    };
-
-    const handleLogin = async (email, password) => {
-        setIsLoading(true);
-        const result = await AuthPort.loginUser(email, password);
-        console.log("Login Result:", result);
-        if (result.success) {
-            const token = Cookies.get('jwtToken');
-            if (token) {
-                try {
-                    const decodedToken = jwtDecode(token);
-                    console.log("Decoded Token:", decodedToken);
-                    const role = decodedToken.roles;
-                    const formattedRole = role.charAt(0).toUpperCase() + role.substring(1).toLowerCase();
-                    setIsAuthenticated(true);
-                    setUserRole(formattedRole);
-                    setUserName(decodedToken.name);
-                    setDefaultSection(formattedRole);
-                } catch (error) {
-                    console.error('Error decodificando el token:', error);
-                    setIsAuthenticated(false);
-                    Cookies.remove('jwtToken');
-                }
-            } else {
-                console.error('Token not found after successful login');
-            }
-        } else {
-            toast.error(result.message);
-        }
-        setIsLoading(false);
-    };
-
-    const handleLogout = () => {
+  useEffect(() => {
+    const token = Cookies.get('jwtToken');
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        const role = decodedToken.roles;
+        setIsAuthenticated(true);
+        setUserRole(role);
+        setUserName(decodedToken.name);
+        setDefaultSection(role);
+      } catch (error) {
+        console.error('Error decodificando el token:', error);
         setIsAuthenticated(false);
-        setUserRole('');
-        setUserName('');
-        setActiveSection('');
         Cookies.remove('jwtToken');
-        navigate('/');
-    };
+      }
+    }
+  }, []);
 
-    const handleButtonClick = (action) => {
-        if (action === 'salir') {
-            handleLogout();
-        } else if (action !== activeSection) {
-            setActiveSection(action);
+  const setDefaultSection = (roles) => {
+    if (roles === 'Administrator') {
+      setActiveSection('dashboard');
+    } else if (roles === 'Vendedor') {
+      setActiveSection('ventas');
+    } else if (roles === 'Almacenero') {
+      setActiveSection('producto');
+    }
+  };
+
+  const handleLogin = async (email, password) => {
+    setIsLoading(true);
+    const result = await AuthPort.loginUser(email, password);
+    if (result.success) {
+      const token = Cookies.get('jwtToken');
+      if (token) {
+        try {
+          const decodedToken = jwtDecode(token);
+          const role = decodedToken.roles;
+          setIsAuthenticated(true);
+          setUserRole(role);
+          setUserName(decodedToken.name);
+          setDefaultSection(role);
+        } catch (error) {
+          console.error('Error decodificando el token:', error);
+          setIsAuthenticated(false);
+          Cookies.remove('jwtToken');
         }
-    };
+      }
+    } else {
+      toast.error(result.message);
+    }
+    setIsLoading(false);
+  };
 
-    const renderModuleContent = useMemo(() => {
-        switch (activeSection) {
-            case 'dashboard':
-                return <Dashboard />;
-            case 'pedidos':
-                return <Pedidos />;
-            case 'producto':
-                return <Productos userRole={userRole} />;
-            case 'ventas':
-                return <Sales />;
-            case 'empleados':
-                return <EmployeeManagement />;
-            case 'suppliers':
-                return <Suppliers />;
-            default:
-                return <Dashboard />;
-        }
-    }, [activeSection, userRole]);
+  const handleButtonClick = (section) => {
+    if (section !== activeSection) {
+      setActiveSection(section);
+    }
+  };
 
-    return (
-        <ProductProvider>
-            <div className="app-container">
-                {isLoading ? (
-                    <div className="loading-container">
-                        <img src={Logo} alt="Loading..." className="loading-logo" />
-                    </div>
-                ) : isAuthenticated ? (
-                    <>
-                        <Header className="header" />
-                        <div className="main-layout">
-                            <SidebarMemo
-                                className="sidebar"
-                                userRole={userRole}
-                                userName={userName}
-                                onButtonClick={handleButtonClick}
-                                onLogout={handleLogout}
-                            />
-                            <MainContent className="main-content">{renderModuleContent}</MainContent>
-                        </div>
-                    </>
-                ) : (
-                    <LoginForm onLogin={handleLogin} />
-                )}
+  const renderModuleContent = useMemo(() => {
+    switch (activeSection) {
+      case 'dashboard':
+        return <Dashboard />;
+      case 'pedidos':
+        return <Pedidos />;
+      case 'producto':
+        return <Productos userRole={userRole} />;
+      case 'ventas':
+        return <Sales />;
+      case 'empleados':
+        return <EmployeeManagement />;
+      case 'suppliers':
+        return <Suppliers />;
+      default:
+        return <Dashboard />;
+    }
+  }, [activeSection, userRole]);
+
+  return (
+    <ProductProvider>
+      <div className="app-container">
+        {isLoading ? (
+          <div>Loading...</div>
+        ) : isAuthenticated ? (
+          <>
+            <Header />
+            <div className="main-layout">
+              <Sidebar
+                userRole={userRole}
+                userName={userName}
+                onButtonClick={handleButtonClick}
+              />
+              <MainContent>{renderModuleContent}</MainContent>
             </div>
-        </ProductProvider>
-    );
+          </>
+        ) : (
+          <LoginForm onLogin={handleLogin} />
+        )}
+      </div>
+    </ProductProvider>
+  );
 }
 
 export default App;

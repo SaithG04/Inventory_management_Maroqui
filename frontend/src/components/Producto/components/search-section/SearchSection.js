@@ -6,7 +6,11 @@ import { handleSearch, handleClearSearch } from '../../../shared/actionbutton/bu
 import './SearchSection.css';
 
 const SearchSection = ({
-    searchOptions,
+    searchOptions = [
+        { name: 'Nombre', code: 'name' },
+        { name: 'Categoría', code: 'category' },
+        { name: 'Descripción', code: 'description' }
+    ],
     searchTerm,
     setSearchTerm,
     setFilteredProducts,
@@ -15,7 +19,7 @@ const SearchSection = ({
     successMessage = 'Se encontraron productos.',
     noResultsMessage = 'No se encontraron productos.'
 }) => {
-    const [searchCriteria, setSearchCriteria] = useState(null); // Inicializar como null para que se muestre el placeholder
+    const [searchCriteria, setSearchCriteria] = useState(null); // Inicializa con null
     const [selectedAvailability, setSelectedAvailability] = useState(null); // Estado para el filtro del checkbox
     const [filteredProductsState, setFilteredProductsState] = useState([]); // Estado para manejar las sugerencias de autocompletado
     const [showAutocomplete, setShowAutocomplete] = useState(false); // Estado para manejar la visibilidad de la lista de autocompletado
@@ -26,21 +30,21 @@ const SearchSection = ({
         setSearchTerm(value);
         setShowAutocomplete(true); // Mostrar la lista de autocompletado
 
-        // Solo filtrar si hay un criterio seleccionado y un término de búsqueda
-        if (searchCriteria && value) {
+        // Filtrar productos según el término de búsqueda y criterio
+        if (searchCriteria && searchCriteria.name && value) {
             const filtered = products.filter(product => {
-                const fieldValue = product[searchCriteria]?.toString().toLowerCase();
+                const fieldValue = product[searchCriteria.name]?.toString().toLowerCase();
                 return fieldValue?.includes(value.toLowerCase());
             });
             setFilteredProductsState(filtered);
         } else {
-            setFilteredProductsState([]); // Limpiar las sugerencias si no hay búsqueda
+            setFilteredProductsState([]); // Limpiar si no hay búsqueda
         }
     };
 
     // Manejar la selección de un elemento de la lista de autocompletado
     const handleAutocompleteClick = (product) => {
-        setSearchTerm(product[searchCriteria]); // Actualizar el término de búsqueda con el valor seleccionado
+        setSearchTerm(product[searchCriteria.name]); // Actualizar el término de búsqueda con el valor seleccionado
         setShowAutocomplete(false); // Ocultar la lista de autocompletado
     };
 
@@ -80,16 +84,18 @@ const SearchSection = ({
 
     return (
         <div className="search-section">
+            {/* Dropdown para seleccionar el criterio de búsqueda */}
             <Dropdown
                 className="search-dropdown"
-                value={searchCriteria}
+                value={searchCriteria} // Aquí, se pasa searchCriteria
                 options={searchOptions}
-                onChange={(e) => setSearchCriteria(e.value)}
-                optionLabel="name"
-                optionValue="code"
-                placeholder="Seleccione un criterio"  // Placeholder agregado al Dropdown
+                onChange={(e) => setSearchCriteria(e.value)} // Actualiza searchCriteria al seleccionar
+                optionLabel="name" // Se muestra el nombre de la categoría
+                optionValue="code" // El valor subyacente
+                placeholder="Seleccione un criterio"
             />
 
+            {/* Campo de búsqueda */}
             <div className="p-inputgroup" style={{ position: 'relative' }}>
                 <span className="p-inputgroup-addon">
                     <i className="pi pi-search" />
@@ -99,25 +105,26 @@ const SearchSection = ({
                     className="search-input"
                     value={searchTerm}
                     onChange={handleSearchTermChange}
-                    placeholder={`Buscar por ${searchCriteria?.name || '...'}`} // Muestra el criterio o "..." si no hay selección
+                    placeholder={`Buscar por ${searchCriteria?.name || '...'}`} // Cambia el placeholder dinámicamente
                 />
 
                 {/* Mostrar sugerencias de autocompletado */}
                 {showAutocomplete && filteredProductsState.length > 0 && (
                     <div className="autocomplete-list">
                         {filteredProductsState.map((product, index) => (
-                            <div 
-                                key={index} 
+                            <div
+                                key={index}
                                 className="autocomplete-item"
                                 onClick={() => handleAutocompleteClick(product)} // Al hacer clic, se selecciona el valor y se oculta la lista
                             >
-                                {product[searchCriteria]} {/* Mostrar el valor según el criterio seleccionado */}
+                                {product[searchCriteria?.name]} {/* Mostrar el valor según el criterio seleccionado */}
                             </div>
                         ))}
                     </div>
                 )}
             </div>
 
+            {/* Botones para buscar y limpiar */}
             <button onClick={handleSearchClick} className="search-button">
                 Buscar
             </button>
@@ -125,6 +132,7 @@ const SearchSection = ({
                 Limpiar
             </button>
 
+            {/* Filtros de disponibilidad */}
             <div className="checkbox-group">
                 <div className="checkbox-item">
                     <Checkbox
