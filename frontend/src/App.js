@@ -14,23 +14,28 @@ import { AuthPort } from './ports/authPort';
 import { ProductProvider } from './context/ProductContext';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Logo from './assets/logo.png'; // Importar el logo de la aplicación
+import config from './config'; // Importar el archivo de configuración centralizada
 
-// Obtenemos el rol predeterminado desde .env
-const DEFAULT_ROLE = process.env.REACT_APP_DEFAULT_ROLE || 'User';
+// Obtenemos el rol predeterminado desde el archivo de configuración
+const DEFAULT_ROLE = config.DEFAULT_ROLE; // Usar la configuración centralizada
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userRole, setUserRole] = useState(DEFAULT_ROLE);
-  const [userName, setUserName] = useState('');
-  const [activeSection, setActiveSection] = useState('dashboard'); // Inicio por defecto
-  const [isLoading, setIsLoading] = useState(false);
+  // Definición de los estados locales
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // Estado para verificar si el usuario está autenticado
+  const [userRole, setUserRole] = useState(DEFAULT_ROLE); // Estado para el rol del usuario
+  const [userName, setUserName] = useState(''); // Estado para el nombre del usuario
+  const [activeSection, setActiveSection] = useState('dashboard'); // Estado para la sección activa, inicialmente en "dashboard"
+  const [isLoading, setIsLoading] = useState(false); // Estado para manejar el indicador de carga
 
+  // Hook para verificar si el usuario ya tiene un token almacenado (sesión activa)
   useEffect(() => {
     const token = Cookies.get('jwtToken');
     if (token) {
       try {
+        // Si el token existe, se decodifica y se configuran los estados correspondientes
         const decodedToken = jwtDecode(token);
         const role = decodedToken.roles;
         setIsAuthenticated(true);
@@ -45,6 +50,7 @@ function App() {
     }
   }, []);
 
+  // Función para configurar la sección predeterminada en función del rol del usuario
   const setDefaultSection = (roles) => {
     if (roles === 'Administrator') {
       setActiveSection('dashboard');
@@ -55,37 +61,85 @@ function App() {
     }
   };
 
+  // Función para manejar el inicio de sesión
   const handleLogin = async (email, password) => {
-    setIsLoading(true);
-    const result = await AuthPort.loginUser(email, password);
-    if (result.success) {
-      const token = Cookies.get('jwtToken');
-      if (token) {
-        try {
-          const decodedToken = jwtDecode(token);
-          const role = decodedToken.roles;
-          setIsAuthenticated(true);
-          setUserRole(role);
-          setUserName(decodedToken.name);
-          setDefaultSection(role);
-        } catch (error) {
-          console.error('Error decodificando el token:', error);
-          setIsAuthenticated(false);
-          Cookies.remove('jwtToken');
+    setIsLoading(true); // Iniciar el indicador de carga
+
+    try {
+        const result = await AuthPort.loginUser(email, password);
+
+        if (result.success) {
+          console.log("Inicio de sesión exitoso.");
+          const token = Cookies.get('jwtToken');
+          if (token) {
+              const decodedToken = jwtDecode(token);
+              const role = decodedToken.roles;
+
+              // Actualizar estados después del inicio de sesión exitoso
+              setIsAuthenticated(true);
+              setUserRole(role);
+              setUserName(decodedToken.name);
+              setDefaultSection(role);
+              console.log("Autenticación exitosa, usuario autenticado:", decodedToken.name);
+
+              // Detener el indicador de carga después de la autenticación exitosa
+              setIsLoading(false);
+          } else {
+              throw new Error("Token no disponible después de autenticación exitosa.");
+          }
+        } else {
+            // Si las credenciales no son válidas, detener la carga y mostrar el error
+            setIsLoading(false);
+
+            // Mostrar notificación de error después de un pequeño retraso
+            setTimeout(() => {
+                toast.error(result.message || 'Credenciales incorrectas. Por favor, intente nuevamente.', {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+            }, 200); // Retraso de 200ms
         }
-      }
-    } else {
-      toast.error(result.message);
+    } catch (error) {
+        console.error('Error durante el proceso de inicio de sesión:', error);
+        setIsLoading(false);
+
+        // Mostrar notificación de error de conexión después de un pequeño retraso
+        setTimeout(() => {
+            toast.error('Ha ocurrido un error. Por favor, intente nuevamente.', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }, 200); // Retraso de 200ms
     }
-    setIsLoading(false);
   };
 
+  // Función para cambiar de sección en la interfaz
   const handleButtonClick = (section) => {
     if (section !== activeSection) {
       setActiveSection(section);
     }
   };
 
+  // Función para cerrar sesión
+  const handleLogout = () => {
+    Cookies.remove('jwtToken');
+    setIsAuthenticated(false);
+    setUserRole(DEFAULT_ROLE);
+    setActiveSection('dashboard');
+    toast.success('Has cerrado sesión exitosamente.');
+  };
+
+  // Definir qué contenido mostrar en función de la sección activa
   const renderModuleContent = useMemo(() => {
     switch (activeSection) {
       case 'dashboard':
@@ -105,12 +159,18 @@ function App() {
     }
   }, [activeSection, userRole]);
 
+  // Renderizado principal de la aplicación
   return (
     <ProductProvider>
       <div className="app-container">
+        <ToastContainer />
         {isLoading ? (
-          <div>Loading...</div>
+          // Mostrar el indicador de carga mientras se procesa el inicio de sesión
+          <div className="loading-container">
+            <img src={Logo} alt="Loading..." className="loading-logo" />
+          </div>
         ) : isAuthenticated ? (
+          // Mostrar la aplicación una vez autenticado
           <>
             <Header />
             <div className="main-layout">
@@ -118,11 +178,13 @@ function App() {
                 userRole={userRole}
                 userName={userName}
                 onButtonClick={handleButtonClick}
+                onLogout={handleLogout}
               />
               <MainContent>{renderModuleContent}</MainContent>
             </div>
           </>
         ) : (
+          // Mostrar el formulario de inicio de sesión si el usuario no está autenticado
           <LoginForm onLogin={handleLogin} />
         )}
       </div>
