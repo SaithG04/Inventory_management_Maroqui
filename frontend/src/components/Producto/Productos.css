@@ -153,3 +153,35 @@
 .cancel-product-button {
     margin-bottom: 15px; /* Aseguramos que haya separación en la parte inferior de los botones */
 }
+
+
+/* ============================
+   Botón "Agregar Producto" y "Crear Categoría"
+============================ */
+.add-product-button,
+.add-category-button {
+    background-color: var(--color-verde); /* Color verde para acciones positivas */
+    border: none;
+}
+
+.add-product-button:hover,
+.add-category-button:hover {
+    background-color: var(--color-verde-oscuro); /* Verde más oscuro en hover */
+    transform: scale(1.05); /* Ligeramente más grande al pasar el ratón */
+}
+
+/* ============================
+   Botón "Cancelar Producto" y "Cancelar Categoría"
+============================ */
+.cancel-product-button,
+.cancel-category-button {
+    background-color: var(--color-rojo); /* Color rojo para acciones negativas */
+    border: none;
+}
+
+.cancel-product-button:hover,
+.cancel-category-button:hover {
+    background-color: var(--color-rojo-oscuro); /* Rojo más oscuro en hover */
+    transform: scale(1.05); /* Ligeramente más grande al pasar el ratón */
+}
+

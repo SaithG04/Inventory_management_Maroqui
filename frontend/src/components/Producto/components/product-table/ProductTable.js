@@ -1,119 +1,53 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
-import Modal from '../../../shared/modal/Modal'; // Modal global importado
+import Modal from '../../../shared/modal/Modal';
 import './ProductTable.css';
 
-// Función para obtener el token desde las cookies
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-    return null;
-}
-
-const ProductTable = ({
-    rows,
-    first,
-    onPageChange,
-    handleEdit,
-    handleDelete,
-    isVendedor,
-}) => {
-    const [products, setProducts] = useState([]); // Estado para los productos
-    const [categories, setCategories] = useState([]); // Estado para las categorías
-    const [loading, setLoading] = useState(false); // Estado para la carga de datos
+const ProductTable = ({ products, categories, rows, first, onPageChange, handleEdit, handleDelete, isVendedor }) => {
     const [showModal, setShowModal] = useState(false);
     const [modalAction, setModalAction] = useState(null);
     const [selectedProduct, setSelectedProduct] = useState(null);
 
-    // Función para obtener los productos
-    const fetchProducts = async () => {
-        const token = getCookie('jwtToken');
-        setLoading(true);
-        try {
-            const response = await fetch('http://10.8.0.1:8081/api/product/listProducts', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`, // Incluir token en el header
-                },
-            });
-            if (!response.ok) throw new Error('Error al obtener los productos.');
-            const data = await response.json();
-            setProducts(data);
-        } catch (error) {
-            console.error('Error fetching products:', error.message);
-        } finally {
-            setLoading(false);
+    const mergedProducts = useMemo(() => {
+        if (!categories || categories.length === 0) {
+            return products.map((product) => ({
+                ...product,
+                category: 'Sin Categoría'
+            }));
         }
-    };
-
-    // Función para obtener las categorías
-    const fetchCategories = async () => {
-        const token = getCookie('jwtToken');
-        try {
-            const response = await fetch('http://10.8.0.1:8081/api/category/list', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`, // Incluir token en el header
-                },
-            });
-            if (!response.ok) throw new Error('Error al obtener las categorías.');
-            const data = await response.json();
-            setCategories(data);
-        } catch (error) {
-            console.error('Error fetching categories:', error.message);
-        }
-    };
-
-    // Unir productos con categorías
-    const mergeData = () => {
+    
         return products.map((product) => {
             const category = categories.find((cat) => cat.id_categoria === product.id_categoria);
             return {
                 ...product,
-                category: category ? category.nombre : 'Sin Categoría',
+                category: category ? category.nombre : 'Sin Categoría'
             };
         });
-    };
+    }, [products, categories]);
+    
 
-    // Cargar datos al montar el componente
-    useEffect(() => {
-        const loadData = async () => {
-            await fetchProducts();
-            await fetchCategories();
-        };
-        loadData();
-    }, []);
-
-    // Función para abrir el modal
     const openModal = (action, product) => {
         setModalAction(action);
         setSelectedProduct(product);
         setShowModal(true);
     };
 
-    // Función para cerrar el modal
     const closeModal = () => {
         setShowModal(false);
         setModalAction(null);
         setSelectedProduct(null);
     };
 
-    // Función para confirmar la acción del modal
     const confirmAction = () => {
         if (modalAction === 'edit') {
-            handleEdit(selectedProduct); // Llamar al método para editar
+            handleEdit(selectedProduct);
         } else if (modalAction === 'delete') {
-            handleDelete(selectedProduct.id_producto); // Llamar al método para eliminar
+            handleDelete(selectedProduct.id_producto);
         }
         closeModal();
     };
-
-    const mergedProducts = mergeData();
 
     return (
         <>
@@ -140,7 +74,6 @@ const ProductTable = ({
                 onPage={onPageChange}
                 removableSort
                 paginatorClassName="custom-paginator"
-                loading={loading}
             >
                 <Column field="nombre" header="Nombre" sortable />
                 <Column
@@ -154,13 +87,7 @@ const ProductTable = ({
                 <Column
                     field="descripcion"
                     header="Descripción"
-                    body={(rowData) => (
-                        <div className="description-wrapper">
-                            <span className="description-cell">
-                                {rowData.descripcion || 'Sin Descripción'}
-                            </span>
-                        </div>
-                    )}
+                    body={(rowData) => rowData.descripcion || 'Sin Descripción'}
                 />
                 <Column field="stock" header="Stock" body={(rowData) => rowData.stock || 0} />
                 <Column
@@ -168,14 +95,14 @@ const ProductTable = ({
                         <div className="products-button-container">
                             <Button
                                 icon="pi pi-pencil"
-                                className="products-button-edit"
+                                className={`products-button-edit ${isVendedor ? 'disabled' : ''}`}
                                 onClick={() => openModal('edit', rowData)}
                                 disabled={isVendedor}
                                 label="Editar"
                             />
                             <Button
                                 icon="pi pi-trash"
-                                className="products-button-delete"
+                                className={`products-button-delete ${isVendedor ? 'disabled' : ''}`}
                                 onClick={() => openModal('delete', rowData)}
                                 disabled={isVendedor}
                                 label="Eliminar"

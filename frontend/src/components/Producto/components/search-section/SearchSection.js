@@ -9,7 +9,7 @@ const SearchSection = ({
     searchOptions = [
         { name: 'Nombre', code: 'name' },
         { name: 'Categoría', code: 'category' },
-        { name: 'Descripción', code: 'description' }
+        { name: 'Estado', code: 'status' }
     ],
     searchTerm,
     setSearchTerm,
@@ -21,45 +21,20 @@ const SearchSection = ({
 }) => {
     const [searchCriteria, setSearchCriteria] = useState(null); // Inicializa con null
     const [selectedAvailability, setSelectedAvailability] = useState(null); // Estado para el filtro del checkbox
-    const [filteredProductsState, setFilteredProductsState] = useState([]); // Estado para manejar las sugerencias de autocompletado
-    const [showAutocomplete, setShowAutocomplete] = useState(false); // Estado para manejar la visibilidad de la lista de autocompletado
 
-    // Mostrar la lista cuando cambia el término de búsqueda
+    // Manejo del cambio en el término de búsqueda
     const handleSearchTermChange = (e) => {
-        const value = e.target.value;
-        setSearchTerm(value);
-        setShowAutocomplete(true); // Mostrar la lista de autocompletado
-
-        // Filtrar productos según el término de búsqueda y criterio
-        if (searchCriteria && searchCriteria.name && value) {
-            const filtered = products.filter(product => {
-                const fieldValue = product[searchCriteria.name]?.toString().toLowerCase();
-                return fieldValue?.includes(value.toLowerCase());
-            });
-            setFilteredProductsState(filtered);
-        } else {
-            setFilteredProductsState([]); // Limpiar si no hay búsqueda
-        }
+        setSearchTerm(e.target.value);
     };
 
-    // Manejar la selección de un elemento de la lista de autocompletado
-    const handleAutocompleteClick = (product) => {
-        setSearchTerm(product[searchCriteria.name]); // Actualizar el término de búsqueda con el valor seleccionado
-        setShowAutocomplete(false); // Ocultar la lista de autocompletado
-    };
-
-    // Manejar la selección de checkboxes (almacenar estado sin aplicar búsqueda)
+    // Manejar la selección de checkboxes
     const handleCheckboxChange = (status) => {
-        if (selectedAvailability === status) {
-            setSelectedAvailability(null); // Deseleccionar si ya estaba seleccionado
-        } else {
-            setSelectedAvailability(status); // Actualizar el valor del checkbox
-        }
+        setSelectedAvailability(selectedAvailability === status ? null : status);
     };
 
     // Manejo de la búsqueda al dar clic en el botón "Buscar"
     const handleSearchClick = () => {
-        // Verificar si el criterio de búsqueda ha sido seleccionado y el input de búsqueda no está vacío
+        // Si no hay término de búsqueda ni disponibilidad seleccionada, mostrar advertencia
         if (!searchCriteria && !selectedAvailability) {
             toast.current.show({
                 severity: 'warn',
@@ -67,11 +42,36 @@ const SearchSection = ({
                 detail: 'Por favor, selecciona un criterio de búsqueda o un estado antes de buscar.',
                 life: 3000
             });
-            return; // No continuar si no se seleccionó un criterio ni un estado
+            return;
         }
 
-        // Utiliza la función global `handleSearch` y pasa los mensajes personalizados
-        handleSearch(searchTerm, setSearchTerm, setFilteredProducts, products, toast, searchCriteria, selectedAvailability, successMessage, noResultsMessage);
+        // Utilizar la función `handleSearch` para el término de búsqueda y aplicar filtro de disponibilidad
+        let filteredResults = products;
+
+        // Aplicar búsqueda por término si está definido
+        if (searchTerm) {
+            handleSearch(searchTerm, setSearchTerm, setFilteredProducts, products, toast, searchCriteria, null, successMessage, noResultsMessage);
+            filteredResults = filteredResults.filter(product =>
+                product[searchCriteria?.code]?.toString().toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        // Aplicar filtro por disponibilidad
+        if (selectedAvailability === 'Con Stock') {
+            filteredResults = filteredResults.filter(product => product.stock > 0);
+        } else if (selectedAvailability === 'Sin Stock') {
+            filteredResults = filteredResults.filter(product => product.stock === 0);
+        }
+
+        setFilteredProducts(filteredResults);
+
+        // Mostrar mensaje según los resultados obtenidos
+        toast.current.show({
+            severity: filteredResults.length > 0 ? 'success' : 'warn',
+            summary: filteredResults.length > 0 ? 'Búsqueda exitosa' : 'Sin resultados',
+            detail: filteredResults.length > 0 ? successMessage : noResultsMessage,
+            life: 3000
+        });
     };
 
     // Manejo del botón "Limpiar"
@@ -79,7 +79,6 @@ const SearchSection = ({
         handleClearSearch(setSearchTerm, setFilteredProducts, products, toast);
         setSearchCriteria(null); // Limpiar el criterio de búsqueda
         setSelectedAvailability(null); // Limpiar también el estado del checkbox
-        setShowAutocomplete(false); // Ocultar la lista de autocompletado
     };
 
     return (
@@ -87,13 +86,18 @@ const SearchSection = ({
             {/* Dropdown para seleccionar el criterio de búsqueda */}
             <Dropdown
                 className="search-dropdown"
-                value={searchCriteria} // Aquí, se pasa searchCriteria
+                value={searchCriteria?.code} // Aquí utilizamos el código del criterio seleccionado
                 options={searchOptions}
-                onChange={(e) => setSearchCriteria(e.value)} // Actualiza searchCriteria al seleccionar
-                optionLabel="name" // Se muestra el nombre de la categoría
-                optionValue="code" // El valor subyacente
+                onChange={(e) => {
+                    const selectedOption = searchOptions.find(opt => opt.code === e.value);
+                    setSearchCriteria(selectedOption); // Actualizamos el objeto completo
+                }}
+                optionLabel="name" // Mostrar el nombre del criterio
+                optionValue="code" // Utilizar el código como valor subyacente
                 placeholder="Seleccione un criterio"
             />
+
+
 
             {/* Campo de búsqueda */}
             <div className="p-inputgroup" style={{ position: 'relative' }}>
@@ -105,23 +109,8 @@ const SearchSection = ({
                     className="search-input"
                     value={searchTerm}
                     onChange={handleSearchTermChange}
-                    placeholder={`Buscar por ${searchCriteria?.name || '...'}`} // Cambia el placeholder dinámicamente
+                    placeholder={`Buscar por ${searchCriteria?.name || '...'}`}
                 />
-
-                {/* Mostrar sugerencias de autocompletado */}
-                {showAutocomplete && filteredProductsState.length > 0 && (
-                    <div className="autocomplete-list">
-                        {filteredProductsState.map((product, index) => (
-                            <div
-                                key={index}
-                                className="autocomplete-item"
-                                onClick={() => handleAutocompleteClick(product)} // Al hacer clic, se selecciona el valor y se oculta la lista
-                            >
-                                {product[searchCriteria?.name]} {/* Mostrar el valor según el criterio seleccionado */}
-                            </div>
-                        ))}
-                    </div>
-                )}
             </div>
 
             {/* Botones para buscar y limpiar */}
@@ -136,19 +125,19 @@ const SearchSection = ({
             <div className="checkbox-group">
                 <div className="checkbox-item">
                     <Checkbox
-                        inputId="activo"
-                        checked={selectedAvailability === 'Activo'}
-                        onChange={() => handleCheckboxChange('Activo')}
+                        inputId="conStock"
+                        checked={selectedAvailability === 'Con Stock'}
+                        onChange={() => handleCheckboxChange('Con Stock')}
                     />
-                    <label htmlFor="activo">Activo</label>
+                    <label htmlFor="conStock">Con Stock</label>
                 </div>
                 <div className="checkbox-item">
                     <Checkbox
                         inputId="sinStock"
-                        checked={selectedAvailability === 'Sin stock'}
-                        onChange={() => handleCheckboxChange('Sin stock')}
+                        checked={selectedAvailability === 'Sin Stock'}
+                        onChange={() => handleCheckboxChange('Sin Stock')}
                     />
-                    <label htmlFor="sinStock">Sin stock</label>
+                    <label htmlFor="sinStock">Sin Stock</label>
                 </div>
             </div>
         </div>

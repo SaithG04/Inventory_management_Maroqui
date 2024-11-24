@@ -1,5 +1,3 @@
-// AddProductForm.js
-
 import React from 'react';
 import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
@@ -11,35 +9,39 @@ const AddProductForm = ({
     handleInputChange,
     handleCategoryChange,
     handleStatusChange,
-    handleAddOrEditProduct,  // Lo recibes como prop
+    handleAddOrEditProduct,
     isEditing
 }) => {
     return (
         <div className="add-product-form">
             <h3>{isEditing ? 'Editar Producto' : 'Agregar Producto'}</h3>
+
+            {/* Primer fila de inputs: Nombre y Unidad de medida */}
             <div className="form-row">
                 <input
                     type="text"
-                    name="name"
-                    value={newProduct.name}
+                    name="nombre"
+                    value={newProduct.nombre}
                     onChange={handleInputChange}
                     placeholder="Nombre"
                     className="input-name"
                 />
                 <input
                     type="text"
-                    name="unit"
-                    value={newProduct.unit}
+                    name="unidad_medida"
+                    value={newProduct.unidad_medida}
                     onChange={handleInputChange}
                     placeholder="Unidad de medida"
                     className="input-unit-measurement"
                 />
             </div>
+
+            {/* Segunda fila de inputs: Descripción y Stock */}
             <div className="form-row">
                 <input
                     type="text"
-                    name="description"
-                    value={newProduct.description}
+                    name="descripcion"
+                    value={newProduct.descripcion}
                     onChange={handleInputChange}
                     placeholder="Descripción"
                     className="input-description"
@@ -53,23 +55,24 @@ const AddProductForm = ({
                     className="input-stock"
                 />
             </div>
+
+            {/* Tercera fila: Dropdown para categoría y estado del producto */}
             <div className="form-row">
                 <Dropdown
-                    value={newProduct.category} // Asegúrate de que newProduct.category sea un string o un objeto con un valor válido
-                    options={categoryOptions}  // Las opciones de categorías
-                    onChange={handleCategoryChange} // Usa directamente el manejador que ya tienes
-                    optionLabel="name"  // Asegúrate de que las opciones tienen una propiedad 'name'
+                    value={newProduct.id_categoria}
+                    options={categoryOptions}
+                    onChange={handleCategoryChange}
+                    optionLabel="label"
                     placeholder="Seleccionar Categoría"
-                    filter
                     className="category-dropdown"
                 />
 
                 <Dropdown
-                    value={newProduct.status}
+                    value={newProduct.estado}
                     options={[
-                        { name: 'Activo', value: 'Activo' },
-                        { name: 'Descontinuado', value: 'Descontinuado' },
-                        { name: 'Sin stock', value: 'Sin stock' }
+                        { name: 'Activo', value: 'ACTIVE' },
+                        { name: 'Descontinuado', value: 'INACTIVE' },
+                        { name: 'Sin stock', value: 'OUT_OF_STOCK' }
                     ]}
                     onChange={handleStatusChange}
                     optionLabel="name"
@@ -78,11 +81,12 @@ const AddProductForm = ({
                 />
             </div>
 
+            {/* Sección de botón: Agregar o Actualizar producto */}
             <div className="add-product-section">
                 <Button
                     label={isEditing ? 'Actualizar Producto' : 'Agregar Producto'}
                     icon="pi pi-check"
-                    onClick={handleAddOrEditProduct} // Este es el evento que llama a la función que recibimos como prop
+                    onClick={handleAddOrEditProduct}
                     className={isEditing ? 'p-button-update' : 'p-button-agproduct'}
                 />
             </div>
