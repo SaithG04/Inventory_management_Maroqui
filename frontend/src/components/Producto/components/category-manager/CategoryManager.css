@@ -1,0 +1,25 @@
+/* Contenedor general del CategoryManager */
+.category-manager {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Botón de alternar entre formulario y tabla */
+.category-manager .toggle-button {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.category-manager .cancel-category-button {
+    background-color: var(--color-rojo); /* Color rojo para acciones negativas */
+    border: none;
+}
+
+.category-manager .cancel-category-button:hover {
+    background-color: var(--color-rojo-oscuro); /* Rojo más oscuro en hover */
+    transform: scale(1.05); /* Ligeramente más grande al pasar el ratón */
+}
+

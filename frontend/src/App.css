@@ -26,11 +26,10 @@
 
 /* Contenedor principal para sidebar y contenido principal */
 .main-layout {
-  display: flex;
-  flex: 1;
+  display: flex; /* Flexbox para alineación horizontal */
+  flex: 1; /* Ocupa todo el espacio disponible */
   width: 100%;
-  height: calc(100vh - 50px);
-  /* Resta la altura del header */
+  height: calc(100vh - 50px); /* Resta la altura del header */
 }
 
 /* Sidebar a la izquierda */
@@ -55,7 +54,7 @@
   /* Bordes redondeados para un diseño moderno */
   box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
   /* Sombra para dar profundidad */
-  margin: 20px;
+  margin: 5px;
   /* Espaciado alrededor del main-content */
   overflow-y: auto;
   /* Permite el desplazamiento si el contenido es muy largo */

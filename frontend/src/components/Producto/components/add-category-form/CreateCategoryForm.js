@@ -1,86 +1,101 @@
-import React, { useState, useRef, useContext } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
+import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
-import Modal from '../../../shared/modal/Modal'; // Importa el modal global
-import { ProductContext } from '../../../../context/ProductContext';
+import Modal from '../../../shared/modal/Modal';
 import './CreateCategoryForm.css';
 
-const CreateCategoryForm = () => {
-    const { addCategory, updateCategory, categoryOptions } = useContext(ProductContext);
+const CreateCategoryForm = ({ isEditing, initialData, onSave, categories, onFormChange }) => {
     const [categoryName, setCategoryName] = useState('');
-    const [isEditing, setIsEditing] = useState(false); // Controla si estamos en modo de edición
-    const [oldCategoryName, setOldCategoryName] = useState(''); // Guarda el nombre anterior en caso de edición
+    const [categoryDescription, setCategoryDescription] = useState('');
+    const [categoryStatus, setCategoryStatus] = useState('ACTIVE');
+    const [showModal, setShowModal] = useState(false);
     const toast = useRef(null);
 
-    // Estados para el modal
-    const [showModal, setShowModal] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState(null); // Categoría seleccionada para edición
-
-    // Función para abrir el modal
-    const openModal = (category) => {
-        setSelectedCategory(category);
-        setShowModal(true);
-    };
-
-    // Función para cerrar el modal
-    const closeModal = () => {
-        setShowModal(false);
-        setSelectedCategory(null);
-    };
-
-    // Función para confirmar la edición desde el modal
-    const confirmEdit = () => {
-        if (selectedCategory) {
-            handleEditCategoryClick(selectedCategory); // Configura la categoría seleccionada para edición
+    // Inicializar los valores del formulario si se está editando una categoría existente
+    useEffect(() => {
+        if (initialData) {
+            setCategoryName(initialData.nombre);
+            setCategoryDescription(initialData.descripcion);
+            setCategoryStatus(initialData.estado);
         }
-        closeModal();
-    };
+    }, [initialData]);
 
-    const handleAddOrEditCategory = () => {
+    // Notificar cambios en el formulario al `CategoryManager` (para activar el control de cancelación)
+    useEffect(() => {
+        onFormChange(categoryName !== '' || categoryDescription !== '');
+    }, [categoryName, categoryDescription, onFormChange]);
+
+    const handleAddOrEditCategory = async () => {
         if (!categoryName.trim()) {
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'El nombre de la categoría no puede estar vacío.' });
             return;
         }
 
-        if (isEditing) {
-            // Editar la categoría existente
-            updateCategory({ oldName: oldCategoryName, newName: categoryName });
-            toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Categoría actualizada con éxito.' });
-        } else {
-            // Crear nueva categoría
-            if (categoryOptions.some((cat) => cat.name.toLowerCase() === categoryName.toLowerCase())) {
-                toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'La categoría ya existe.' });
-                return;
-            }
-            addCategory({ name: categoryName, code: categoryName.toLowerCase().replace(/\s+/g, '') });
-            toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Categoría creada con éxito.' });
+        // Verificar si ya existe una categoría con el mismo nombre
+        const existingCategory = categories.find(
+            (category) => category.nombre.toLowerCase() === categoryName.trim().toLowerCase()
+        );
+
+        if (existingCategory && !isEditing) {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Ya existe una categoría con este nombre.' });
+            return;
         }
 
-        setCategoryName('');
-        setIsEditing(false); // Restablece el modo edición
+        try {
+            if (isEditing) {
+                setShowModal(true); // Mostrar el modal antes de confirmar la edición
+            } else {
+                onSave({
+                    nombre: categoryName,
+                    descripcion: categoryDescription,
+                    estado: categoryStatus,
+                });
+                toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Categoría creada con éxito.' });
+                resetForm();
+            }
+        } catch (error) {
+            console.error('Error al agregar o editar categoría:', error);
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'No se pudo completar la operación.' });
+        }
     };
 
-    const handleEditCategoryClick = (category) => {
-        setCategoryName(category.name);
-        setOldCategoryName(category.name);
-        setIsEditing(true);
+    const confirmEdit = () => {
+        onSave({
+            id_categoria: initialData?.id_categoria, // Asegúrate de que `id_categoria` tenga un valor válido
+            nombre: categoryName,
+            descripcion: categoryDescription,
+            estado: categoryStatus,
+        });
+        resetForm();
+        setShowModal(false);
+    };
+    
+    
+
+    const resetForm = () => {
+        setCategoryName('');
+        setCategoryDescription('');
+        setCategoryStatus('ACTIVE');
     };
 
     return (
         <div className="add-category-form">
             <Toast ref={toast} />
 
-            {/* Modal Global */}
+            {/* Modal para confirmar la edición */}
             <Modal
                 show={showModal}
-                onClose={closeModal}
+                onClose={() => setShowModal(false)}
                 onConfirm={confirmEdit}
-                title="Editar Categoría"
-                message={`¿Estás seguro de que deseas editar la categoría "${selectedCategory?.name}"?`}
+                title="Confirmar Edición"
+                message={`¿Estás seguro de que deseas editar la categoría "${categoryName}"?`}
             />
 
             <h3>{isEditing ? 'Editar Categoría' : 'Crear Categoría'}</h3>
+
+            {/* Campos de formulario */}
             <div className="form-row">
                 <InputText
                     value={categoryName}
@@ -88,27 +103,35 @@ const CreateCategoryForm = () => {
                     placeholder="Nombre de la Categoría"
                     className="input-category-name"
                 />
+                <Dropdown
+                    value={categoryStatus}
+                    options={[
+                        { label: 'Activo', value: 'ACTIVE' },
+                        { label: 'Inactivo', value: 'INACTIVE' }
+                    ]}
+                    onChange={(e) => setCategoryStatus(e.value)}
+                    placeholder="Estado"
+                    className="dropdown-category-status"
+                />
+            </div>
+
+            <div className="form-row">
+                <InputText
+                    value={categoryDescription}
+                    onChange={(e) => setCategoryDescription(e.target.value)}
+                    placeholder="Descripción de la Categoría"
+                    className="input-category-description"
+                />
+            </div>
+
+            {/* Botones de acción */}
+            <div className="form-actions">
                 <Button
                     label={isEditing ? 'Actualizar Categoría' : 'Crear Categoría'}
                     icon="pi pi-check"
                     onClick={handleAddOrEditCategory}
-                    className={isEditing ? 'p-button-update' : 'p-button-agproduct'}
+                    className={isEditing ? 'p-button-update' : 'p-button-create'}
                 />
-            </div>
-
-            {/* Lista de categorías para editar */}
-            <div className="category-list">
-                <h4>Categorías Existentes:</h4>
-                {categoryOptions.map((category) => (
-                    <div key={category.name} className="category-item">
-                        <span>{category.name}</span>
-                        <Button
-                            icon="pi pi-pencil"
-                            onClick={() => openModal(category)} // Abre el modal para confirmar la edición
-                            className="edit-category-button"
-                        />
-                    </div>
-                ))}
             </div>
         </div>
     );

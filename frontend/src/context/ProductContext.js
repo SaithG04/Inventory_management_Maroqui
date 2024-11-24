@@ -82,8 +82,6 @@ const updateProduct = (updatedProduct) => {
     }
 };
 
-
-
     // Función para actualizar el stock de un producto específico
     const updateProductStock = async (id, newStock) => {
         try {

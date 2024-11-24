@@ -1,66 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
-import Modal from '../../../shared/modal/Modal'; // Importa el modal global
+import Modal from '../../../shared/modal/Modal';
 import './ProductTable.css';
 
-const ProductTable = ({
-    products,
-    rows,
-    first,
-    onPageChange,
-    handleEdit,
-    handleDelete,
-    isVendedor,
-}) => {
-    // Estados para controlar el modal
+const ProductTable = ({ products, categories, rows, first, onPageChange, handleEdit, handleDelete, isVendedor }) => {
     const [showModal, setShowModal] = useState(false);
-    const [modalAction, setModalAction] = useState(null); // 'edit' o 'delete'
+    const [modalAction, setModalAction] = useState(null);
     const [selectedProduct, setSelectedProduct] = useState(null);
 
-    // Función para abrir el modal
+    const mergedProducts = useMemo(() => {
+        if (!categories || categories.length === 0) {
+            return products.map((product) => ({
+                ...product,
+                category: 'Sin Categoría'
+            }));
+        }
+    
+        return products.map((product) => {
+            const category = categories.find((cat) => cat.id_categoria === product.id_categoria);
+            return {
+                ...product,
+                category: category ? category.nombre : 'Sin Categoría'
+            };
+        });
+    }, [products, categories]);
+    
+
     const openModal = (action, product) => {
         setModalAction(action);
         setSelectedProduct(product);
         setShowModal(true);
     };
 
-    // Función para cerrar el modal
     const closeModal = () => {
         setShowModal(false);
         setModalAction(null);
         setSelectedProduct(null);
     };
 
-    // Función para confirmar la acción del modal
     const confirmAction = () => {
         if (modalAction === 'edit') {
             handleEdit(selectedProduct);
         } else if (modalAction === 'delete') {
-            handleDelete(selectedProduct.id);
+            handleDelete(selectedProduct.id_producto);
         }
         closeModal();
     };
 
     return (
         <>
-            {/* Modal Global */}
             <Modal
                 show={showModal}
                 onClose={closeModal}
                 onConfirm={confirmAction}
-                title={modalAction === 'edit' ? "Editar Producto" : "Eliminar Producto"}
+                title={modalAction === 'edit' ? 'Editar Producto' : 'Eliminar Producto'}
                 message={
                     modalAction === 'edit'
-                        ? `¿Estás seguro de que deseas editar el producto "${selectedProduct?.name}"?`
-                        : `¿Estás seguro de que deseas eliminar el producto "${selectedProduct?.name}"?`
+                        ? `¿Estás seguro de que deseas editar el producto "${selectedProduct?.nombre}"?`
+                        : `¿Estás seguro de que deseas eliminar el producto "${selectedProduct?.nombre}"?`
                 }
             />
 
-            {/* Tabla de Productos */}
             <DataTable
-                value={products}
+                value={mergedProducts}
                 style={{ margin: '0 auto', width: '100%' }}
                 className="product-table productos-table"
                 paginator
@@ -71,28 +75,19 @@ const ProductTable = ({
                 removableSort
                 paginatorClassName="custom-paginator"
             >
-                <Column field="name" header="Nombre" sortable />
+                <Column field="nombre" header="Nombre" sortable />
                 <Column
                     field="category"
                     header="Categoría"
-                    body={(rowData) => {
-                        const category = rowData.category;
-                        return typeof category === 'object' ? category?.name : category || 'Sin Categoría';
-                    }}
+                    body={(rowData) => rowData.category || 'Sin Categoría'}
                     sortable
                 />
-                <Column field="unit" header="Unidad" />
-                <Column field="status" header="Estado" sortable />
+                <Column field="unidad_medida" header="Unidad" />
+                <Column field="estado" header="Estado" sortable />
                 <Column
-                    field="description"
+                    field="descripcion"
                     header="Descripción"
-                    body={(rowData) => (
-                        <div className="description-wrapper">
-                            <span className="description-cell">
-                                {rowData.description || 'Sin Descripción'}
-                            </span>
-                        </div>
-                    )}
+                    body={(rowData) => rowData.descripcion || 'Sin Descripción'}
                 />
                 <Column field="stock" header="Stock" body={(rowData) => rowData.stock || 0} />
                 <Column
@@ -100,15 +95,15 @@ const ProductTable = ({
                         <div className="products-button-container">
                             <Button
                                 icon="pi pi-pencil"
-                                className="products-button-edit"
-                                onClick={() => openModal('edit', rowData)} // Abre el modal para "Editar"
+                                className={`products-button-edit ${isVendedor ? 'disabled' : ''}`}
+                                onClick={() => openModal('edit', rowData)}
                                 disabled={isVendedor}
                                 label="Editar"
                             />
                             <Button
                                 icon="pi pi-trash"
-                                className="products-button-delete"
-                                onClick={() => openModal('delete', rowData)} // Abre el modal para "Eliminar"
+                                className={`products-button-delete ${isVendedor ? 'disabled' : ''}`}
+                                onClick={() => openModal('delete', rowData)}
                                 disabled={isVendedor}
                                 label="Eliminar"
                             />

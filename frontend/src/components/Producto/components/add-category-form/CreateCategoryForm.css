@@ -1,23 +1,24 @@
-/* ============================ Estilos para el Formulario Crear Categoría ============================ */
+/* Contenedor principal del formulario */
 .add-category-form {
     background-color: #fff;
     padding: 25px;
     border-radius: 10px;
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-    margin: 0 auto 20px;
-    max-width: 800px;
+    margin: 0 auto;
+    max-width: 600px;
+    margin-bottom: 50px; /* Aumenta el espacio inferior */
     font-family: Arial, sans-serif;
 }
 
-/* Títulos del formulario */
+/* Título del formulario */
 .add-category-form h3 {
     font-size: 24px;
     color: #444;
     margin-bottom: 20px;
-    text-align: left;
+    text-align: center;
 }
 
-/* Contenedor para los campos de entrada */
+/* Fila del formulario */
 .add-category-form .form-row {
     display: flex;
     flex-wrap: wrap;
@@ -25,68 +26,58 @@
     margin-bottom: 20px;
 }
 
-/* Estilos para el campo de nombre de categoría */
-.input-category-name {
+/* Inputs y dropdowns */
+.add-category-form input,
+.add-category-form .dropdown-category-status {
     flex: 1;
-    min-width: 200px;
     padding: 12px;
     border: 1px solid #ddd;
     border-radius: 5px;
-    font-size: 15px;
+    font-size: 14px;
+    box-sizing: border-box;
 }
 
-.input-category-name:focus {
+.add-category-form input:focus,
+.add-category-form .dropdown-category-status:focus {
     border-color: var(--color-borde-focus);
     outline: none;
 }
 
-/* Botón de añadir categoría */
-.p-button-agproduct {
-    background-color: var(--color-verde);
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    font-size: 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.p-button-agproduct:hover {
-    background-color: var(--color-verde-oscuro);
-}
-
-
-.category-list {
-    margin-top: 20px;
-    background-color: #f9f9f9;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.category-item {
+/* Botones del formulario */
+.add-category-form .form-actions {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
 }
 
-.category-item span {
-    font-size: 16px;
-    color: #333;
-}
-
-.edit-category-button {
+.add-category-form .p-button-create {
     background-color: var(--color-verde);
     color: white;
-    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
     border-radius: 5px;
-    padding: 5px 10px;
-    cursor: pointer;
 }
 
-.edit-category-button:hover {
+.add-category-form .p-button-create:hover {
     background-color: var(--color-verde-oscuro);
+}
+
+.add-category-form .p-button-cancel {
+    background-color: var(--color-gris-claro);
+    color: #333;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+.add-category-form .p-button-cancel:hover {
+    background-color: var(--color-gris-oscuro);
+}
+
+/* Adaptación para pantallas pequeñas */
+@media (max-width: 600px) {
+    .add-category-form .form-row {
+        flex-direction: column;
+    }
 }

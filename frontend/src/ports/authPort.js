@@ -1,50 +1,62 @@
-// AuthPort.js
-import { jwtDecode } from 'jwt-decode'; // Usa una exportación con nombre en lugar de una exportación por defecto
+// Importamos las dependencias necesarias
 import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode';
+import config from '../config'; // Importar el archivo de configuración centralizada
 
+// Definimos la URL base de la API a partir del archivo de configuración
+const API_AUTH = config.API_AUTH;
+
+// Objeto `AuthPort` que contiene las funciones para interactuar con la API de autenticación
 export const AuthPort = {
+  // Función para iniciar sesión
   loginUser: async (email, clave) => {
     try {
-      const response = await fetch('http://10.8.0.1:8080/api/auth/login', {
-        method: 'POST',
+      // Realizar una solicitud HTTP POST a la API de inicio de sesión
+      const response = await fetch(`${API_AUTH}/login`, { // Usa la URL base desde config
+        method: 'POST', // Método POST para enviar credenciales
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json', // Especificamos el tipo de contenido como JSON
         },
-        body: JSON.stringify({ email, clave }),
-        credentials: 'include', // Para manejar cookies
+        body: JSON.stringify({ email, clave }), // Convertimos las credenciales a un formato JSON
+        credentials: 'include', // Incluir cookies para manejar sesiones
       });
 
+      // Verificar si la respuesta es correcta (status code 200)
       if (!response.ok) {
-        if (response.status === 401) {
-          return { success: false, message: 'No autorizado. Credenciales inválidas.' };
-        } else if (response.status === 403) {
-          return { success: false, message: 'Prohibido. No tienes acceso a este recurso.' };
-        } else if (response.status === 500) {
-          return { success: false, message: 'Error interno del servidor. Intenta nuevamente más tarde.' };
-        } else {
-          return { success: false, message: 'Error desconocido.' };
-        }
+        // Dependiendo del código de estado, devolvemos un mensaje de error específico
+        const errorMessages = {
+          401: 'No autorizado. Credenciales inválidas.', // Código 401: No autorizado
+          403: 'Prohibido. No tienes acceso a este recurso.', // Código 403: Prohibido
+          500: 'Error interno del servidor. Intenta nuevamente más tarde.' // Código 500: Error interno del servidor
+        };
+        
+        const message = errorMessages[response.status] || 'Error desconocido.';
+        return { success: false, message };
       }
 
+      // Parsear la respuesta JSON del servidor
       const data = await response.json();
 
+      // Verificar si la respuesta contiene un token de autenticación
       if (data.data && data.data.token) {
         const token = data.data.token;
 
-        // Cambiar configuración de la cookie
-        Cookies.set('jwtToken', token, { expires: 1, sameSite: 'Lax' }); // Quitar `secure: true` para entorno de pruebas HTTP
-        console.log("Token guardado en cookies:", Cookies.get('jwtToken')); // Verificar si se almacena correctamente
+        // Guardar el token en cookies con una expiración de 1 día
+        Cookies.set('jwtToken', token, { expires: 1, sameSite: 'Lax' });
 
+        // Decodificar el token JWT para extraer información del usuario
         const decodedToken = jwtDecode(token);
-        console.log("Decoded Token:", decodedToken);
 
+        // Retornar el resultado exitoso de la autenticación
         return { success: true, email: decodedToken.email, role: decodedToken.roles, message: 'Autenticación exitosa' };
       } else {
+        // Si no se encuentra un token en la respuesta, retornamos un error de autenticación
         return { success: false, message: data.message || 'Error de autenticación' };
       }
     } catch (error) {
+      // Manejar errores de conexión con el servidor
       console.error('Error de conexión:', error);
       return { success: false, message: 'Error de conexión con el servidor' };
     }
-  }
+  },
 };

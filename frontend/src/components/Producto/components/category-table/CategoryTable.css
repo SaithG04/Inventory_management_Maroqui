@@ -1,0 +1,96 @@
+/* Estilo para la tabla de categorías */
+.category-table .p-datatable .p-datatable-tbody > tr > td {
+    text-align: center;
+}
+
+/* Contenedor para los botones de acción en la tabla */
+.category-table .category-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 10px;
+    padding: 10px 0;
+}
+
+/* Botones de acción (editar y eliminar) */
+.category-table .category-button-edit,
+.category-table .category-button-delete {
+    padding: 0.5rem 1rem;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s ease;
+    color: #fff;
+    min-width: 100px;
+    text-align: center;
+}
+
+/* Botón de Editar */
+.category-table .category-button-edit {
+    background-color: var(--color-verde);
+}
+
+.category-table .category-button-edit:hover {
+    background-color: var(--color-verde-oscuro);
+}
+
+/* Botón de Eliminar */
+.category-table .category-button-delete {
+    background-color: var(--color-rojo);
+}
+
+.category-table .category-button-delete:hover {
+    background-color: var(--color-rojo-oscuro);
+}
+
+/* Tooltip para descripción */
+.category-table .description-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.category-table .description-cell {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.category-table .custom-tooltip {
+    visibility: hidden;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.category-table .custom-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+}
+
+.category-table .description-wrapper:hover .custom-tooltip {
+    visibility: visible;
+    opacity: 1;
+}

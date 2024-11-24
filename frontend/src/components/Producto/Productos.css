@@ -4,18 +4,17 @@
 ============================ */
 .productos-container {
     max-width: auto;
-    margin: 0 auto;
-    padding: 15px;
+    padding: 15px; /* Espacio interno mínimo */
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     overflow-y: auto;
-    max-height: 80vh;
+    max-height: 90vh;
 }
 
 /* Botones generales para el formulario de toggle */
 .product-toggle-form .p-button {
-    padding: 12px 20px;
+    padding: 0px 10px;
     font-size: 16px;
     border-radius: 5px;
     transition: background-color 0.3s ease, transform 0.2s ease;
@@ -154,3 +153,35 @@
 .cancel-product-button {
     margin-bottom: 15px; /* Aseguramos que haya separación en la parte inferior de los botones */
 }
+
+
+/* ============================
+   Botón "Agregar Producto" y "Crear Categoría"
+============================ */
+.add-product-button,
+.add-category-button {
+    background-color: var(--color-verde); /* Color verde para acciones positivas */
+    border: none;
+}
+
+.add-product-button:hover,
+.add-category-button:hover {
+    background-color: var(--color-verde-oscuro); /* Verde más oscuro en hover */
+    transform: scale(1.05); /* Ligeramente más grande al pasar el ratón */
+}
+
+/* ============================
+   Botón "Cancelar Producto" y "Cancelar Categoría"
+============================ */
+.cancel-product-button,
+.cancel-category-button {
+    background-color: var(--color-rojo); /* Color rojo para acciones negativas */
+    border: none;
+}
+
+.cancel-product-button:hover,
+.cancel-category-button:hover {
+    background-color: var(--color-rojo-oscuro); /* Rojo más oscuro en hover */
+    transform: scale(1.05); /* Ligeramente más grande al pasar el ratón */
+}
+
