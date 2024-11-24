@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ucv.app_inventory.application.DTO.ProductDTO;
 import ucv.app_inventory.application.services.ProductApplicationService;
 import ucv.app_inventory.domain.entities.Product;
+import ucv.app_inventory.exception.ProductNotFoundException;
 
 import java.util.List;
 
@@ -24,79 +25,82 @@ public class ProductController {
     public ResponseEntity<List<ProductDTO>> listProduct(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size) {
-        logger.info("Listing products with page: {}, size: {}", page, size);
+        logger.info("Listing products");
         List<ProductDTO> products = productApplicationService.listProducts(page, size);
         return ResponseEntity.ok(products);
     }
 
     @PostMapping("/saveProduct")
     public ResponseEntity<ProductDTO> saveProduct(@RequestBody ProductDTO productDto) {
-        logger.info("Saving product: {}", productDto);
+        logger.info("Saving product");
         ProductDTO savedProduct = productApplicationService.saveProduct(productDto);
-        logger.info("Product saved: {}", savedProduct);
+        logger.info("Product saved");
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
     }
 
     @PutMapping("/updateProduct/{id}")
     public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @RequestBody ProductDTO productDto) {
-        logger.info("Updating product with id: {}", id);
+        logger.info("Updating product with id");
         ProductDTO updatedProduct = productApplicationService.updateProduct(id, productDto);
-        logger.info("Product updated: {}", updatedProduct);
+        logger.info("Product updated");
         return ResponseEntity.ok(updatedProduct);
     }
 
+
     @DeleteMapping("/deleteProduct/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        logger.info("Deleting product with id: {}", id);
+        logger.info("Deleting product");
         productApplicationService.deleteProduct(id);
-        logger.info("Product deleted with id: {}", id);
+        logger.info("Product deleted");
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/findProductById/{id}")
     public ResponseEntity<ProductDTO> findById(@PathVariable(value = "id") final Long id) {
-        logger.info("Finding product by id: {}", id);
+        logger.info("Buscando producto por id: {}", id);
         try {
             ProductDTO productDto = productApplicationService.findProductById(id);
-            if (productDto == null) {
-                logger.warn("Product not found with id: {}", id);
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
             return ResponseEntity.ok(productDto);
+        } catch (ProductNotFoundException e) {
+            logger.warn("Producto no encontrado con id: {}", id);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            logger.error("Error finding product by id: {}", id, e);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            logger.error("Error interno: {}", e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/findByName")
-    public ResponseEntity<List<ProductDTO>> findByName(@RequestParam String name) {
-        logger.info("Finding products by name: {}", name);
-        List<ProductDTO> products = productApplicationService.findProductsByName(name);
+    public ResponseEntity<List<ProductDTO>> findByName(
+            @RequestParam String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size) {
+        List<ProductDTO> products = productApplicationService.findProductsByName(name, page, size);
         if (products.isEmpty()) {
-            logger.info("No products found with name: {}", name);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(products);
     }
 
     @GetMapping("/findByStatus")
-    public ResponseEntity<List<ProductDTO>> findByStatus(@RequestParam Product.Status status) {
-        logger.info("Finding products by status: {}", status);
-        List<ProductDTO> products = productApplicationService.findProductsByStatus(status);
+    public ResponseEntity<List<ProductDTO>> findByStatus(
+            @RequestParam Product.Status status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size) {
+        List<ProductDTO> products = productApplicationService.findProductsByStatus(status, page, size);
         if (products.isEmpty()) {
-            logger.info("No products found with status: {}", status);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(products);
     }
 
     @GetMapping("/findByCategoryName")
-    public ResponseEntity<List<ProductDTO>> findByCategoryName(@RequestParam String categoryName) {
-        logger.info("Finding products by category name: {}", categoryName);
-        List<ProductDTO> products = productApplicationService.findProductsByCategoryName(categoryName);
+    public ResponseEntity<List<ProductDTO>> findByCategoryName(
+            @RequestParam String categoryName,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size) {
+        List<ProductDTO> products = productApplicationService.findProductsByCategoryName(categoryName, page, size);
         if (products.isEmpty()) {
-            logger.info("No products found with category name: {}", categoryName);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(products);

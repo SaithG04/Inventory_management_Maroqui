@@ -37,4 +37,12 @@ public class CategoryController {
         categoryApplicationService.deleteCategory(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<CategoryDTO> updateCategory(
+            @PathVariable Long id,
+            @RequestBody CategoryDTO categoryDto) {
+        CategoryDTO updatedCategory = categoryApplicationService.updateCategory(id, categoryDto);
+        return updatedCategory != null ? ResponseEntity.ok(updatedCategory) : ResponseEntity.notFound().build();
+    }
 }

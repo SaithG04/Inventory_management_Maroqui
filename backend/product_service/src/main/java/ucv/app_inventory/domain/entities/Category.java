@@ -24,7 +24,7 @@ public class Category implements Serializable {
     @Column(nullable = false)
     private String name;
 
-    @Column
+    @Column(nullable = true)
     private String description;
 
     @Enumerated(EnumType.STRING)
@@ -34,5 +34,11 @@ public class Category implements Serializable {
     public enum Status {
         ACTIVE,
         INACTIVE
+    }
+    @PrePersist
+    public void prePersist() {
+        if (status == null) {
+            status = Category.Status.ACTIVE;
+        }
     }
 }
