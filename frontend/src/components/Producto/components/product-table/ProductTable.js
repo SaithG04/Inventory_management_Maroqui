@@ -20,12 +20,15 @@ const ProductTable = ({ products, categories, rows, first, onPageChange, handleE
     
         return products.map((product) => {
             const category = categories.find((cat) => cat.id_categoria === product.id_categoria);
-            return {
+            const mergedProduct = {
                 ...product,
                 category: category ? category.nombre : 'Sin Categoría'
             };
+            console.log('Merged Product:', mergedProduct); // Verifica que el producto tenga el campo `category` asignado correctamente
+            return mergedProduct;
         });
     }, [products, categories]);
+    
     
 
     const openModal = (action, product) => {

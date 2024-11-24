@@ -13,26 +13,25 @@ const Productos = ({ userRole }) => {
     const productToast = useRef(null);
 
     // Estados principales
+    const [originalProducts, setOriginalProducts] = useState([]);
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [searchCriteria, setSearchCriteria] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const [isAvailable, setIsAvailable] = useState(false);
     const [showAddProductForm, setShowAddProductForm] = useState(false);
     const [showProductTable, setShowProductTable] = useState(true);
     const [loading, setLoading] = useState(false);
-    const [toastShown, setToastShown] = useState(false);
-    const [error, setError] = useState(null);
+    const [isToastShown, setIsToastShown] = useState(false); // Estado para controlar si ya se mostró el toast
     const [newProduct, setNewProduct] = useState({
-        id_producto: '',
+        id_producto: '',        // Solo se usa en modo de edición
         nombre: '',
-        precio: '',
-        stock: '',
-        id_categoria: '',
         unidad_medida: '',
-        estado: 'Activo', // Valor por defecto alineado con el dropdown
         descripcion: '',
+        stock: '0',             // Valor inicial de stock
+        id_categoria: '',       // Debe tener un valor válido una vez seleccionado
+        estado: 'ACTIVE',       // Valor por defecto
     });
+    
     const [isEditing, setIsEditing] = useState(false);
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(15);
@@ -40,24 +39,27 @@ const Productos = ({ userRole }) => {
     // Función para cargar productos
     const fetchProducts = useCallback(async () => {
         setLoading(true);
-        setError(null);
-        setToastShown(false);
         try {
             const productList = await ProductService.listProducts();
-            setProducts(productList || []);
-        } catch (err) {
-            setError('No se pudieron cargar los productos.');
+            setOriginalProducts(productList || []);
+            setProducts(enrichProductsWithCategory(productList || [], categories));
+        } catch {
+            productToast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'No se pudieron cargar los productos.',
+            });
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [categories]);
 
     // Función para cargar categorías
     const fetchCategories = useCallback(async () => {
         try {
             const categoryList = await CategoryService.listCategories();
             setCategories(categoryList || []);
-        } catch (err) {
+        } catch {
             productToast.current?.show({
                 severity: 'error',
                 summary: 'Error',
@@ -66,42 +68,47 @@ const Productos = ({ userRole }) => {
         }
     }, []);
 
-    // Mostrar Toast solo una vez cuando la carga se complete
+    // Mostrar Toast solo una vez cuando la carga de productos se complete por primera vez
     useEffect(() => {
-        if (!loading && !toastShown && showProductTable) {
-            if (error) {
-                productToast.current?.show({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: error,
-                });
-            } else if (products.length > 0) {
-                productToast.current?.show({
-                    severity: 'success',
-                    summary: 'Éxito',
-                    detail: 'Productos cargados correctamente.',
-                });
-            }
-            setToastShown(true);
+        if (!loading && products.length > 0 && !isToastShown) {
+            productToast.current?.show({
+                severity: 'success',
+                summary: 'Éxito',
+                detail: 'Productos cargados correctamente.',
+            });
+            setIsToastShown(true); // Marcar que el toast ya fue mostrado
         }
-    }, [loading, error, toastShown, showProductTable, products]);
+    }, [loading, products, isToastShown]);
 
-    // Efecto para cargar productos y categorías solo si se visualizan
     useEffect(() => {
         if (showProductTable) {
-            fetchProducts();
-            fetchCategories();
+            // Solo carga categorías y productos si no se ha hecho ya
+            if (categories.length === 0) {
+                fetchCategories();
+            }
+            if (originalProducts.length === 0) {
+                fetchProducts();
+            }
         }
-    }, [showProductTable, fetchProducts, fetchCategories]);
+    }, [showProductTable, categories.length, originalProducts.length, fetchCategories, fetchProducts]);
+    
 
-    // Cambio de vista entre productos y categorías
+    const enrichProductsWithCategory = (products, categories) => {
+        return products.map(product => {
+            const category = categories.find(cat => cat.id_categoria === product.id_categoria);
+            return {
+                ...product,
+                categoria_nombre: category ? category.nombre : 'Sin Categoría',
+            };
+        });
+    };
+
     const handleViewChange = (view) => {
         setShowProductTable(view === 'products');
         setShowAddProductForm(false);
-        setToastShown(false);
+        setIsToastShown(false); // Resetear la bandera para que se muestre nuevamente si se cambia de vista
     };
 
-    // Gestión de formulario de productos
     const handleAddProductClick = () => {
         setShowAddProductForm(!showAddProductForm);
         if (!showAddProductForm) {
@@ -123,25 +130,36 @@ const Productos = ({ userRole }) => {
         });
     };
 
-    // Guardar o editar productos
     const handleAddOrEditProduct = async () => {
+        // Crear el objeto producto con todos los campos necesarios para el backend
+        const productToSave = {
+            nombre: newProduct.nombre || '',
+            id_categoria: newProduct.id_categoria || '',
+            descripcion: newProduct.descripcion || null,
+            unidad_medida: newProduct.unidad_medida || 'UN', // Valor predeterminado "UN"
+            stock: newProduct.stock || 0,
+            estado: newProduct.estado || 'ACTIVE', // Valor predeterminado "ACTIVE"
+        };
+    
+        console.log("Datos del producto a enviar:", productToSave);
+    
         try {
             if (isEditing) {
-                await ProductService.updateProduct(newProduct.id_producto, newProduct);
+                await ProductService.updateProduct(newProduct.id_producto, productToSave);
                 productToast.current.show({
                     severity: 'success',
                     summary: 'Producto Actualizado',
                     detail: 'El producto fue actualizado con éxito.',
                 });
             } else {
-                await ProductService.saveProduct(newProduct);
+                await ProductService.saveProduct(productToSave);
                 productToast.current.show({
                     severity: 'success',
                     summary: 'Producto Agregado',
                     detail: 'El producto fue agregado con éxito.',
                 });
             }
-            fetchProducts();
+            await fetchProducts();
             setShowAddProductForm(false);
         } catch (error) {
             productToast.current.show({
@@ -151,6 +169,10 @@ const Productos = ({ userRole }) => {
             });
         }
     };
+    
+    
+    
+    
 
     const handleEditProduct = (product) => {
         setNewProduct({
@@ -167,7 +189,6 @@ const Productos = ({ userRole }) => {
         setShowAddProductForm(true);
     };
 
-    // Definir handleStatusChange para manejar el cambio de estado del producto
     const handleStatusChange = (e) => {
         setNewProduct((prev) => ({
             ...prev,
@@ -183,25 +204,26 @@ const Productos = ({ userRole }) => {
     return (
         <div className="productos-container">
             <Toast ref={productToast} />
-
             <h2 className="productos-title">Gestión de Productos y Categorías</h2>
-
             <SearchSection
                 searchOptions={showProductTable ? [
                     { name: 'Nombre', code: 'nombre' },
                     { name: 'Categoría', code: 'id_categoria' },
                     { name: 'Estado', code: 'estado' },
-                ] : []}
+                ] : [
+                    { name: 'Nombre de Categoría', code: 'nombre' },
+                    { name: 'Estado', code: 'estado' },
+                ]}
                 searchCriteria={searchCriteria}
                 setSearchCriteria={setSearchCriteria}
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
-                isAvailable={isAvailable}
-                setIsAvailable={setIsAvailable}
                 setFilteredProducts={setProducts}
-                products={products}
+                products={originalProducts}
+                categories={categories} // Pasa las categorías aquí
+                toast={productToast}
+                showProductTable={showProductTable}
             />
-
             <div className="button-container products-and-categories">
                 <Button
                     label="Ver Productos"
@@ -216,7 +238,6 @@ const Productos = ({ userRole }) => {
                     onClick={() => handleViewChange('categories')}
                 />
             </div>
-
             {showProductTable && (
                 <Button
                     label={showAddProductForm ? 'Cancelar' : 'Agregar Producto'}
@@ -225,7 +246,6 @@ const Productos = ({ userRole }) => {
                     className={showAddProductForm ? 'cancel-product-button' : 'add-product-button'}
                 />
             )}
-
             {showAddProductForm && (
                 <AddProductForm
                     newProduct={newProduct}
@@ -237,12 +257,11 @@ const Productos = ({ userRole }) => {
                     handleCategoryChange={(e) => {
                         setNewProduct((prev) => ({ ...prev, id_categoria: e.value }));
                     }}
-                    handleStatusChange={handleStatusChange} // Pasa la función handleStatusChange
+                    handleStatusChange={handleStatusChange}
                     handleAddOrEditProduct={handleAddOrEditProduct}
                     isEditing={isEditing}
                 />
             )}
-
             {showProductTable ? (
                 <ProductTable
                     products={products}
@@ -260,7 +279,7 @@ const Productos = ({ userRole }) => {
                                 detail: 'El producto fue eliminado con éxito.',
                             });
                             fetchProducts();
-                        } catch (error) {
+                        } catch {
                             productToast.current.show({
                                 severity: 'error',
                                 summary: 'Error',

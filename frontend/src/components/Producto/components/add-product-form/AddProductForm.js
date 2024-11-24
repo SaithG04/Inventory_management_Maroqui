@@ -58,27 +58,28 @@ const AddProductForm = ({
 
             {/* Tercera fila: Dropdown para categoría y estado del producto */}
             <div className="form-row">
-                <Dropdown
-                    value={newProduct.id_categoria}
-                    options={categoryOptions}
-                    onChange={handleCategoryChange}
-                    optionLabel="label"
-                    placeholder="Seleccionar Categoría"
-                    className="category-dropdown"
-                />
+            <Dropdown
+    value={newProduct.id_categoria}
+    options={categoryOptions}
+    onChange={handleCategoryChange}
+    optionLabel="label"
+    placeholder="Seleccionar Categoría"
+    className="category-dropdown"
+/>
 
-                <Dropdown
-                    value={newProduct.estado}
-                    options={[
-                        { name: 'Activo', value: 'ACTIVE' },
-                        { name: 'Descontinuado', value: 'INACTIVE' },
-                        { name: 'Sin stock', value: 'OUT_OF_STOCK' }
-                    ]}
-                    onChange={handleStatusChange}
-                    optionLabel="name"
-                    placeholder="Selecciona un estado"
-                    className="status-dropdown"
-                />
+<Dropdown
+    value={newProduct.estado}
+    options={[
+        { name: 'Activo', value: 'ACTIVE' },
+        { name: 'Inactivo', value: 'INACTIVE' },
+        { name: 'Sin stock', value: 'OUT_OF_STOCK' }
+    ]}
+    onChange={handleStatusChange}
+    optionLabel="name"
+    placeholder="Selecciona un estado"
+    className="status-dropdown"
+/>
+
             </div>
 
             {/* Sección de botón: Agregar o Actualizar producto */}

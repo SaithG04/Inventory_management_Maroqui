@@ -150,6 +150,30 @@ const ProductService = {
     }
   },
 
+  // Buscar productos por nombre de la categoría
+findByCategoryName: async (categoryName, page = 0, size = 15) => {
+  try {
+      const token = getToken();
+      const response = await fetch(`${API_PRODUCTS}/findByCategoryName?categoryName=${categoryName}&page=${page}&size=${size}`, {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+          },
+      });
+
+      if (!response.ok) {
+          throw new Error(`Error al buscar productos por nombre de la categoría: ${response.statusText}`);
+      }
+
+      return await response.json();
+  } catch (error) {
+      console.error('Error en findByCategoryName:', error.message);
+      throw error;
+  }
+},
+
+
   // Buscar productos por nombre
   findByName: async (name, page = 0, size = 15) => {
     try {
