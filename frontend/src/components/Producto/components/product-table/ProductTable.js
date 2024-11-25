@@ -24,12 +24,21 @@ const ProductTable = ({ products, categories, rows, first, onPageChange, handleE
                 ...product,
                 category: category ? category.nombre : 'Sin Categoría'
             };
-            console.log('Merged Product:', mergedProduct); // Verifica que el producto tenga el campo `category` asignado correctamente
             return mergedProduct;
         });
     }, [products, categories]);
-    
-    
+
+    // Función para traducir el estado
+    const traducirEstado = (estado) => {
+        switch (estado) {
+            case 'ACTIVE':
+                return 'ACTIVO';
+            case 'OUT_OF_STOCK':
+                return 'SIN STOCK';
+            default:
+                return estado; // Si no hay mapeo, devolver el estado original
+        }
+    };
 
     const openModal = (action, product) => {
         setModalAction(action);
@@ -86,7 +95,12 @@ const ProductTable = ({ products, categories, rows, first, onPageChange, handleE
                     sortable
                 />
                 <Column field="unidad_medida" header="Unidad" />
-                <Column field="estado" header="Estado" sortable />
+                <Column
+                    field="estado"
+                    header="Estado"
+                    body={(rowData) => traducirEstado(rowData.estado)}
+                    sortable
+                />
                 <Column
                     field="descripcion"
                     header="Descripción"

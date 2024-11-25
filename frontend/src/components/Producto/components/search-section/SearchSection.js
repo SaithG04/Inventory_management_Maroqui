@@ -36,12 +36,23 @@ const SearchSection = ({
 
     // Manejo de la búsqueda al dar clic en el botón "Buscar"
     const handleSearchClick = async () => {
-        // Validar si el criterio de búsqueda, el término de búsqueda y los checkboxes están vacíos
-        if (!searchCriteria && !searchTerm.trim() && !selectedAvailability) {
+        // Validar si no se ha seleccionado un criterio de búsqueda y no hay checkbox seleccionados
+        if (!searchCriteria && !selectedAvailability) {
             toast.current?.show({
                 severity: 'warn',
                 summary: 'Advertencia',
-                detail: 'Por favor, seleccione un criterio de búsqueda, ingrese un término válido o marque una opción de disponibilidad.',
+                detail: 'Por favor, seleccione un criterio de búsqueda o marque una opción de disponibilidad.',
+                life: 3000,
+            });
+            return; // Salir de la función si no se cumple la validación
+        }
+
+        // Validar si el término de búsqueda está vacío cuando se ha seleccionado un criterio
+        if (searchCriteria && !searchTerm.trim()) {
+            toast.current?.show({
+                severity: 'warn',
+                summary: 'Advertencia',
+                detail: 'Por favor, ingrese un término de búsqueda.',
                 life: 3000,
             });
             return; // Salir de la función si no se cumple la validación
@@ -185,6 +196,7 @@ const SearchSection = ({
                     value={searchTerm}
                     onChange={handleSearchTermChange}
                     placeholder={`Buscar por ${searchCriteria?.name || '...'}`}
+                    disabled={!searchCriteria} // Desactivar el input hasta que se seleccione un criterio
                 />
             </div>
 

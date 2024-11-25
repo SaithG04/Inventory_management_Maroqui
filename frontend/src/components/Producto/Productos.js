@@ -6,6 +6,7 @@ import CategoryManager from './components/category-manager/CategoryManager';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import ProductService from '../../services/ProductService';
+import Modal from '../../../src/components/shared/modal/Modal'; // Ajusta la ruta según dónde esté tu componente Modal
 import CategoryService from '../../services/CategoryService';
 import './Productos.css';
 
@@ -21,20 +22,20 @@ const Productos = ({ userRole }) => {
     const [showAddProductForm, setShowAddProductForm] = useState(false);
     const [showProductTable, setShowProductTable] = useState(true);
     const [loading, setLoading] = useState(false);
-    const [isToastShown, setIsToastShown] = useState(false); // Estado para controlar si ya se mostró el toast
+    const [isToastShown, setIsToastShown] = useState(false);
     const [newProduct, setNewProduct] = useState({
-        id_producto: '',        // Solo se usa en modo de edición
+        id_producto: '',
         nombre: '',
         unidad_medida: '',
         descripcion: '',
-        stock: '0',             // Valor inicial de stock
-        id_categoria: '',       // Debe tener un valor válido una vez seleccionado
-        estado: 'ACTIVE',       // Valor por defecto
+        stock: '0',
+        id_categoria: '',
+        estado: 'ACTIVE',
     });
-    
     const [isEditing, setIsEditing] = useState(false);
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(15);
+    const [showCancelModal, setShowCancelModal] = useState(false); // Estado para mostrar el modal de confirmación
 
     // Función para cargar productos
     const fetchProducts = useCallback(async () => {
@@ -76,13 +77,12 @@ const Productos = ({ userRole }) => {
                 summary: 'Éxito',
                 detail: 'Productos cargados correctamente.',
             });
-            setIsToastShown(true); // Marcar que el toast ya fue mostrado
+            setIsToastShown(true);
         }
     }, [loading, products, isToastShown]);
 
     useEffect(() => {
         if (showProductTable) {
-            // Solo carga categorías y productos si no se ha hecho ya
             if (categories.length === 0) {
                 fetchCategories();
             }
@@ -91,11 +91,10 @@ const Productos = ({ userRole }) => {
             }
         }
     }, [showProductTable, categories.length, originalProducts.length, fetchCategories, fetchProducts]);
-    
 
     const enrichProductsWithCategory = (products, categories) => {
-        return products.map(product => {
-            const category = categories.find(cat => cat.id_categoria === product.id_categoria);
+        return products.map((product) => {
+            const category = categories.find((cat) => cat.id_categoria === product.id_categoria);
             return {
                 ...product,
                 categoria_nombre: category ? category.nombre : 'Sin Categoría',
@@ -106,43 +105,64 @@ const Productos = ({ userRole }) => {
     const handleViewChange = (view) => {
         setShowProductTable(view === 'products');
         setShowAddProductForm(false);
-        setIsToastShown(false); // Resetear la bandera para que se muestre nuevamente si se cambia de vista
+        setIsToastShown(false);
     };
 
     const handleAddProductClick = () => {
-        setShowAddProductForm(!showAddProductForm);
-        if (!showAddProductForm) {
+        if (showAddProductForm) {
+            // Verificar si hay datos importantes llenos en el formulario antes de cerrar
+            if (
+                newProduct.nombre.trim() !== '' ||
+                newProduct.id_categoria !== '' ||
+                newProduct.estado !== 'ACTIVE'
+            ) {
+                // Mostrar el modal de confirmación si hay datos
+                setShowCancelModal(true);
+            } else {
+                // Si no hay datos, cerrar el formulario directamente
+                setShowAddProductForm(false);
+            }
+        } else {
+            // Si no está abierto, abrir el formulario
+            setShowAddProductForm(true);
             resetNewProduct();
             setIsEditing(false);
         }
+    };
+
+    const handleCancelModalConfirm = () => {
+        // Confirmar el cierre del formulario
+        setShowAddProductForm(false);
+        setShowCancelModal(false);
+    };
+
+    const handleCancelModalHide = () => {
+        // Cancelar la acción de cerrar
+        setShowCancelModal(false);
     };
 
     const resetNewProduct = () => {
         setNewProduct({
             id_producto: '',
             nombre: '',
-            precio: '',
-            stock: '',
-            id_categoria: '',
             unidad_medida: '',
-            estado: 'Activo',
             descripcion: '',
+            stock: '0',
+            id_categoria: '',
+            estado: 'ACTIVE',
         });
     };
 
     const handleAddOrEditProduct = async () => {
-        // Crear el objeto producto con todos los campos necesarios para el backend
         const productToSave = {
             nombre: newProduct.nombre || '',
             id_categoria: newProduct.id_categoria || '',
             descripcion: newProduct.descripcion || null,
-            unidad_medida: newProduct.unidad_medida || 'UN', // Valor predeterminado "UN"
+            unidad_medida: newProduct.unidad_medida || 'UN',
             stock: newProduct.stock || 0,
-            estado: newProduct.estado || 'ACTIVE', // Valor predeterminado "ACTIVE"
+            estado: newProduct.estado || 'ACTIVE',
         };
-    
-        console.log("Datos del producto a enviar:", productToSave);
-    
+
         try {
             if (isEditing) {
                 await ProductService.updateProduct(newProduct.id_producto, productToSave);
@@ -169,21 +189,16 @@ const Productos = ({ userRole }) => {
             });
         }
     };
-    
-    
-    
-    
 
     const handleEditProduct = (product) => {
         setNewProduct({
             id_producto: product.id_producto,
             nombre: product.nombre,
-            precio: product.precio,
+            unidad_medida: product.unidad_medida,
+            descripcion: product.descripcion,
             stock: product.stock,
             id_categoria: product.id_categoria,
-            unidad_medida: product.unidad_medida,
             estado: product.estado,
-            descripcion: product.descripcion,
         });
         setIsEditing(true);
         setShowAddProductForm(true);
@@ -220,7 +235,7 @@ const Productos = ({ userRole }) => {
                 setSearchTerm={setSearchTerm}
                 setFilteredProducts={setProducts}
                 products={originalProducts}
-                categories={categories} // Pasa las categorías aquí
+                categories={categories}
                 toast={productToast}
                 showProductTable={showProductTable}
             />
@@ -246,6 +261,16 @@ const Productos = ({ userRole }) => {
                     className={showAddProductForm ? 'cancel-product-button' : 'add-product-button'}
                 />
             )}
+
+            {/* Modal de Confirmación para Cerrar el Formulario */}
+            <Modal
+                show={showCancelModal}
+                onClose={handleCancelModalHide}
+                onConfirm={handleCancelModalConfirm}
+                title="Confirmación"
+                message="¿Estás seguro de que deseas cerrar el formulario? Se perderán todos los datos no guardados."
+            />
+
             {showAddProductForm && (
                 <AddProductForm
                     newProduct={newProduct}

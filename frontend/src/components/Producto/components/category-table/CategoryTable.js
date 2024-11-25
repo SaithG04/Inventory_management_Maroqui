@@ -5,12 +5,29 @@ import { Button } from 'primereact/button'; // Importa Button desde PrimeReact
 import './CategoryTable.css'; // Importa los estilos personalizados para CategoryTable
 
 const CategoryTable = ({ categories, handleEdit, handleDelete }) => {
+    // Función para traducir el estado
+    const traducirEstado = (estado) => {
+        switch (estado) {
+            case 'ACTIVE':
+                return 'ACTIVO';
+            case 'INACTIVE':
+                return 'INACTIVO';
+            default:
+                return estado; // Si no hay mapeo, devolver el estado original
+        }
+    };
+
     return (
         <div>
             <DataTable value={categories} className="category-table" paginator rows={10}>
                 <Column field="nombre" header="Nombre" sortable />
                 <Column field="descripcion" header="Descripción" />
-                <Column field="estado" header="Estado" sortable />
+                <Column
+                    field="estado"
+                    header="Estado"
+                    body={(rowData) => traducirEstado(rowData.estado)}
+                    sortable
+                />
                 <Column
                     body={(rowData) => (
                         <div className="category-button-container">
