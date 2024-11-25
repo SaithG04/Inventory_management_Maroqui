@@ -39,7 +39,7 @@ const CreateCategoryForm = ({ isEditing, initialData, onSave, categories, onForm
         );
 
         if (existingCategory && !isEditing) {
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Ya existe una categoría con este nombre.' });
+            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Ya existe una categoría con este nombre.' });
             return;
         }
 
