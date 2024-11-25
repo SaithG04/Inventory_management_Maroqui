@@ -29,20 +29,25 @@ const CreateCategoryForm = ({ isEditing, initialData, onSave, categories, onForm
 
     const handleAddOrEditCategory = async () => {
         if (!categoryName.trim()) {
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'El nombre de la categoría no puede estar vacío.' });
+            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre de la categoría no puede estar vacío.' });
             return;
         }
-
+    
         // Verificar si ya existe una categoría con el mismo nombre
         const existingCategory = categories.find(
             (category) => category.nombre.toLowerCase() === categoryName.trim().toLowerCase()
         );
-
+    
         if (existingCategory && !isEditing) {
             toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Ya existe una categoría con este nombre.' });
             return;
         }
-
+    
+        // Si la descripción está vacía, establecer 'Sin Descripción'
+        if (!categoryDescription.trim()) {
+            setCategoryDescription('Sin Descripción');
+        }
+    
         try {
             if (isEditing) {
                 setShowModal(true); // Mostrar el modal antes de confirmar la edición
@@ -60,6 +65,7 @@ const CreateCategoryForm = ({ isEditing, initialData, onSave, categories, onForm
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'No se pudo completar la operación.' });
         }
     };
+    
 
     const confirmEdit = () => {
         onSave({
