@@ -58,17 +58,28 @@ public class Product implements Serializable {
 
     @PrePersist
     public void prePersist() {
-        if (status == null) {
-            status = Status.ACTIVE;
-        }
         if (unitMeasurement == null) {
             unitMeasurement = UnitMeasurement.UN;
         }
         if (stock == null) {
             stock = 0;
         }
+        if (stock == 0) {
+            status = Status.OUT_OF_STOCK;
+        } else if (status == null) {
+            status = Status.ACTIVE;
+        }
         if (code == null || code.isEmpty()) {
             code = generateNextCode();
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        if (stock == 0) {
+            status = Status.OUT_OF_STOCK;
+        } else {
+            status = Status.ACTIVE;
         }
     }
 

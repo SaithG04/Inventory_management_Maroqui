@@ -1,5 +1,6 @@
 package ucv.app_inventory.application.services;
 
+import org.springframework.data.domain.Page;
 import ucv.app_inventory.domain.entities.Category;
 
 import java.util.List;
@@ -9,5 +10,6 @@ public interface CategoryService {
     Category saveCategory(Category category);
     Category findCategoryById(Long id);
     void deleteCategory(Long id);
-    Category findByName(String name);
+    Page<Category> findByName(String name, int page, int size);
+    Page<Category> findByStatus(Category.Status status, int page, int size);
 }

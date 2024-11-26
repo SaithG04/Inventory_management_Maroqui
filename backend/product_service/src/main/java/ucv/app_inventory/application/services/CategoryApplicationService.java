@@ -1,5 +1,6 @@
 package ucv.app_inventory.application.services;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import ucv.app_inventory.application.DTO.CategoryDTO;
 import ucv.app_inventory.domain.entities.Category;
@@ -64,4 +65,13 @@ public class CategoryApplicationService {
     private Category convertToEntity(CategoryDTO categoryDto) {
         return new Category(categoryDto.getId(), categoryDto.getName(), categoryDto.getDescription(), categoryDto.getStatus());
     }
+
+    public Page<CategoryDTO> findByName(String name, int page, int size) {
+        return categoryService.findByName(name, page, size).map(this::convertToDto);
+    }
+
+    public Page<CategoryDTO> findByStatus(Category.Status status, int page, int size) {
+        return categoryService.findByStatus(status, page, size).map(this::convertToDto);
+    }
+
 }

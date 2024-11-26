@@ -100,6 +100,12 @@ public class ProductApplicationService {
             existingProduct.setStatus(productDto.getStatus());
         }
 
+        if (existingProduct.getStock() == 0) {
+            existingProduct.setStatus(Product.Status.OUT_OF_STOCK);
+        } else {
+            existingProduct.setStatus(Product.Status.ACTIVE);
+        }
+        
         Product updatedProduct = productService.saveProduct(existingProduct);
         logger.info("Product updated");
         return convertToDto(updatedProduct);

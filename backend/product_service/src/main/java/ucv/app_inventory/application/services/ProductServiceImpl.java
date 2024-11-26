@@ -12,6 +12,7 @@ import ucv.app_inventory.application.DTO.SupplierDTO;
 import ucv.app_inventory.domain.entities.Product;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class ProductServiceImpl implements ProductService{
@@ -39,6 +40,7 @@ public class ProductServiceImpl implements ProductService{
         }
         return productRepository.save(product);
     }
+
 
     @Override
     public void deleteProduct(Long id) {

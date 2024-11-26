@@ -1,5 +1,8 @@
 package ucv.app_inventory.application.services;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ucv.app_inventory.adapters.repositories.CategoryRepository;
 import ucv.app_inventory.domain.entities.Category;
@@ -35,7 +38,15 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category findByName(String name) {
-        return categoryRepository.findByName(name);
+    public Page<Category> findByName(String name, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return categoryRepository.findByNameContainingIgnoreCase(name, pageable);
     }
+
+    @Override
+    public Page<Category> findByStatus(Category.Status status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return categoryRepository.findByStatus(status, pageable);
+    }
+
 }

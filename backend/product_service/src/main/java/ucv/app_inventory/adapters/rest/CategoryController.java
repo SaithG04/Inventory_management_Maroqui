@@ -1,10 +1,12 @@
 package ucv.app_inventory.adapters.rest;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ucv.app_inventory.application.DTO.CategoryDTO;
 import ucv.app_inventory.application.services.CategoryApplicationService;
+import ucv.app_inventory.domain.entities.Category;
 
 import java.util.List;
 
@@ -45,4 +47,25 @@ public class CategoryController {
         CategoryDTO updatedCategory = categoryApplicationService.updateCategory(id, categoryDto);
         return updatedCategory != null ? ResponseEntity.ok(updatedCategory) : ResponseEntity.notFound().build();
     }
+
+    @GetMapping("/search/name")
+    public ResponseEntity<Page<CategoryDTO>> findByName(
+            @RequestParam String name,
+            @RequestParam int page,
+            @RequestParam int size) {
+        Page<CategoryDTO> categories = categoryApplicationService.findByName(name, page, size);
+        return ResponseEntity.ok(categories);
+    }
+
+    @GetMapping("/search/status")
+    public ResponseEntity<Page<CategoryDTO>> findByStatus(
+            @RequestParam Category.Status status,
+            @RequestParam int page,
+            @RequestParam int size) {
+        Page<CategoryDTO> categories = categoryApplicationService.findByStatus(status, page, size);
+        return ResponseEntity.ok(categories);
+    }
+
+
+
 }
