@@ -4,6 +4,7 @@ import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
 import Modal from '../../../shared/modal/Modal';
+import { categoryModalMessages } from '../../../../utils/modalMessages';
 import './CreateCategoryForm.css';
 
 const CreateCategoryForm = ({ isEditing, initialData, onSave, categories, onFormChange }) => {
@@ -13,73 +14,85 @@ const CreateCategoryForm = ({ isEditing, initialData, onSave, categories, onForm
     const [showModal, setShowModal] = useState(false);
     const toast = useRef(null);
 
-    // Inicializar los valores del formulario si se está editando una categoría existente
+    // Inicializar los valores del formulario si se está editando
     useEffect(() => {
-        if (initialData) {
+        if (isEditing && initialData) {
             setCategoryName(initialData.nombre);
             setCategoryDescription(initialData.descripcion);
             setCategoryStatus(initialData.estado);
         }
-    }, [initialData]);
+    }, [isEditing, initialData]);
 
-    // Notificar cambios en el formulario al `CategoryManager` (para activar el control de cancelación)
+    // Notificar cambios en el formulario al `CategoryManager`
     useEffect(() => {
         onFormChange(categoryName !== '' || categoryDescription !== '');
     }, [categoryName, categoryDescription, onFormChange]);
 
-    const handleAddOrEditCategory = async () => {
+    // Validar el formulario
+    const validateForm = () => {
         if (!categoryName.trim()) {
-            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre de la categoría no puede estar vacío.' });
-            return;
+            toast.current.show({
+                severity: 'warn',
+                summary: 'Advertencia',
+                detail: 'El nombre de la categoría no puede estar vacío.',
+            });
+            return false;
         }
-    
-        // Verificar si ya existe una categoría con el mismo nombre
-        const existingCategory = categories.find(
-            (category) => category.nombre.toLowerCase() === categoryName.trim().toLowerCase()
-        );
-    
-        if (existingCategory && !isEditing) {
-            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Ya existe una categoría con este nombre.' });
-            return;
-        }
-    
-        // Si la descripción está vacía, establecer 'Sin Descripción'
-        if (!categoryDescription.trim()) {
-            setCategoryDescription('Sin Descripción');
-        }
-    
-        try {
-            if (isEditing) {
-                setShowModal(true); // Mostrar el modal antes de confirmar la edición
-            } else {
-                onSave({
-                    nombre: categoryName,
-                    descripcion: categoryDescription,
-                    estado: categoryStatus,
+
+        if (!isEditing) {
+            const existingCategory = categories.find(
+                (category) => category.nombre.toLowerCase() === categoryName.trim().toLowerCase()
+            );
+            if (existingCategory) {
+                toast.current.show({
+                    severity: 'warn',
+                    summary: 'Advertencia',
+                    detail: 'Ya existe una categoría con este nombre.',
                 });
-                toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Categoría creada con éxito.' });
-                resetForm();
+                return false;
             }
-        } catch (error) {
-            console.error('Error al agregar o editar categoría:', error);
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'No se pudo completar la operación.' });
+        }
+
+        return true;
+    };
+
+    // Manejar el guardado de la categoría
+    const handleAddOrEditCategory = () => {
+        if (!validateForm()) return;
+
+        if (isEditing) {
+            setShowModal(true);
+        } else {
+            saveCategory();
         }
     };
-    
 
-    const confirmEdit = () => {
+    const saveCategory = () => {
         onSave({
-            id_categoria: initialData?.id_categoria, // Asegúrate de que `id_categoria` tenga un valor válido
-            nombre: categoryName,
-            descripcion: categoryDescription,
+            id_categoria: initialData?.id_categoria, // Solo para edición
+            nombre: categoryName.trim(),
+            descripcion: categoryDescription.trim() || 'Sin Descripción',
             estado: categoryStatus,
         });
+
+        toast.current.show({
+            severity: 'success',
+            summary: isEditing ? 'Categoría Actualizada' : 'Categoría Creada',
+            detail: isEditing
+                ? 'La categoría se actualizó correctamente.'
+                : 'La categoría se creó correctamente.',
+        });
+
         resetForm();
+    };
+
+    // Confirmar la edición
+    const confirmEdit = () => {
+        saveCategory();
         setShowModal(false);
     };
-    
-    
 
+    // Resetear el formulario
     const resetForm = () => {
         setCategoryName('');
         setCategoryDescription('');
@@ -96,7 +109,7 @@ const CreateCategoryForm = ({ isEditing, initialData, onSave, categories, onForm
                 onClose={() => setShowModal(false)}
                 onConfirm={confirmEdit}
                 title="Confirmar Edición"
-                message={`¿Estás seguro de que deseas editar la categoría "${categoryName}"?`}
+                message={categoryModalMessages.edit(categoryName)}
             />
 
             <h3>{isEditing ? 'Editar Categoría' : 'Crear Categoría'}</h3>
@@ -113,7 +126,7 @@ const CreateCategoryForm = ({ isEditing, initialData, onSave, categories, onForm
                     value={categoryStatus}
                     options={[
                         { label: 'Activo', value: 'ACTIVE' },
-                        { label: 'Inactivo', value: 'INACTIVE' }
+                        { label: 'Inactivo', value: 'INACTIVE' },
                     ]}
                     onChange={(e) => setCategoryStatus(e.value)}
                     placeholder="Estado"

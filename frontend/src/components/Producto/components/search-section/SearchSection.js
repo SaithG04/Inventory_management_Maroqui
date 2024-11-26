@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { Checkbox } from 'primereact/checkbox';
-import ProductService from '../../../../services/ProductService';
+import { filterItems } from '../../../shared/actionbutton/searchUtils'; // Usamos la función genérica
 import './SearchSection.css';
 
 const SearchSection = ({
     searchOptions = [
         { name: 'Nombre', code: 'nombre' },
         { name: 'Categoría', code: 'id_categoria' },
-        { name: 'Estado', code: 'estado' }
+        { name: 'Estado', code: 'estado' },
     ],
     searchTerm,
     setSearchTerm,
@@ -17,8 +17,8 @@ const SearchSection = ({
     products,
     categories,
     toast,
-    successMessage = 'Se encontraron productos.',
-    noResultsMessage = 'No se encontraron productos.',
+    successMessage = 'Se encontraron resultados.',
+    noResultsMessage = 'No se encontraron resultados.',
     showProductTable,
 }) => {
     const [searchCriteria, setSearchCriteria] = useState(null);
@@ -35,19 +35,17 @@ const SearchSection = ({
     };
 
     // Manejo de la búsqueda al dar clic en el botón "Buscar"
-    const handleSearchClick = async () => {
-        // Validar si no se ha seleccionado un criterio de búsqueda y no hay checkbox seleccionados
+    const handleSearchClick = () => {
         if (!searchCriteria && !selectedAvailability) {
             toast.current?.show({
                 severity: 'warn',
                 summary: 'Advertencia',
-                detail: 'Por favor, seleccione un criterio de búsqueda o marque una opción de disponibilidad.',
+                detail: 'Seleccione un criterio de búsqueda o marque una opción de disponibilidad.',
                 life: 3000,
             });
-            return; // Salir de la función si no se cumple la validación
+            return;
         }
 
-        // Validar si el término de búsqueda está vacío cuando se ha seleccionado un criterio
         if (searchCriteria && !searchTerm.trim()) {
             toast.current?.show({
                 severity: 'warn',
@@ -55,117 +53,60 @@ const SearchSection = ({
                 detail: 'Por favor, ingrese un término de búsqueda.',
                 life: 3000,
             });
-            return; // Salir de la función si no se cumple la validación
+            return;
         }
-    
-        let filteredResults;
-    
-        try {
-            // Empezamos con todos los productos o categorías según la vista actual
-            filteredResults = showProductTable ? [...products] : [...categories];
-    
-            // Aplicar filtro de búsqueda si se selecciona un criterio y se ingresa un término
-            if (searchCriteria?.code && searchTerm) {
-                if (showProductTable) {
-                    // Lógica de búsqueda para productos
-                    if (searchCriteria.code === 'nombre') {
-                        // Filtrar por nombre de producto
-                        filteredResults = filteredResults.filter(item =>
-                            item.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-                        );
-                    } else if (searchCriteria.code === 'id_categoria') {
-                        // Buscar productos por nombre de categoría utilizando el servicio
-                        filteredResults = await ProductService.findByCategoryName(searchTerm);
-                    } else if (searchCriteria.code === 'estado') {
-                        // Convertir 'Activo', 'Inactivo', y 'Sin stock' a 'ACTIVE', 'INACTIVE', y 'OUT_OF_STOCK' para el backend
-                        let translatedStatus = 
-                            searchTerm.toLowerCase() === 'activo' ? 'ACTIVE' : 
-                            searchTerm.toLowerCase() === 'inactivo' ? 'INACTIVE' : 
-                            searchTerm.toLowerCase() === 'sin stock' ? 'OUT_OF_STOCK' : 
-                            searchTerm;
-    
-                        // Filtrar por estado del producto (localmente)
-                        filteredResults = filteredResults.filter(product =>
-                            product.estado && product.estado.toLowerCase() === translatedStatus.toLowerCase()
-                        );
-                    }
-                } else {
-                    // Lógica de búsqueda para categorías
-                    if (searchCriteria.code === 'nombre') {
-                        // Filtrar por nombre de la categoría
-                        filteredResults = filteredResults.filter(category =>
-                            category.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-                        );
-                    } else if (searchCriteria.code === 'estado') {
-                        // Convertir 'Activo' e 'Inactivo' a 'ACTIVE' e 'INACTIVE' para el backend
-                        let translatedStatus = 
-                            searchTerm.toLowerCase() === 'activo' ? 'ACTIVE' : 
-                            searchTerm.toLowerCase() === 'inactivo' ? 'INACTIVE' : 
-                            searchTerm;
-    
-                        // Filtrar por estado de la categoría (localmente)
-                        filteredResults = filteredResults.filter(category =>
-                            category.estado && category.estado.toLowerCase() === translatedStatus.toLowerCase()
-                        );
+
+        // Determinar si trabajar con productos o categorías
+        let dataToFilter = showProductTable ? products : categories;
+
+        // Filtrar usando `filterItems`
+        const filteredResults = filterItems({
+            items: dataToFilter,
+            searchTerm,
+            searchKey: searchCriteria?.code,
+            additionalFilter: (item) => {
+                if (selectedAvailability) {
+                    if (showProductTable) {
+                        if (selectedAvailability === 'Con Stock') {
+                            return item.stock > 0;
+                        } else if (selectedAvailability === 'Sin Stock') {
+                            return item.stock === 0;
+                        }
+                    } else {
+                        if (selectedAvailability === 'Activo') {
+                            return item.estado?.toLowerCase() === 'active';
+                        } else if (selectedAvailability === 'Inactivo') {
+                            return item.estado?.toLowerCase() === 'inactive';
+                        }
                     }
                 }
-            }
-    
-            // Aplicar filtro de disponibilidad con los checkboxes seleccionados
-            if (selectedAvailability) {
-                if (showProductTable) {
-                    if (selectedAvailability === 'Con Stock') {
-                        // Filtrar productos que tienen stock disponible
-                        filteredResults = filteredResults.filter(product => product.stock > 0);
-                    } else if (selectedAvailability === 'Sin Stock') {
-                        // Filtrar productos que no tienen stock
-                        filteredResults = filteredResults.filter(product => product.stock === 0);
-                    }
-                } else {
-                    if (selectedAvailability === 'Activo') {
-                        // Filtrar categorías activas
-                        filteredResults = filteredResults.filter(category => category.estado && category.estado.toLowerCase() === 'active');
-                    } else if (selectedAvailability === 'Inactivo') {
-                        // Filtrar categorías inactivas
-                        filteredResults = filteredResults.filter(category => category.estado && category.estado.toLowerCase() === 'inactive');
-                    }
-                }
-            }
-    
-            setFilteredProducts(filteredResults);
-    
-            // Mostrar mensaje según los resultados obtenidos
-            toast.current?.show({
-                severity: filteredResults.length > 0 ? 'success' : 'warn',
-                summary: filteredResults.length > 0 ? 'Búsqueda exitosa' : 'Sin resultados',
-                detail: filteredResults.length > 0 ? successMessage : noResultsMessage,
-                life: 3000,
-            });
-    
-        } catch (error) {
-            toast.current?.show({
-                severity: 'error',
-                summary: 'Error en la búsqueda',
-                detail: 'Hubo un problema al realizar la búsqueda.',
-                life: 3000,
-            });
-        }
+                return true; // Si no hay disponibilidad seleccionada, incluir todos
+            },
+        });
+
+        setFilteredProducts(filteredResults);
+
+        // Mostrar mensaje de resultados
+        toast.current?.show({
+            severity: filteredResults.length > 0 ? 'success' : 'warn',
+            summary: filteredResults.length > 0 ? 'Búsqueda exitosa' : 'Sin resultados',
+            detail: filteredResults.length > 0 ? successMessage : noResultsMessage,
+            life: 3000,
+        });
     };
-    
 
     // Manejo del botón "Limpiar"
     const handleClearClick = () => {
-        setSearchTerm(''); // Limpiar el término de búsqueda
-        setSearchCriteria(null); // Limpiar el criterio de búsqueda
-        setSelectedAvailability(null); // Limpiar la disponibilidad seleccionada
-        setFilteredProducts(products); // Restaurar la lista de productos original
+        setSearchTerm('');
+        setSearchCriteria(null);
+        setSelectedAvailability(null);
+        setFilteredProducts(products);
 
-        // Mostrar un mensaje de que se ha limpiado el filtro
         toast.current?.show({
             severity: 'info',
             summary: 'Filtros limpiados',
-            detail: 'La búsqueda se ha restablecido y se han cargado todos los productos.',
-            life: 3000
+            detail: 'La búsqueda se ha restablecido.',
+            life: 3000,
         });
     };
 
@@ -177,7 +118,7 @@ const SearchSection = ({
                 value={searchCriteria?.code}
                 options={searchOptions}
                 onChange={(e) => {
-                    const selectedOption = searchOptions.find(opt => opt.code === e.value);
+                    const selectedOption = searchOptions.find((opt) => opt.code === e.value);
                     setSearchCriteria(selectedOption);
                 }}
                 optionLabel="name"
@@ -196,11 +137,11 @@ const SearchSection = ({
                     value={searchTerm}
                     onChange={handleSearchTermChange}
                     placeholder={`Buscar por ${searchCriteria?.name || '...'}`}
-                    disabled={!searchCriteria} // Desactivar el input hasta que se seleccione un criterio
+                    disabled={!searchCriteria} // Desactivar si no hay un criterio seleccionado
                 />
             </div>
 
-            {/* Botones para buscar y limpiar */}
+            {/* Botones de acción */}
             <button onClick={handleSearchClick} className="search-button">
                 Buscar
             </button>

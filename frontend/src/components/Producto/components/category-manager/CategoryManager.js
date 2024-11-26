@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import CreateCategoryForm from '../add-category-form/CreateCategoryForm';
 import CategoryTable from '../category-table/CategoryTable';
-import CategoryService from '../../../../services/CategoryService';
+import CategoryService from '../../../../services/products/CategoryService';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import Modal from '../../../shared/modal/Modal'; // Importar el componente Modal para la confirmación

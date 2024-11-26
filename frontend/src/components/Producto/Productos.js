@@ -5,9 +5,9 @@ import ProductTable from './components/product-table/ProductTable';
 import CategoryManager from './components/category-manager/CategoryManager';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
-import ProductService from '../../services/ProductService';
+import ProductService from '../../services/products/ProductService';
 import Modal from '../../../src/components/shared/modal/Modal'; // Ajusta la ruta según dónde esté tu componente Modal
-import CategoryService from '../../services/CategoryService';
+import CategoryService from '../../services/products/CategoryService';
 import './Productos.css';
 
 const Productos = ({ userRole }) => {

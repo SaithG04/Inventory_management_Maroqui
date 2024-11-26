@@ -3,6 +3,8 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import Modal from '../../../shared/modal/Modal';
+import { traducirEstado } from '../../../../utils/translate';
+import { productModalMessages } from '../../../../utils/modalMessages';
 import './ProductTable.css';
 
 const ProductTable = ({ products, categories, rows, first, onPageChange, handleEdit, handleDelete, isVendedor }) => {
@@ -11,34 +13,14 @@ const ProductTable = ({ products, categories, rows, first, onPageChange, handleE
     const [selectedProduct, setSelectedProduct] = useState(null);
 
     const mergedProducts = useMemo(() => {
-        if (!categories || categories.length === 0) {
-            return products.map((product) => ({
+        return (products || []).map((product) => {
+            const category = categories?.find((cat) => cat.id_categoria === product.id_categoria);
+            return {
                 ...product,
-                category: 'Sin Categoría'
-            }));
-        }
-    
-        return products.map((product) => {
-            const category = categories.find((cat) => cat.id_categoria === product.id_categoria);
-            const mergedProduct = {
-                ...product,
-                category: category ? category.nombre : 'Sin Categoría'
+                category: category ? category.nombre : 'Sin Categoría',
             };
-            return mergedProduct;
         });
     }, [products, categories]);
-
-    // Función para traducir el estado
-    const traducirEstado = (estado) => {
-        switch (estado) {
-            case 'ACTIVE':
-                return 'ACTIVO';
-            case 'OUT_OF_STOCK':
-                return 'SIN STOCK';
-            default:
-                return estado; // Si no hay mapeo, devolver el estado original
-        }
-    };
 
     const openModal = (action, product) => {
         setModalAction(action);
@@ -70,8 +52,8 @@ const ProductTable = ({ products, categories, rows, first, onPageChange, handleE
                 title={modalAction === 'edit' ? 'Editar Producto' : 'Eliminar Producto'}
                 message={
                     modalAction === 'edit'
-                        ? `¿Estás seguro de que deseas editar el producto "${selectedProduct?.nombre}"?`
-                        : `¿Estás seguro de que deseas eliminar el producto "${selectedProduct?.nombre}"?`
+                        ? productModalMessages.edit(selectedProduct?.nombre)
+                        : productModalMessages.delete(selectedProduct?.nombre)
                 }
             />
 
@@ -104,25 +86,30 @@ const ProductTable = ({ products, categories, rows, first, onPageChange, handleE
                 <Column
                     field="descripcion"
                     header="Descripción"
-                    body={(rowData) => rowData.descripcion || 'Sin Descripción'}
+                    body={(rowData) => (
+                        <div className="description-wrapper">
+                            <span className="description-cell">{rowData.descripcion || 'Sin Descripción'}</span>
+                            {rowData.descripcion && (
+                                <div className="custom-tooltip">{rowData.descripcion}</div>
+                            )}
+                        </div>
+                    )}
                 />
                 <Column field="stock" header="Stock" body={(rowData) => rowData.stock || 0} />
                 <Column
                     body={(rowData) => (
-                        <div className="products-button-container">
+                        <div className={`products-button-container ${isVendedor ? 'disabled' : ''}`}>
                             <Button
                                 icon="pi pi-pencil"
-                                className={`products-button-edit ${isVendedor ? 'disabled' : ''}`}
                                 onClick={() => openModal('edit', rowData)}
-                                disabled={isVendedor}
                                 label="Editar"
+                                className="products-button-edit"
                             />
                             <Button
                                 icon="pi pi-trash"
-                                className={`products-button-delete ${isVendedor ? 'disabled' : ''}`}
                                 onClick={() => openModal('delete', rowData)}
-                                disabled={isVendedor}
                                 label="Eliminar"
+                                className="products-button-delete"
                             />
                         </div>
                     )}
