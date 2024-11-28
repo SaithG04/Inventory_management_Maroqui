@@ -5,7 +5,7 @@ import Sidebar from './components/layout/sidebar/Sidebar';
 import MainContent from './components/layout/maincontent/MainContent';
 import Dashboard from './components/DashboardCard/DashboardCard';
 import Pedidos from './components/Pedidos/Pedidos';
-import Productos from './components/Producto/Productos';
+import ParentComponentProduct from './products/infraestructure/components/ParentComponentProduct';
 import Sales from './components/Sales/Sales';
 import EmployeeManagement from './components/EmployeeManagement/EmployeeManagement';
 import Suppliers from './components/Suppliers/Suppliers';
@@ -147,7 +147,7 @@ function App() {
       case 'pedidos':
         return <Pedidos />;
       case 'producto':
-        return <Productos userRole={userRole} />;
+        return  <ParentComponentProduct />;
       case 'ventas':
         return <Sales />;
       case 'empleados':

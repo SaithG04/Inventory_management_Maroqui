@@ -8,6 +8,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "app_inventory": "file:",
+    "axios": "^1.7.8",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
     "lodash.debounce": "^4.0.8",
