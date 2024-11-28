@@ -17,12 +17,21 @@ const ApiProduct = async (url, method = 'GET', body = null) => {
 
         const response = await fetch(url, options);
 
+        // Verificar si la respuesta es exitosa
         if (!response.ok) {
-            const errorDetails = await response.json();
-            throw new Error(errorDetails.message || `Error: ${response.statusText}`);
+            // Si no es exitosa, intentar obtener el mensaje de error
+            const errorText = await response.text(); // Usar text() si no es JSON
+            throw new Error(errorText || `Error: ${response.statusText}`);
         }
 
-        return await response.json(); // Devuelve la respuesta en JSON
+        // Si la respuesta tiene contenido, intentar parsearlo como JSON
+        const responseBody = await response.text(); // Obtener el cuerpo como texto
+        if (responseBody) {
+            return JSON.parse(responseBody); // Si hay contenido, parsearlo como JSON
+        } else {
+            return {}; // Si no hay contenido, retornar un objeto vacío
+        }
+
     } catch (error) {
         console.error(`Error en ApiProduct (${method} ${url}):`, error.message);
         throw error;

@@ -17,10 +17,11 @@ const Productos = ({ userRole }) => {
     const [originalProducts, setOriginalProducts] = useState([]);
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [filteredCategories, setFilteredCategories] = useState([]); // Esto es lo correcto
     const [searchCriteria, setSearchCriteria] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [showAddProductForm, setShowAddProductForm] = useState(false);
-    const [showProductTable, setShowProductTable] = useState(true);
+    const [showProductTable, setShowProductTable] = useState(true); // Controla si se muestra la tabla de productos o categorías
     const [loading, setLoading] = useState(false);
     const [isToastShown, setIsToastShown] = useState(false);
     const [newProduct, setNewProduct] = useState({
@@ -82,15 +83,21 @@ const Productos = ({ userRole }) => {
     }, [loading, products, isToastShown]);
 
     useEffect(() => {
-        if (showProductTable) {
-            if (categories.length === 0) {
-                fetchCategories();
-            }
-            if (originalProducts.length === 0) {
-                fetchProducts();
-            }
+        if (originalProducts.length > 0 && categories.length > 0) {
+            const enrichedProducts = enrichProductsWithCategory(originalProducts, categories);
+            setProducts(enrichedProducts);
         }
-    }, [showProductTable, categories.length, originalProducts.length, fetchCategories, fetchProducts]);
+    }, [originalProducts, categories]);
+
+
+    useEffect(() => {
+        if (showProductTable) {
+            // Solo carga las categorías y productos si no están ya cargados
+            if (!categories.length) fetchCategories();
+            if (!originalProducts.length) fetchProducts();
+        }
+    }, [showProductTable, categories, originalProducts, fetchCategories, fetchProducts]);
+
 
     const enrichProductsWithCategory = (products, categories) => {
         return products.map((product) => {
@@ -102,11 +109,15 @@ const Productos = ({ userRole }) => {
         });
     };
 
+    // Manejar el cambio de vista entre productos y categorías
     const handleViewChange = (view) => {
         setShowProductTable(view === 'products');
-        setShowAddProductForm(false);
-        setIsToastShown(false);
+        setShowAddProductForm(false); // Restablecer el formulario
+        setSearchTerm(''); // Limpiar el término de búsqueda
+        setSearchCriteria(null); // Limpiar el criterio de búsqueda
+        setIsToastShown(false); // Restablecer el Toast
     };
+
 
     const handleAddProductClick = () => {
         if (showAddProductForm) {
@@ -220,6 +231,8 @@ const Productos = ({ userRole }) => {
         <div className="productos-container">
             <Toast ref={productToast} />
             <h2 className="productos-title">Gestión de Productos y Categorías</h2>
+
+            {/* Sección de búsqueda */}
             <SearchSection
                 searchOptions={showProductTable ? [
                     { name: 'Nombre', code: 'nombre' },
@@ -234,11 +247,15 @@ const Productos = ({ userRole }) => {
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
                 setFilteredProducts={setProducts}
+                filteredCategories={setFilteredCategories}
                 products={originalProducts}
                 categories={categories}
                 toast={productToast}
                 showProductTable={showProductTable}
             />
+
+
+            {/* Botones para cambiar entre productos y categorías */}
             <div className="button-container products-and-categories">
                 <Button
                     label="Ver Productos"
@@ -253,6 +270,8 @@ const Productos = ({ userRole }) => {
                     onClick={() => handleViewChange('categories')}
                 />
             </div>
+
+            {/* Mostrar el botón de agregar producto si estamos en la vista de productos */}
             {showProductTable && (
                 <Button
                     label={showAddProductForm ? 'Cancelar' : 'Agregar Producto'}
@@ -271,6 +290,7 @@ const Productos = ({ userRole }) => {
                 message="¿Estás seguro de que deseas cerrar el formulario? Se perderán todos los datos no guardados."
             />
 
+            {/* Formulario de agregar o editar producto */}
             {showAddProductForm && (
                 <AddProductForm
                     newProduct={newProduct}
@@ -287,6 +307,8 @@ const Productos = ({ userRole }) => {
                     isEditing={isEditing}
                 />
             )}
+
+            {/* Mostrar la tabla de productos o el manejador de categorías */}
             {showProductTable ? (
                 <ProductTable
                     products={products}
@@ -314,7 +336,13 @@ const Productos = ({ userRole }) => {
                     }}
                 />
             ) : (
-                <CategoryManager />
+                <CategoryManager
+                    categories={categories}
+                    setFilteredCategories={setFilteredCategories} // Pásalo correctamente
+                    searchTerm={searchTerm}
+                    searchCriteria={searchCriteria}
+                />
+
             )}
         </div>
     );

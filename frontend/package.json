@@ -10,6 +10,7 @@
     "app_inventory": "file:",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
+    "lodash.debounce": "^4.0.8",
     "primeflex": "^3.3.1",
     "primeicons": "^7.0.0",
     "primereact": "^10.8.4",
