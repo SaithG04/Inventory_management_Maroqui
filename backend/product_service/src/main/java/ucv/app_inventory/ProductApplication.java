@@ -10,9 +10,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableFeignClients
 @EnableCaching
 @EnableDiscoveryClient
-public class AppInventoryApplication {
+public class ProductApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(AppInventoryApplication.class, args);        
+        SpringApplication.run(ProductApplication.class, args);
     }
 }

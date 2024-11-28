@@ -18,8 +18,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> listCategories() {
-        return categoryRepository.findAll();
+    public List<Category> listCategories(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return categoryRepository.findAll(pageable).getContent();
     }
 
     @Override
@@ -38,15 +39,20 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Page<Category> findByName(String name, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return categoryRepository.findByNameContainingIgnoreCase(name, pageable);
+    public Page<Category> findByName(String name, Pageable pageable) {
+        return categoryRepository.findByNameStartingWith(name, pageable);
     }
 
     @Override
     public Page<Category> findByStatus(Category.Status status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return categoryRepository.findByStatus(status, pageable);
+    }
+
+    @Override
+    public Page<Category> findByNameAndStatus(String name, Category.Status status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return categoryRepository.findByNameAndStatus(name, status, pageable);
     }
 
 }

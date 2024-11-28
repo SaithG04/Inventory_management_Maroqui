@@ -2,6 +2,8 @@ package ucv.app_inventory.adapters.rest;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ucv.app_inventory.application.DTO.CategoryDTO;
@@ -17,8 +19,10 @@ public class CategoryController {
     private final CategoryApplicationService categoryApplicationService;
 
     @GetMapping("/list")
-    public ResponseEntity<List<CategoryDTO>> listCategories() {
-        List<CategoryDTO> categories = categoryApplicationService.listCategories();
+    public ResponseEntity<List<CategoryDTO>> listCategories(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size) {
+        List<CategoryDTO> categories = categoryApplicationService.listCategories(page, size);
         return ResponseEntity.ok(categories);
     }
 
@@ -48,24 +52,35 @@ public class CategoryController {
         return updatedCategory != null ? ResponseEntity.ok(updatedCategory) : ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/search/name")
+    @GetMapping("/findByName")
     public ResponseEntity<Page<CategoryDTO>> findByName(
             @RequestParam String name,
-            @RequestParam int page,
-            @RequestParam int size) {
-        Page<CategoryDTO> categories = categoryApplicationService.findByName(name, page, size);
-        return ResponseEntity.ok(categories);
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CategoryDTO> categoriesPage = categoryApplicationService.findByName(name, pageable);
+
+        return ResponseEntity.ok(categoriesPage);
     }
 
-    @GetMapping("/search/status")
-    public ResponseEntity<Page<CategoryDTO>> findByStatus(
+    @GetMapping("/findByStatus")
+    public ResponseEntity<List<CategoryDTO>> findByStatus(
             @RequestParam Category.Status status,
-            @RequestParam int page,
-            @RequestParam int size) {
-        Page<CategoryDTO> categories = categoryApplicationService.findByStatus(status, page, size);
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size) {
+        List<CategoryDTO> categories = categoryApplicationService.findByStatus(status, page, size);
         return ResponseEntity.ok(categories);
     }
 
-
+    @GetMapping("/findByNameAndStatus")
+    public ResponseEntity<List<CategoryDTO>> findByNameAndStatus(
+            @RequestParam String name,
+            @RequestParam Category.Status status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size){
+        List<CategoryDTO> categories = categoryApplicationService.findByNameAndStatus(name, status, page, size);
+        return ResponseEntity.ok(categories);
+    }
 
 }
