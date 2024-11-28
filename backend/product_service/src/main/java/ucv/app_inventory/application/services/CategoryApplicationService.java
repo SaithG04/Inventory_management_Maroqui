@@ -1,5 +1,8 @@
 package ucv.app_inventory.application.services;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ucv.app_inventory.application.DTO.CategoryDTO;
 import ucv.app_inventory.domain.entities.Category;
@@ -15,8 +18,8 @@ public class CategoryApplicationService {
         this.categoryService = categoryService;
     }
 
-    public List<CategoryDTO> listCategories() {
-        return categoryService.listCategories().stream().map(this::convertToDto).toList();
+    public List<CategoryDTO> listCategories(int page, int size) {
+        return categoryService.listCategories(page, size).stream().map(this::convertToDto).toList();
     }
 
     public CategoryDTO updateCategory(Long id, CategoryDTO categoryDto) {
@@ -41,7 +44,6 @@ public class CategoryApplicationService {
     }
 
 
-
     public CategoryDTO saveCategory(CategoryDTO categoryDto) {
         Category category = convertToEntity(categoryDto);
         Category savedCategory = categoryService.saveCategory(category);
@@ -64,4 +66,17 @@ public class CategoryApplicationService {
     private Category convertToEntity(CategoryDTO categoryDto) {
         return new Category(categoryDto.getId(), categoryDto.getName(), categoryDto.getDescription(), categoryDto.getStatus());
     }
+
+    public Page<CategoryDTO> findByName(String name, Pageable pageable) {
+        return categoryService.findByName(name, pageable).map(this::convertToDto);
+    }
+
+    public List<CategoryDTO> findByStatus(Category.Status status, int page, int size) {
+        return categoryService.findByStatus(status, page, size).stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    public List<CategoryDTO> findByNameAndStatus(String name, Category.Status status, int page, int size) {
+        return categoryService.findByNameAndStatus(name, status, page, size).stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
 }
