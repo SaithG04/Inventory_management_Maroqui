@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DetalleExcepcion {
+public class DetailException {
 
     private String mensaje;
     private String detalles;

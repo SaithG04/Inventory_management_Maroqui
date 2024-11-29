@@ -18,7 +18,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-public class User implements UserDetails {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,6 +46,9 @@ public class User implements UserDetails {
     @Column(name = "refresh_token")
     private String refreshToken;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private UserProfile userProfile;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_roles",
@@ -54,14 +57,14 @@ public class User implements UserDetails {
     )
     private Set<Role> roles;
 
-    @Override
+    /*@Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
             .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName().toUpperCase()))
             .collect(Collectors.toSet());
-    }
+    }*/
 
-    @Override
+    /*@Override
     public String getUsername() {
         return this.email;
     }
@@ -89,5 +92,5 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return this.status == Status.ACTIVE;
-    }
+    }*/
 }

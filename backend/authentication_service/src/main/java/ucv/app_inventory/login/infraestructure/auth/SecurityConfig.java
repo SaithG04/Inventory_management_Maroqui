@@ -1,8 +1,11 @@
 package ucv.app_inventory.login.infraestructure.auth;
 
+import jakarta.servlet.Filter;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -13,28 +16,37 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import ucv.app_inventory.login.adapters.auth.UsuarioDetailsService;
 import org.springframework.web.cors.CorsConfigurationSource;
+import ucv.app_inventory.login.application.UserService;
+
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
-public class ConfigSecurity {
+public class SecurityConfig {
 
-    private final UsuarioDetailsService userDetailsService;
-    private final JwtAuthFilter jwtAuthFilter;
-    private final CorsConfigurationSource corsConfigurationSource;
+    @Autowired
+    private Filter jwtAuthFilter;
+    @Autowired
+    private CorsConfigurationSource corsConfigurationSource;
+    @Autowired
+    private UserService userService;
 
-    public ConfigSecurity(UsuarioDetailsService userDetailsService, JwtAuthFilter jwtAuthFilter, CorsConfigurationSource corsConfigurationSource) {
-        this.userDetailsService = userDetailsService;
+    /*@Autowired
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter,
+                          CorsConfigurationSource corsConfigurationSource,
+                          UserService userService) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.corsConfigurationSource = corsConfigurationSource;
-    }
+        this.userService = userService;
+    }*/
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -60,7 +72,7 @@ public class ConfigSecurity {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setUserDetailsService((UserDetailsService) userService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
@@ -75,3 +87,6 @@ public class ConfigSecurity {
         return new BCryptPasswordEncoder();
     }
 }
+
+
+
