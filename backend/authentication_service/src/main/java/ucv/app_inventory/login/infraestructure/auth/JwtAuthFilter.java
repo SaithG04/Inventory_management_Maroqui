@@ -12,28 +12,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import ucv.app_inventory.login.adapters.auth.CustomUserDetails;
-import ucv.app_inventory.login.adapters.auth.UsuarioDetailsService;
-import ucv.app_inventory.login.application.PruebaAuthService;
-import ucv.app_inventory.login.application.UserService;
-import ucv.app_inventory.login.application.UserServiceImpl;
 import ucv.app_inventory.login.domain.auth.TokenManagementService;
 import ucv.app_inventory.login.domain.auth.TokenRevocationService;
-import ucv.app_inventory.login.domain.model.Status;
-import ucv.app_inventory.login.domain.model.User;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-
-    //private UsuarioDetailsService userDetailsService;
-    @Autowired
-    private PruebaAuthService authService;
     private final TokenManagementService tokenManagementService;
     private final TokenRevocationService tokenRevocationService;
 
+    @Autowired
     public JwtAuthFilter(TokenManagementService tokenManagementService,
                          TokenRevocationService tokenRevocationService) {
         this.tokenManagementService = tokenManagementService;
@@ -48,13 +37,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (token != null && !tokenRevocationService.isTokenRevoked(token)) {
             try {
-                String email = tokenManagementService.getUsuarioToken(token);
+                // Aquí obtenemos el email (o el campo que quieras) directamente desde el token
+                String email = tokenManagementService.getUsuarioToken(token); // Suponiendo que este método extrae el email desde el token
 
                 if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetails userDetails = authService.authenticateUser(email);
-
+                    // Si no es necesario cargar UserDetails, solo autenticamos directamente con el email
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities());
+                            email, null, null);  // Solo con el email y las authorities serían opcionales
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
@@ -69,4 +58,3 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
-

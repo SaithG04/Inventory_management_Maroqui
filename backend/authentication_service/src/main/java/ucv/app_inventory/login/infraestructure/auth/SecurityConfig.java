@@ -23,6 +23,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
+import ucv.app_inventory.login.adapters.auth.CustomUserDetailsService;
 import ucv.app_inventory.login.application.UserService;
 
 
@@ -36,17 +37,7 @@ public class SecurityConfig {
     @Autowired
     private CorsConfigurationSource corsConfigurationSource;
     @Autowired
-    private UserService userService;
-
-    /*@Autowired
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter,
-                          CorsConfigurationSource corsConfigurationSource,
-                          UserService userService) {
-        this.jwtAuthFilter = jwtAuthFilter;
-        this.corsConfigurationSource = corsConfigurationSource;
-        this.userService = userService;
-    }*/
-
+    private CustomUserDetailsService customUserDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -72,7 +63,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService((UserDetailsService) userService);
+        authProvider.setUserDetailsService(customUserDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }

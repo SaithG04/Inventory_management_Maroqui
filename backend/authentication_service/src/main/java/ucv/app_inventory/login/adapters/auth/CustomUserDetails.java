@@ -1,5 +1,6 @@
 package ucv.app_inventory.login.adapters.auth;
 
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,8 +11,10 @@ import ucv.app_inventory.login.domain.model.Role;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+@Getter
 public class CustomUserDetails implements UserDetails {
 
+    // Métodos adicionales
     private final User user;
 
     public CustomUserDetails(User user) {
@@ -56,8 +59,4 @@ public class CustomUserDetails implements UserDetails {
         return user.getStatus() == Status.ACTIVE; // Solo activo
     }
 
-    // Métodos adicionales
-    public User getUser() {
-        return user;
-    }
 }

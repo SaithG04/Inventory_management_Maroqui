@@ -56,41 +56,4 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "id_role")
     )
     private Set<Role> roles;
-
-    /*@Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-            .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName().toUpperCase()))
-            .collect(Collectors.toSet());
-    }*/
-
-    /*@Override
-    public String getUsername() {
-        return this.email;
-    }
-
-    @Override
-    public String getPassword() {
-        return this.password;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return this.status == Status.ACTIVE;
-    }*/
 }

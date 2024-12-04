@@ -199,7 +199,6 @@ public class UserServiceImpl implements UserService {
         if (updatedProfile.getLastName() != null) {
             profile.setLastName(updatedProfile.getLastName());
         }
-        // Actualiza otros campos si es necesario
 
         jpaUsuarioRepositorio.save(user);
         return UserMapper.toUserDto(user);
