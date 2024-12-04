@@ -33,7 +33,7 @@ import ucv.app_inventory.login.application.UserService;
 public class SecurityConfig {
 
     @Autowired
-    private Filter jwtAuthFilter;
+    private JwtAuthFilter jwtAuthFilter;
     @Autowired
     private CorsConfigurationSource corsConfigurationSource;
     @Autowired

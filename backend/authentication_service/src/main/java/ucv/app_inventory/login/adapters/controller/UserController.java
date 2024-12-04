@@ -43,13 +43,6 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse<>("success", "Usuarios obtenidos exitosamente", users));
     }
 
-    // 3. Obtener la información del usuario autenticado
-    @GetMapping("/me")
-    public ResponseEntity<ApiResponse<UserDto>> getCurrentUserInfo(@AuthenticationPrincipal UserDetails userDetails) {
-        UserDto userDto = userService.getUserProfile(userDetails.getUsername());
-        return ResponseEntity.ok(new ApiResponse<>("success", "Información del usuario autenticado", userDto));
-    }
-
     // 4. Actualizar un usuario específico
     @PutMapping("/update/{id}")
     public ResponseEntity<ApiResponse<UserDto>> updateUser(@PathVariable Long id, @Valid @RequestBody UserDto updatedUser) {
@@ -72,6 +65,7 @@ public class UserController {
     }
 
     // 7. Obtener todos los roles disponibles
+    // Mover a otro controller solo para lo relacionado a roles
     @GetMapping("/roles")
     public ResponseEntity<ApiResponse<List<String>>> getAllRoles() {
         List<String> roles = userService.getAllRoles();
@@ -85,16 +79,6 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse<>("success", "Perfil del usuario obtenido exitosamente", userDto));
     }
 
-    // 12. Actualizar el perfil del usuario autenticado
-    @PutMapping("/profile")
-    public ResponseEntity<ApiResponse<UserDto>> updateUserProfile(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @Valid @RequestBody UserDto updatedProfile) {
-
-        UserDto userDto = userService.updateUserProfile(userDetails.getUsername(), updatedProfile);
-        return ResponseEntity.ok(new ApiResponse<>("success", "Perfil del usuario actualizado exitosamente", userDto));
-    }
-
     // 13. Activar o desactivar un usuario
     @PutMapping("/activate/{id}")
     public ResponseEntity<ApiResponse<String>> activateUser(@PathVariable Long id, @RequestParam boolean isActive) {
@@ -102,6 +86,7 @@ public class UserController {
         String status = isActive ? "activado" : "desactivado";
         return ResponseEntity.ok(new ApiResponse<>("success", "Usuario " + status + " exitosamente", null));
     }
+
     @PostMapping("/refresh-token")
     public ResponseEntity<ApiResponse<String>> refreshToken(@RequestParam String refreshToken) {
         // Verificar el refresh token

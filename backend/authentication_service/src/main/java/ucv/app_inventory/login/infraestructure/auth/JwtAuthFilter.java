@@ -2,6 +2,7 @@ package ucv.app_inventory.login.infraestructure.auth;
 
 import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import ucv.app_inventory.login.adapters.auth.CustomUserDetailsService;
 import ucv.app_inventory.login.domain.auth.TokenManagementService;
 import ucv.app_inventory.login.domain.auth.TokenRevocationService;
 
@@ -21,12 +23,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final TokenManagementService tokenManagementService;
     private final TokenRevocationService tokenRevocationService;
+    private final CustomUserDetailsService customUserDetailsService; // Añadir el servicio de UserDetails
 
     @Autowired
     public JwtAuthFilter(TokenManagementService tokenManagementService,
-                         TokenRevocationService tokenRevocationService) {
+                         TokenRevocationService tokenRevocationService,
+                         CustomUserDetailsService customUserDetailsService) {
         this.tokenManagementService = tokenManagementService;
         this.tokenRevocationService = tokenRevocationService;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     @Override
@@ -37,15 +42,21 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (token != null && !tokenRevocationService.isTokenRevoked(token)) {
             try {
-                // Aquí obtenemos el email (o el campo que quieras) directamente desde el token
-                String email = tokenManagementService.getUsuarioToken(token); // Suponiendo que este método extrae el email desde el token
+                // Obtener el email del token
+                String email = tokenManagementService.getUsuarioToken(token);
 
                 if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    // Si no es necesario cargar UserDetails, solo autenticamos directamente con el email
+                    // Cargar los detalles completos del usuario (UserDetails)
+                    UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+
+                    // Crear el objeto de autenticación con los detalles completos del usuario
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                            email, null, null);  // Solo con el email y las authorities serían opcionales
+                            userDetails, null, userDetails.getAuthorities());
+
+                    // Establecer detalles adicionales
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
+                    // Establecer la autenticación en el contexto de seguridad
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
 

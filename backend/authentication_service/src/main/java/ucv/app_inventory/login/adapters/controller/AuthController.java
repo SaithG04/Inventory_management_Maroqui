@@ -36,10 +36,10 @@ public class AuthController {
             return ResponseEntity.ok(new ApiResponse<>("success", "Autenticación exitosa", new JwtResponse(token)));
         } catch (InvalidCredentials e) {
             logger.warn("Intento fallido de autenticación para el usuario: {}", loginRequest.getEmail());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>("error", "User o contraseña incorrectos", null));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>("error", e.getMessage(), null));
         } catch (Exception e) {
             logger.error("Error inesperado durante la autenticación: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>("error", "Error interno del servidor", null));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>("error", e.getMessage(), null));
         }
     }
 
