@@ -16,7 +16,7 @@ import ucv.app_inventory.login.adapters.controller.dto.JwtResponse;
 import ucv.app_inventory.login.adapters.controller.dto.LoginRequest;
 import ucv.app_inventory.login.adapters.controller.dto.LogoutRequest;
 import ucv.app_inventory.login.application.AuthService;
-import ucv.app_inventory.login.domain.exception.CredencialesInvalidas;
+import ucv.app_inventory.login.domain.exception.InvalidCredentials;
 
 @Controller
 @RequestMapping("/api/auth")
@@ -34,12 +34,12 @@ public class AuthController {
             String token = authService.authenticateUser(loginRequest.getEmail(), loginRequest.getClave());
             logger.info("User autenticado: {}", loginRequest.getEmail());
             return ResponseEntity.ok(new ApiResponse<>("success", "Autenticación exitosa", new JwtResponse(token)));
-        } catch (CredencialesInvalidas e) {
+        } catch (InvalidCredentials e) {
             logger.warn("Intento fallido de autenticación para el usuario: {}", loginRequest.getEmail());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>("error", "User o contraseña incorrectos", null));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>("error", e.getMessage(), null));
         } catch (Exception e) {
             logger.error("Error inesperado durante la autenticación: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>("error", "Error interno del servidor", null));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>("error", e.getMessage(), null));
         }
     }
 

@@ -30,15 +30,14 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Permitir orígenes específicos
         configuration.setAllowedOriginPatterns(Arrays.asList(allowedOrigins));
-        // Permitir métodos específicos
+
         configuration.setAllowedMethods(Arrays.asList(allowedMethods));
-        // Permitir headers específicos
+
         configuration.setAllowedHeaders(Arrays.asList(allowedHeaders));
-        // Exponer headers específicos
+
         configuration.setExposedHeaders(Arrays.asList(exposedHeaders));
-        // Permitir credenciales
+
         configuration.setAllowCredentials(allowCredentials);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

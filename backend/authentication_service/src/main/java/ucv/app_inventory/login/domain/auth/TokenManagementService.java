@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import ucv.app_inventory.login.domain.model.Role;
 import ucv.app_inventory.login.domain.model.User;
+import ucv.app_inventory.login.domain.model.UserProfile;
 
 /**
  * Clase utilitaria para manejar operaciones JWT como generación y validación de
@@ -44,39 +45,52 @@ public class TokenManagementService {
                 .build();
     }
 
-    public String generarToken(User user) {
+    public String generateToken(User user) {
+        UserProfile userProfile = user.getUserProfile();
+        String fullname = userProfile.getFirstName() + " " + userProfile.getLastName();
         String roles = user.getRoles().stream()
                 .map(Role::getName)
                 .collect(Collectors.joining(","));
 
         return Jwts.builder()
                 .setSubject(user.getEmail())
-                //.claim("name", user.getFullname())
                 .claim("email", user.getEmail())
                 .claim("roles", roles)
+                .claim("fullname", fullname)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + tiempoExp))
                 .signWith(claveSecreta, SignatureAlgorithm.HS512)
                 .compact();
     }
+    public String generateRefreshToken(User user) {
+        String refreshToken = Jwts.builder()
+                .setSubject(user.getEmail())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 30 * 24 * 60 * 60 * 1000))
+                .signWith(claveSecreta, SignatureAlgorithm.HS512)
+                .compact();
+
+        return refreshToken;
+    }
 
     public void validarToken(String token) {
         try {
-            jwtParser.parseClaimsJws(token);
+            Claims claims = jwtParser.parseClaimsJws(token).getBody();
+            Date expiration = claims.getExpiration();
+            if (expiration.before(new Date())) {
+                throw new JwtException("El token ha expirado.");
+            }
         } catch (MalformedJwtException e) {
-            logger.error("Token JWT malformado: {}", e.getMessage());
             throw new JwtException("Token malformado.");
         } catch (ExpiredJwtException e) {
-            logger.error("Token JWT expirado: {}", e.getMessage());
             throw new JwtException("Token expirado.");
         } catch (SignatureException e) {
-            logger.error("Firma del Token JWT no válida: {}", e.getMessage());
             throw new JwtException("Firma no válida.");
         } catch (UnsupportedJwtException e) {
-            logger.error("Token JWT inválido: {}", e.getMessage());
             throw new JwtException("Token inválido.");
         }
     }
+
 
     /**
      * Extrae el nombre de usuario del token JWT proporcionado.
@@ -97,7 +111,7 @@ public class TokenManagementService {
      */
     public long getExpirationMillis(String token) {
         Claims claims = jwtParser.parseClaimsJws(token).getBody();
-        Date expiration = claims.getExpiration(); // Extrae el claim `exp`
+        Date expiration = claims.getExpiration();
         return expiration.getTime() - System.currentTimeMillis();
     }
 }
