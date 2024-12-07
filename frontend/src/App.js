@@ -6,9 +6,9 @@ import MainContent from './components/layout/maincontent/MainContent';
 import Dashboard from './components/DashboardCard/DashboardCard';
 import Pedidos from './components/Pedidos/Pedidos';
 import ParentComponentProduct from './products/infraestructure/components/ParentComponentProduct';
+import ParentComponentEmployee from './employees/infrastructure/components/ParentComponentEmployee';
 import Sales from './components/Sales/Sales';
-import EmployeeManagement from './components/EmployeeManagement/EmployeeManagement';
-import Suppliers from './components/Suppliers/Suppliers';
+import ParentComponentProvider from './providers/infrastructure/components/ParentComponentProvider'; // Importamos el componente de proveedores
 import LoginForm from './components/Login/LoginForm';
 import { AuthPort } from './ports/authPort';
 import { ProductProvider } from './context/ProductContext';
@@ -66,60 +66,60 @@ function App() {
     setIsLoading(true); // Iniciar el indicador de carga
 
     try {
-        const result = await AuthPort.loginUser(email, password);
+      const result = await AuthPort.loginUser(email, password);
 
-        if (result.success) {
-          console.log("Inicio de sesión exitoso.");
-          const token = Cookies.get('jwtToken');
-          if (token) {
-              const decodedToken = jwtDecode(token);
-              const role = decodedToken.roles;
+      if (result.success) {
+        console.log("Inicio de sesión exitoso.");
+        const token = Cookies.get('jwtToken');
+        if (token) {
+          const decodedToken = jwtDecode(token);
+          const role = decodedToken.roles;
 
-              // Actualizar estados después del inicio de sesión exitoso
-              setIsAuthenticated(true);
-              setUserRole(role);
-              setUserName(decodedToken.name);
-              setDefaultSection(role);
-              console.log("Autenticación exitosa, usuario autenticado:", decodedToken.name);
+          // Actualizar estados después del inicio de sesión exitoso
+          setIsAuthenticated(true);
+          setUserRole(role);
+          setUserName(decodedToken.name);
+          setDefaultSection(role);
+          console.log("Autenticación exitosa, usuario autenticado:", decodedToken.name);
 
-              // Detener el indicador de carga después de la autenticación exitosa
-              setIsLoading(false);
-          } else {
-              throw new Error("Token no disponible después de autenticación exitosa.");
-          }
+          // Detener el indicador de carga después de la autenticación exitosa
+          setIsLoading(false);
         } else {
-            // Si las credenciales no son válidas, detener la carga y mostrar el error
-            setIsLoading(false);
-
-            // Mostrar notificación de error después de un pequeño retraso
-            setTimeout(() => {
-                toast.error(result.message || 'Credenciales incorrectas. Por favor, intente nuevamente.', {
-                    position: "top-right",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
-            }, 200); // Retraso de 200ms
+          throw new Error("Token no disponible después de autenticación exitosa.");
         }
-    } catch (error) {
-        console.error('Error durante el proceso de inicio de sesión:', error);
+      } else {
+        // Si las credenciales no son válidas, detener la carga y mostrar el error
         setIsLoading(false);
 
-        // Mostrar notificación de error de conexión después de un pequeño retraso
+        // Mostrar notificación de error después de un pequeño retraso
         setTimeout(() => {
-            toast.error('Ha ocurrido un error. Por favor, intente nuevamente.', {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
+          toast.error(result.message || 'Credenciales incorrectas. Por favor, intente nuevamente.', {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
         }, 200); // Retraso de 200ms
+      }
+    } catch (error) {
+      console.error('Error durante el proceso de inicio de sesión:', error);
+      setIsLoading(false);
+
+      // Mostrar notificación de error de conexión después de un pequeño retraso
+      setTimeout(() => {
+        toast.error('Ha ocurrido un error. Por favor, intente nuevamente.', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }, 200); // Retraso de 200ms
     }
   };
 
@@ -147,17 +147,18 @@ function App() {
       case 'pedidos':
         return <Pedidos />;
       case 'producto':
-        return  <ParentComponentProduct />;
+        return <ParentComponentProduct />;
       case 'ventas':
         return <Sales />;
       case 'empleados':
-        return <EmployeeManagement />;
-      case 'suppliers':
-        return <Suppliers />;
+        return <ParentComponentEmployee />; // Nueva sección para empleados
+      case 'proveedores': // Sección de proveedores
+        return <ParentComponentProvider />;
       default:
         return <Dashboard />;
     }
-  }, [activeSection, userRole]);
+  }, [activeSection]); // Solo activeSection como dependencia
+
 
   // Renderizado principal de la aplicación
   return (
@@ -172,7 +173,7 @@ function App() {
         ) : isAuthenticated ? (
           // Mostrar la aplicación una vez autenticado
           <>
-            <Header />
+            <Header userName={userName} userRole={userRole} />
             <div className="main-layout">
               <Sidebar
                 userRole={userRole}
@@ -187,6 +188,7 @@ function App() {
           // Mostrar el formulario de inicio de sesión si el usuario no está autenticado
           <LoginForm onLogin={handleLogin} />
         )}
+
       </div>
     </ProductProvider>
   );
