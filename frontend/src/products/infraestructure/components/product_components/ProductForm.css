@@ -17,14 +17,6 @@ Estilos para el Formulario Crear Producto
     margin-bottom: 0;
 }
 
-/* Título del formulario */
-.add-product-form h1 {
-    font-size: 24px;
-    color: #444;
-    margin-bottom: 20px;
-    text-align: left;
-}
-
 /* Contenedor de columnas para los campos */
 .form-columns {
     display: flex;
@@ -54,61 +46,82 @@ Estilos para el Formulario Crear Producto
     margin-bottom: 5px; /* Separación entre la etiqueta y el campo */
 }
 
-/* Campos de entrada */
-.form-row input,
-.form-row select {
+/* ============================
+Campos de entrada
+============================ */
+.form-row input {
     padding: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-borde, #ddd); /* Usa color global para el borde */
     border-radius: 5px;
     font-size: 14px;
+    line-height: 1.5; /* Asegura consistencia en la altura */
+    height: 42px; /* Tamaño fijo para asegurar uniformidad */
     width: 100%;
     box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transiciones suaves */
 }
 
-.form-row input:focus,
-.form-row select:focus {
-    border-color: #007bff; /* Color de foco */
+/* Hover en los campos de entrada */
+.form-row input:hover {
+    border-color: var(--color-borde-focus, #007bff); /* Color del borde al pasar el mouse */
+    box-shadow: 0px 0px 4px var(--color-borde-focus, #9fceff); /* Sombra para resaltar */
+}
+
+/* Foco en los campos de entrada */
+.form-row input:focus {
+    border-color: var(--color-borde-focus, #007bff); /* Color del borde al enfocar */
     outline: none;
+    box-shadow: 0px 0px 6px var(--color-borde-focus, #9fceff); /* Sombra más intensa */
 }
 
-/* Botones del formulario */
-.form-buttons {
+/* ============================
+Estilos para los Dropdown
+============================ */
+.form-row .p-dropdown {
     display: flex;
-    justify-content: center;
-    gap: 15px; /* Espaciado entre botones */
-    margin-top: 20px;
-    margin-bottom: 0; /* Elimina cualquier margen inferior */
+    align-items: center; /* Centra verticalmente los elementos */
+    justify-content: center; /* Centra horizontalmente el texto */
+    padding: 8px 10px; /* Ajusta el padding para un diseño más compacto */
+    border: 1px solid var(--color-borde, #ddd); /* Usa color global para el borde */
+    border-radius: 5px; /* Bordes suaves */
+    font-size: 14px; /* Tamaño de fuente consistente */
+    line-height: 1.5; /* Asegura consistencia en la altura */
+    height: 42px; /* Tamaño fijo para igualar con los input */
+    width: 100%;
+    box-sizing: border-box; /* Incluye bordes y padding en el tamaño */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transiciones suaves */
 }
 
-/* Botón Guardar */
-.p-button-success {
-    background-color: #28a745;
-    color: #fff;
-    padding: 12px 20px;
+/* Hover en los Dropdown */
+.form-row .p-dropdown:hover {
+    border-color: var(--color-borde-focus, #007bff); /* Color del borde al pasar el mouse */
+    box-shadow: 0px 0px 4px var(--color-borde-focus, #9fceff); /* Sombra para resaltar */
+}
+
+/* Foco en los Dropdown */
+.form-row .p-dropdown:focus {
+    border-color: var(--color-borde-focus, #007bff); /* Color del borde al enfocar */
+    outline: none;
+    box-shadow: 0px 0px 6px var(--color-borde-focus, #9fceff); /* Sombra más intensa */
+}
+
+.form-row .p-dropdown-panel {
+    max-height: 200px; /* Limita la altura máxima del panel desplegable */
+    overflow-y: auto; /* Activa el scroll si hay demasiadas opciones */
+    border: 1px solid var(--color-borde, #ddd); /* Bordes consistentes */
+    border-radius: 5px; /* Bordes suaves */
     font-size: 14px;
-    border-radius: 5px;
-    border: none;
-    transition: background-color 0.3s ease;
 }
 
-.p-button-success:hover {
-    background-color: #218838;
+.form-row .p-dropdown-item {
+    padding: 10px; /* Ajusta el padding de las opciones */
+    font-size: 14px; /* Tamaño de texto uniforme */
+    color: #333; /* Color del texto */
 }
 
-/* Botón Cancelar */
-.p-button-secondary {
-    background-color: #6c757d;
-    color: #fff;
-    padding: 12px 20px;
-    font-size: 14px;
-    border-radius: 5px;
-    border: none;
-    transition: background-color 0.3s ease;
-}
-
-.p-button-secondary:hover {
-    background-color: #5a6268;
-}
+/* ============================
+Botones del formulario
+============================ */
 
 /* ============================
 Responsive - Ajustes para Pantallas Pequeñas

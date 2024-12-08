@@ -1,9 +1,9 @@
 /* ============================
-Sección de Búsqueda de Productos
-=========================== */
+Sección de Búsqueda de Categorías
+============================ */
 
-/* Contenedor general de la sección de búsqueda de productos */
-.product-search-section {
+/* Contenedor general de la sección de búsqueda de categorías */
+.category-search-section {
     display: flex; /* Alinear los elementos horizontalmente */
     flex-wrap: wrap; /* Permitir que los elementos salten a la siguiente línea en pantallas pequeñas */
     justify-content: space-between; /* Espacio igual entre elementos */
@@ -20,33 +20,33 @@ Sección de Búsqueda de Productos
 }
 
 /* Mantener el tamaño fijo cuando el sidebar está expandido */
-body.sidebar-expanded .product-search-section {
+body.sidebar-expanded .category-search-section {
     width: calc(100% - 250px); /* Ancho ajustado considerando el tamaño del sidebar expandido */
 }
 
 /* Mantener el tamaño fijo cuando el sidebar está oculto */
-body.sidebar-hidden .product-search-section {
+body.sidebar-hidden .category-search-section {
     width: calc(100% - 50px); /* Ancho ajustado considerando el tamaño reducido del sidebar */
 }
 
 /* ============================
 Criterio de Búsqueda (Dropdown de tipo)
-=========================== */
-.product-search-dropdown {
+============================ */
+.category-search-dropdown {
     min-width: 300px;
     max-width: 300px;
     padding: 5px;
     font-size: 14px;
 }
 
-.product-search-dropdown .p-dropdown {
+.category-search-dropdown .p-dropdown {
     width: 100%;
 }
 
 /* ============================
 Entrada de Búsqueda o Selección de Estado (Input o Dropdown)
-=========================== */
-.product-input {
+============================ */
+.category-input {
     min-width: 300px; /* Ajuste del ancho mínimo */
     max-width: 800px; /* Limitar el ancho máximo */
     flex-grow: 1; /* Permitir que crezca dentro del contenedor flexible */
@@ -54,23 +54,23 @@ Entrada de Búsqueda o Selección de Estado (Input o Dropdown)
     font-size: 14px;
 }
 
-.product-input .p-dropdown,
-.product-input .p-inputtext {
+.category-input .p-dropdown,
+.category-input .p-inputtext {
     width: 100%; /* Ancho completo */
 }
 
 /* ============================
 Responsive - Ajustes para Pantallas Pequeñas
-=========================== */
+============================ */
 @media (max-width: 768px) {
-    .product-search-section {
+    .category-search-section {
         flex-direction: column; /* Cambiar disposición a columna */
         align-items: stretch; /* Alinear al ancho completo */
         padding: 15px;
         width: 100%; /* Asegurar que ocupe todo el ancho en pantallas pequeñas */
     }
 
-    .product-search-buttons {
+    .category-search-buttons {
         justify-content: center; /* Centrar los botones en pantallas pequeñas */
         width: 100%; /* Asegurar que ocupen todo el ancho disponible */
     }

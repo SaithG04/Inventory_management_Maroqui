@@ -2,11 +2,11 @@ import ProductRepository from "../../infraestructure/repositories/ProductReposit
 
 class ProductService {
   constructor() {
-    this.productRepository = new ProductRepository();
+    this.productRepository = new ProductRepository(); // Inicializar correctamente
   }
 
-  async getAllProducts(page, size) {
-    return await this.productRepository.getAll(page, size);
+  async getAllProducts() {
+    return await this.productRepository.getAll();
   }
 
   async getProductById(id) {
@@ -24,17 +24,6 @@ class ProductService {
   async deleteProduct(id) {
     return await this.productRepository.delete(id);
   }
-  async findByName(name, page, size) {
-    return await this.productRepository.findByName(name, page, size);
-  }
-
-  async findByStatus(status, page, size) {
-    return await this.productRepository.findByStatus(status, page, size);
-  }
-
-  async findByCategoryName(categoryName, page, size) {
-    return await this.productRepository.findByCategoryName(categoryName, page, size);
-  }
 }
 
-export default ProductService;
+export default ProductService; // Exportar el servicio como clase

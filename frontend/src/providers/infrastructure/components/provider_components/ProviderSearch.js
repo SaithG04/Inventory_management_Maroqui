@@ -112,18 +112,18 @@ const ProviderSearch = ({ onSearchResults }) => {
       )}
 
       {/* Botones de búsqueda y limpiar */}
-      <div className="provider-search-buttons">
+      <div className="search-clear-buttons"> {/* Usar la clase global del contenedor */}
         <Button
-          label={loading ? 'Searching...' : 'Search'}
-          onClick={handleSearch}
-          disabled={loading}
-          className="p-button-primary search-button"  // Asegúrate de usar las clases correctas
+          label={loading ? 'Searching...' : 'Search'} // Texto dinámico para el estado de carga
+          onClick={handleSearch} // Evento para realizar la búsqueda
+          disabled={loading} // Desactiva el botón mientras está cargando
+          className="search-button" // Clase global para el botón de búsqueda
         />
         <Button
-          label="Clear"
-          onClick={handleClearSearch}
-          disabled={loading}
-          className="p-button-secondary clear-button"  // Asegúrate de usar las clases correctas
+          label="Clear" // Texto para limpiar búsqueda
+          onClick={handleClearSearch} // Evento para limpiar
+          disabled={loading} // Desactiva el botón mientras está cargando
+          className="clear-button" // Clase global para el botón de limpiar
         />
       </div>
     </div>

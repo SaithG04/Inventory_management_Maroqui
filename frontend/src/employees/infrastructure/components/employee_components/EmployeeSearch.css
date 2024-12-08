@@ -59,40 +59,6 @@ Entrada de Búsqueda o Selección de Estado (Input o Dropdown)
     width: 100%; /* Ancho completo */
 }
 
-/* ============================
-Botones de búsqueda y limpiar
-=========================== */
-.employee-search-buttons {
-    display: flex; /* Alinear los botones horizontalmente */
-    gap: 10px; /* Separación entre botones */
-    flex-shrink: 0; /* Evitar que se reduzcan */
-    justify-content: flex-end; /* Alinear los botones al final del contenedor */
-}
-
-.employee-search-buttons .search-button,
-.employee-search-buttons .clear-button {
-    padding: 12px 50px;
-    font-size: 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s, opacity 0.3s;
-}
-
-.employee-search-buttons .search-button {
-    background-color: var(--color-verde);
-}
-
-.employee-search-buttons .search-button:hover {
-    background-color: var(--color-verde-oscuro);
-}
-
-.employee-search-buttons .clear-button {
-    background-color: var(--color-rojo);
-}
-
-.employee-search-buttons .clear-button:hover {
-    background-color: var(--color-rojo-oscuro);
-}
 
 /* ============================
 Responsive - Ajustes para Pantallas Pequeñas

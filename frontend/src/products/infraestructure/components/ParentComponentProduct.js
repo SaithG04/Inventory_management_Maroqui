@@ -1,79 +1,153 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import ProductForm from "./product_components/ProductForm";
 import ProductList from "./product_components/ProductList";
-import ProductSearch from "./product_components/ProductSearch"; // Importar el componente de búsqueda
+import ProductSearch from "./product_components/ProductSearch";
+import CategoryForm from "./category_components/CategoryForm";
+import CategoryList from "./category_components/CategoryList";
+import CategorySearch from "./category_components/CategorySearch";
 import ProductService from "../../domain/services/ProductService";
-import './ParentComponentProduct.css'; // Asegúrate de importar el archivo CSS
+import CategoryService from "../../domain/services/CategoryService";
+import { Button } from "primereact/button";
+import "./ParentComponentProduct.css";
 
 const ParentComponentProduct = () => {
-  const [selectedProductId, setSelectedProductId] = useState(null); // Para saber qué producto editar
-  const [allProducts, setAllProducts] = useState([]); // Para almacenar todos los productos
+  const [activeSection, setActiveSection] = useState("products"); // "products" o "categories"
+  const [selectedProductId, setSelectedProductId] = useState(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [allProducts, setAllProducts] = useState([]);
+  const [allCategories, setAllCategories] = useState([]);
+  const [isFormVisible, setIsFormVisible] = useState(false); // Control de visibilidad del formulario
 
-  // Memorizar la creación de 'productService' para evitar su recreación en cada render
   const productService = useMemo(() => new ProductService(), []);
+  const categoryService = useMemo(() => new CategoryService(), []);
 
-  // Función para seleccionar un producto para editar
-  const handleEditProduct = (productId) => {
-    setSelectedProductId(productId);
-  };
-
-  // Función para limpiar la selección de producto (para agregar un nuevo producto)
-  const handleAddProduct = () => {
-    setSelectedProductId(null);
-  };
-
-  // Función para obtener todos los productos, envuelta en useCallback
+  // Obtener productos
   const fetchAllProducts = useCallback(async () => {
-    const response = await productService.getAllProducts();
-    const fetchedProducts = response?.data || []; // Si data es null/undefined, usar un array vacío
-    setAllProducts(fetchedProducts); // Guardamos todos los productos
+    try {
+      const fetchedProducts = await productService.getAllProducts();
+      setAllProducts(fetchedProducts);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
   }, [productService]);
 
-  const handleSearchResults = (results) => {
-    // Lógica para manejar los resultados de búsqueda
-    setAllProducts(results);
+  // Obtener categorías
+  const fetchAllCategories = useCallback(async () => {
+    try {
+      const fetchedCategories = await categoryService.getAllCategories();
+      setAllCategories(fetchedCategories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  }, [categoryService]);
+
+  // Cambiar entre productos y categorías
+  useEffect(() => {
+    if (activeSection === "products") {
+      fetchAllProducts();
+    } else {
+      fetchAllCategories();
+    }
+  }, [activeSection, fetchAllProducts, fetchAllCategories]);
+
+  const handleAddProduct = () => {
+    setSelectedProductId(null);
+    setIsFormVisible(true); // Mostrar formulario de productos
   };
 
-  useEffect(() => {
-    fetchAllProducts(); // Cargar productos al inicio
-  }, [fetchAllProducts]);
+  const handleEditProduct = (productId) => {
+    setSelectedProductId(productId);
+    setIsFormVisible(true); // Mostrar formulario de productos
+  };
+
+  const handleAddCategory = () => {
+    setSelectedCategoryId(null);
+    setIsFormVisible(true); // Mostrar formulario de categorías
+  };
+
+  const handleEditCategory = (categoryId) => {
+    setSelectedCategoryId(categoryId);
+    setIsFormVisible(true); // Mostrar formulario de categorías
+  };
+
+  const handleCancelForm = () => {
+    setIsFormVisible(false); // Solo oculta el formulario
+  };  
+
+  const handleSwitchSection = (section) => {
+    setActiveSection(section);
+    setIsFormVisible(false); // Ocultar cualquier formulario al cambiar de sección
+  };
 
   return (
     <div className="productos-container">
-      <h2>Product Management</h2>
-
-      {/* Componente de búsqueda de productos */}
-      <ProductSearch
-        products={allProducts}
-        onSearchResults={handleSearchResults}
+    <h2>{activeSection === "products" ? "Gestión de Productos" : "Gestión de Categorías"}</h2>
+  
+    {/* Botones para alternar entre productos y categorías */}
+    <div className="button-container products-and-categories">
+      <Button
+        label="Ver Productos"
+        icon="pi pi-box"
+        className="p-button view-products-button"
+        onClick={() => handleSwitchSection("products")}
       />
-
-      {/* Contenedor de botones para agregar, cancelar o crear categorías */}
-      <div className="button-container products-and-categories">
-        <button
-          className="p-button add-product-button"
-          onClick={handleAddProduct}
-        >
-          <i className="pi pi-plus" /> Add New Product
-        </button>
-      </div>
-
-      {/* Formulario para agregar/editar producto */}
-      <div className="add-product-form">
-        <ProductForm
-          productId={selectedProductId}
-          onProductSaved={fetchAllProducts} // Listar nuevamente
-        />
-      </div>
-
-      {/* Lista de productos */}
-      <div className="productos-list">
-        <ProductList
-          onEditProduct={handleEditProduct}
-          products={allProducts} // Pasar la lista completa de productos
-        />
-      </div>
+      <Button
+        label="Ver Categorías"
+        icon="pi pi-tags"
+        className="p-button view-categories-button"
+        onClick={() => handleSwitchSection("categories")}
+      />
     </div>
+  
+    {/* Sección de productos */}
+    {activeSection === "products" && (
+      <section className="products-section">
+        <ProductSearch products={allProducts} onSearchResults={setAllProducts} />
+        <div className="button-container">
+          <Button
+            label="Agregar Producto"
+            icon="pi pi-plus"
+            className="p-button-success add-product-button"
+            onClick={handleAddProduct}
+          />
+        </div>
+        {isFormVisible ? (
+          <ProductForm
+            productId={selectedProductId}
+            onProductSaved={fetchAllProducts}
+            onCancel={handleCancelForm}
+          />
+        ) : (
+          <ProductList onEditProduct={handleEditProduct} products={allProducts} />
+        )}
+      </section>
+    )}
+  
+    {/* Sección de categorías */}
+    {activeSection === "categories" && (
+      <section className="categories-section">
+        <CategorySearch categories={allCategories} onSearchResults={setAllCategories} />
+        <div className="button-container">
+          <Button
+            label="Agregar Categoría"
+            icon="pi pi-plus"
+            className="p-button-info add-category-button"
+            onClick={handleAddCategory}
+          />
+        </div>
+        {isFormVisible ? (
+          <CategoryForm
+          categoryId={selectedCategoryId}
+          onCategorySaved={fetchAllCategories} // Actualiza categorías después de guardar
+          onCancel={handleCancelForm} // Cancela sin errores
+        />        
+        ) : (
+          <CategoryList onEditCategory={handleEditCategory} />
+        )}
+      </section>
+    )}
+  </div>
+  
   );
 };
 

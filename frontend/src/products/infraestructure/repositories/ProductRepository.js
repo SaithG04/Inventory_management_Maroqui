@@ -1,59 +1,33 @@
-// src/repositories/ProductRepository.js
-import { Http } from "../../../utils/ConHttp";
+import { ProductsHttp } from "../../../utils/ConHttp";
+import { ProductDTO } from "../dto/ProductDTO";
 
 class ProductRepository {
-  // Obtener todos los productos
-  async getAll(page = 0, size = 15) {
-    const response = await Http.get(`${process.env.REACT_APP_API_PRODUCTS_PATH}/listProducts?page=${page}&size=${size}`);
-    return response;
+  async getAll() {
+    const response = await ProductsHttp.get("/listProducts");
+    return response.data.map((product) => new ProductDTO(product).toDomain());
   }
 
-  // Obtener un producto por ID
   async getById(id) {
-    const response = await Http.get(`${process.env.REACT_APP_API_PRODUCTS_PATH}/findProductById/${id}`);
-    return response;
+    const response = await ProductsHttp.get(`/findProductById/${id}`);
+    return new ProductDTO(response.data).toDomain();
   }
 
-  // Crear un nuevo producto
   async create(product) {
-    const response = await Http.post(`${process.env.REACT_APP_API_PRODUCTS_PATH}/saveProduct`, product);
-    return response;
+    const productDTO = ProductDTO.fromDomain(product);
+    const response = await ProductsHttp.post("/saveProduct", productDTO);
+    return new ProductDTO(response.data).toDomain();
   }
 
-  // Actualizar un producto
   async update(id, product) {
-    const response = await Http.put(`${process.env.REACT_APP_API_PRODUCTS_PATH}/updateProduct/${id}`, product);
-    return response;
+    const productDTO = ProductDTO.fromDomain(product);
+    const response = await ProductsHttp.put(`/updateProduct/${id}`, productDTO);
+    return new ProductDTO(response.data).toDomain();
   }
 
-  // Eliminar un producto
   async delete(id) {
-    await Http.delete(`${process.env.REACT_APP_API_PRODUCTS_PATH}/deleteProduct/${id}`);
-  }
-
-  // Buscar productos por nombre
-  async findByName(name, page = 0, size = 15) {
-    const response = await Http.get(
-      `${process.env.REACT_APP_API_PRODUCTS_PATH}/findByName?name=${name}&page=${page}&size=${size}`
-    );
-    return response;
-  }
-
-  // Buscar productos por estado
-  async findByStatus(status, page = 0, size = 15) {
-    const response = await Http.get(
-      `${process.env.REACT_APP_API_PRODUCTS_PATH}/findByStatus?status=${status}&page=${page}&size=${size}`
-    );
-    return response;
-  }
-
-  // Buscar productos por nombre de categoría
-  async findByCategoryName(categoryName, page = 0, size = 15) {
-    const response = await Http.get(
-      `${process.env.REACT_APP_API_PRODUCTS_PATH}/findByCategoryName?categoryName=${categoryName}&page=${page}&size=${size}`
-    );
-    return response;
+    await ProductsHttp.delete(`/deleteProduct/${id}`);
   }
 }
 
+// Exportar la clase (no la instancia)
 export default ProductRepository;

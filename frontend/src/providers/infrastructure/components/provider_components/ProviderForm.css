@@ -17,14 +17,6 @@ Estilos para el Formulario Crear Proveedor
     margin-bottom: 0;
 }
 
-/* Título del formulario */
-.add-provider-form h1 {
-    font-size: 24px;
-    color: #444;
-    margin-bottom: 20px;
-    text-align: left;
-}
-
 /* Contenedor de columnas para los campos */
 .form-columns {
     display: flex;
@@ -71,44 +63,6 @@ Estilos para el Formulario Crear Proveedor
     outline: none;
 }
 
-/* Botones del formulario */
-.form-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 15px; /* Espaciado entre botones */
-    margin-top: 20px;
-    margin-bottom: 0; /* Elimina cualquier margen inferior */
-}
-
-/* Botón Guardar */
-.p-button-success {
-    background-color: #28a745;
-    color: #fff;
-    padding: 12px 20px;
-    font-size: 14px;
-    border-radius: 5px;
-    border: none;
-    transition: background-color 0.3s ease;
-}
-
-.p-button-success:hover {
-    background-color: #218838;
-}
-
-/* Botón Cancelar */
-.p-button-secondary {
-    background-color: #6c757d;
-    color: #fff;
-    padding: 12px 20px;
-    font-size: 14px;
-    border-radius: 5px;
-    border: none;
-    transition: background-color 0.3s ease;
-}
-
-.p-button-secondary:hover {
-    background-color: #5a6268;
-}
 
 /* ============================
 Responsive - Ajustes para Pantallas Pequeñas

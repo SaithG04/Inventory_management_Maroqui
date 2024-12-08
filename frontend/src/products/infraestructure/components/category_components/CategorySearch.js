@@ -3,11 +3,11 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { Toast } from "primereact/toast";
-import ProductService from "../../../domain/services/ProductService";
-import { ProductDTO } from "../../dto/ProductDTO";
-import "./ProductSearch.css";
+import CategoryService from "../../../domain/services/CategoryService";
+import { CategoryDTO } from "../../dto/CategoryDTO";
+import "./CategorySearch.css";
 
-const ProductSearch = ({ onSearchResults }) => {
+const CategorySearch = ({ onSearchResults }) => {
   const [searchType, setSearchType] = useState("name");
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("ACTIVE");
@@ -15,7 +15,7 @@ const ProductSearch = ({ onSearchResults }) => {
   const toast = useRef(null); // Referencia para Toast
 
   // Memorizar la instancia del servicio para evitar recreaciones innecesarias
-  const productService = useMemo(() => new ProductService(), []);
+  const categoryService = useMemo(() => new CategoryService(), []);
 
   // Manejo de búsqueda
   const handleSearch = useCallback(async () => {
@@ -25,51 +25,53 @@ const ProductSearch = ({ onSearchResults }) => {
 
       // Realizar la búsqueda según el tipo seleccionado
       if (searchType === "name") {
-        response = await productService.findByName(query, 0, 15);
+        response = await categoryService.getAllCategories();
+        response = response.filter((category) =>
+          category.name.toLowerCase().includes(query.toLowerCase())
+        );
       } else if (searchType === "status") {
-        response = await productService.findByStatus(status, 0, 15);
-      } else if (searchType === "category") {
-        response = await productService.findByCategoryName(query, 0, 15);
+        response = await categoryService.getAllCategories();
+        response = response.filter((category) => category.status === status);
       }
 
       // Validar y mapear resultados
-      if (response && Array.isArray(response.data)) {
-        const products = response.data
-          .map((productData) => {
-            try {
-              const productDTO = new ProductDTO(productData);
-              return productDTO.toDomain();
-            } catch (err) {
-              console.error("Error converting product to domain:", err);
-              return null;
-            }
-          })
-          .filter((product) => product !== null);
+      const categories = response
+        .map((categoryData) => {
+          try {
+            const categoryDTO = new CategoryDTO(categoryData);
+            return categoryDTO.toDomain();
+          } catch (err) {
+            console.error("Error converting category to domain:", err);
+            return null;
+          }
+        })
+        .filter((category) => category !== null);
 
-        // Enviar resultados al componente padre
-        onSearchResults(products);
+      // Enviar resultados al componente padre
+      if (categories.length > 0) {
+        onSearchResults(categories);
       } else {
         toast.current.show({
           severity: "warn",
-          summary: "No Products Found",
-          detail: "No products match the search criteria.",
+          summary: "No Categories Found",
+          detail: "No categories match the search criteria.",
           life: 3000,
         });
         onSearchResults([]);
       }
     } catch (err) {
-      console.error("Error fetching products:", err);
+      console.error("Error fetching categories:", err);
       toast.current.show({
         severity: "error",
         summary: "Search Error",
-        detail: "Failed to fetch products. Please try again.",
+        detail: "Failed to fetch categories. Please try again.",
         life: 3000,
       });
       onSearchResults([]);
     } finally {
       setLoading(false);
     }
-  }, [searchType, query, status, productService, onSearchResults]);
+  }, [searchType, query, status, categoryService, onSearchResults]);
 
   // Manejo de limpieza de búsqueda
   const handleClearSearch = () => {
@@ -79,17 +81,16 @@ const ProductSearch = ({ onSearchResults }) => {
   };
 
   return (
-    <div className="product-search-section">
+    <div className="category-search-section">
       <Toast ref={toast} />
 
       {/* Dropdown para seleccionar el tipo de búsqueda */}
-      <div className="product-search-dropdown">
+      <div className="category-search-dropdown">
         <Dropdown
           value={searchType}
           options={[
             { label: "Name", value: "name" },
             { label: "Status", value: "status" },
-            { label: "Category", value: "category" },
           ]}
           onChange={(e) => setSearchType(e.value)}
           placeholder="Select Search Type"
@@ -98,20 +99,19 @@ const ProductSearch = ({ onSearchResults }) => {
 
       {/* Inputs dinámicos según el tipo de búsqueda */}
       {searchType === "status" ? (
-        <div className="product-input">
+        <div className="category-input">
           <Dropdown
             value={status}
             options={[
               { label: "Active", value: "ACTIVE" },
-              { label: "Discontinued", value: "DISCONTINUED" },
-              { label: "Out of Stock", value: "OUT_OF_STOCK" },
+              { label: "Inactive", value: "INACTIVE" },
             ]}
             onChange={(e) => setStatus(e.value)}
             placeholder="Select Status"
           />
         </div>
       ) : (
-        <div className="product-input">
+        <div className="category-input">
           <InputText
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -137,8 +137,9 @@ const ProductSearch = ({ onSearchResults }) => {
           className="clear-button" // Clase global para el botón de limpiar
         />
       </div>
+
     </div>
   );
 };
 
-export default ProductSearch;
+export default CategorySearch;

@@ -10,14 +10,6 @@ Formulario de Empleados
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.employee-form h1 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 20px;
-    font-size: 24px;
-    font-weight: bold;
-}
-
 /* ============================
 Estructura del Formulario
 ============================ */
@@ -75,51 +67,7 @@ Mensajes de error
 /* ============================
 Estilo para los botones
 ============================ */
-.form-buttons {
-    display: flex;
-    justify-content: center; /* Centra los botones horizontalmente */
-    align-items: center; /* Alinea los botones verticalmente */
-    flex-wrap: wrap; /* Ajusta los botones si el espacio es pequeño */
-    margin-top: 20px; /* Margen superior para separación */
-}
 
-.form-buttons .p-button {
-    padding: 14px 60px; /* Ajustar tamaño del botón */
-    border-radius: 6px;
-    font-size: 16px; /* Ajustar tamaño del texto */
-    text-align: center;
-    cursor: pointer;
-    color: #fff;
-    border: none;
-    transition: background-color 0.3s, opacity 0.3s;
-    margin-right: 20px; /* Espacio entre botones */
-}
-
-.form-buttons .p-button:last-child {
-    margin-right: 0; /* Elimina el margen derecho del último botón */
-}
-
-.form-buttons .p-button-success {
-    background-color: var(--color-verde);
-    border: 1px solid var(--color-verde);
-    color: #fff;
-}
-
-.form-buttons .p-button-success:hover {
-    background-color: var(--color-verde-oscuro);
-    border-color: var(--color-verde-oscuro);
-}
-
-.form-buttons .p-button-secondary {
-    background-color: var(--color-rojo);
-    border: 1px solid var(--color-rojo);
-    color: #fff;
-}
-
-.form-buttons .p-button-secondary:hover {
-    background-color: var(--color-rojo-oscuro);
-    border-color: var(--color-rojo-oscuro);
-}
 
 /* ============================
 Estilo responsive

@@ -106,18 +106,18 @@ const EmployeeSearch = ({ onSearchResults }) => {
             )}
 
             {/* Botones de búsqueda y limpiar */}
-            <div className="employee-search-buttons">
+            <div className="search-clear-buttons"> {/* Usar la clase global del contenedor */}
                 <Button
-                    label={loading ? 'Searching...' : 'Search'}
-                    onClick={handleSearch}
-                    disabled={loading}
-                    className="p-button-primary search-button"
+                    label={loading ? 'Searching...' : 'Search'} // Cambia el texto dinámicamente
+                    onClick={handleSearch} // Evento de búsqueda
+                    disabled={loading} // Desactiva el botón si está cargando
+                    className="search-button" // Clase global para el botón de búsqueda
                 />
                 <Button
-                    label="Clear"
-                    onClick={handleClearSearch}
-                    disabled={loading}
-                    className="p-button-secondary clear-button"
+                    label="Clear" // Texto del botón de limpiar
+                    onClick={handleClearSearch} // Evento para limpiar
+                    disabled={loading} // Desactiva el botón si está cargando
+                    className="clear-button" // Clase global para el botón de limpiar
                 />
             </div>
         </div>
