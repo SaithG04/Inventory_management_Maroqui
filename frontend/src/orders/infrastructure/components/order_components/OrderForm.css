@@ -1,0 +1,145 @@
+/* ============================
+Estilos para el Formulario de Pedidos
+============================ */
+.order-form {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+    max-width: 800px;
+    font-family: Arial, sans-serif;
+    position: relative;
+}
+
+/* Filas del formulario */
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 15px;
+    justify-content: space-between;
+}
+
+/* Dropdowns */
+.order-dropdown {
+    padding: 10px;
+    border: 1px solid var(--color-borde, #ddd);
+    border-radius: 5px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.order-dropdown:hover {
+    border-color: var(--color-borde-focus, #007bff);
+    box-shadow: 0px 0px 4px var(--color-borde-focus, #9fceff);
+}
+
+.order-dropdown:focus {
+    border-color: var(--color-borde-focus, #007bff);
+    outline: none;
+    box-shadow: 0px 0px 6px var(--color-borde-focus, #9fceff);
+}
+
+/* Campos de entrada */
+.order-input {
+    padding: 10px;
+    border: 1px solid var(--color-borde, #ddd);
+    border-radius: 5px;
+    font-size: 14px;
+    width: calc(50% - 10px);
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.order-input:hover {
+    border-color: var(--color-borde-focus, #007bff);
+    box-shadow: 0px 0px 4px var(--color-borde-focus, #9fceff);
+}
+
+.order-input:focus {
+    border-color: var(--color-borde-focus, #007bff);
+    outline: none;
+    box-shadow: 0px 0px 6px var(--color-borde-focus, #9fceff);
+}
+
+/* Lista de productos */
+.product-list {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.product-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid var(--color-borde, #ddd);
+    border-radius: 5px;
+    margin-bottom: 10px;
+    transition: box-shadow 0.3s ease;
+}
+
+.product-item:hover {
+    box-shadow: 0px 0px 6px var(--color-borde-focus, #9fceff);
+}
+
+.product-item span {
+    font-size: 14px;
+    color: #444;
+}
+
+/* Botones de remover productos */
+.remove-product-button {
+    background-color: var(--color-rojo, #dc3545);
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.remove-product-button:hover {
+    background-color: var(--color-rojo-oscuro, #c82333);
+}
+
+/* Botón para agregar productos */
+.add-product-button {
+    background-color: var(--color-verde, #28a745);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.add-product-button:hover {
+    background-color: var(--color-verde-oscuro, #218838);
+    transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .order-form {
+        padding: 20px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .order-input {
+        width: 100%;
+    }
+}

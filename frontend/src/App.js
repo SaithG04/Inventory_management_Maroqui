@@ -4,7 +4,7 @@ import Header from './components/layout/header/Header';
 import Sidebar from './components/layout/sidebar/Sidebar';
 import MainContent from './components/layout/maincontent/MainContent';
 import Dashboard from './components/DashboardCard/DashboardCard';
-import Pedidos from './components/Pedidos/Pedidos';
+import ParentComponentOrder from './orders/infrastructure/components/ParentComponentOrder'; // NUEVO
 import ParentComponentProduct from './products/infraestructure/components/ParentComponentProduct';
 import ParentComponentEmployee from './employees/infrastructure/components/ParentComponentEmployee';
 import Sales from './components/Sales/Sales';
@@ -57,9 +57,10 @@ function App() {
     } else if (roles === 'Vendedor') {
       setActiveSection('ventas');
     } else if (roles === 'Almacenero') {
-      setActiveSection('producto');
+      setActiveSection('pedidos'); // NUEVO
     }
   };
+  
 
   // Función para manejar el inicio de sesión
   const handleLogin = async (email, password) => {
@@ -144,21 +145,21 @@ function App() {
     switch (activeSection) {
       case 'dashboard':
         return <Dashboard />;
-      case 'pedidos':
-        return <Pedidos />;
+      case 'pedidos': // NUEVO
+        return <ParentComponentOrder />;
       case 'producto':
         return <ParentComponentProduct />;
       case 'ventas':
         return <Sales />;
       case 'empleados':
-        return <ParentComponentEmployee />; // Nueva sección para empleados
-      case 'proveedores': // Sección de proveedores
+        return <ParentComponentEmployee />;
+      case 'proveedores':
         return <ParentComponentProvider />;
       default:
         return <Dashboard />;
     }
   }, [activeSection]); // Solo activeSection como dependencia
-
+  
 
   // Renderizado principal de la aplicación
   return (

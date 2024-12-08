@@ -20,19 +20,22 @@ const Sidebar = ({ onButtonClick, userRole = '', activeSection: parentActiveSect
   const modulesByRole = {
     Administrator: [
       { key: 'dashboard', label: 'Dashboard', icon: <FaChartLine className="sidebar-icon" /> },
-      { key: 'pedidos', label: 'Pedidos', icon: <FaBox className="sidebar-icon" /> },
+      { key: 'pedidos', label: 'Pedidos', icon: <FaBox className="sidebar-icon" /> }, // NUEVO
       { key: 'producto', label: 'Productos', icon: <FaClipboardList className="sidebar-icon" /> },
       { key: 'ventas', label: 'Ventas', icon: <FaShoppingCart className="sidebar-icon" /> },
       { key: 'empleados', label: 'Empleados', icon: <FaUsers className="sidebar-icon" /> },
       { key: 'proveedores', label: 'Proveedores', icon: <FaUser className="sidebar-icon" /> },
     ],
-    Almacenero: [{ key: 'producto', label: 'Productos', icon: <FaClipboardList className="sidebar-icon" /> }],
+    Almacenero: [
+      { key: 'producto', label: 'Productos', icon: <FaClipboardList className="sidebar-icon" /> },
+      { key: 'pedidos', label: 'Pedidos', icon: <FaBox className="sidebar-icon" /> }, // NUEVO
+    ],
     Vendedor: [
       { key: 'producto', label: 'Productos', icon: <FaClipboardList className="sidebar-icon" /> },
       { key: 'ventas', label: 'Ventas', icon: <FaShoppingCart className="sidebar-icon" /> },
     ],
   };
-
+  
   const normalizedRole = userRole
     ? userRole.charAt(0).toUpperCase() + userRole.slice(1).toLowerCase()
     : 'Guest';
