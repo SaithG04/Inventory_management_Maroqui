@@ -15,7 +15,7 @@ const ProtectedRoute = ({ element, allowedRoles }) => {
   try {
     // Decodificar el JWT
     const decodedToken = jwtDecode(token); // Usamos jwtDecode aquí
-    const userRole = decodedToken.rol; // Asumiendo que el rol está en el JWT
+    const userRole = decodedToken.roles; // Asumiendo que el rol está en el JWT
 
     // Verificar si el rol del usuario está permitido para esta ruta
     if (allowedRoles.includes(userRole)) {

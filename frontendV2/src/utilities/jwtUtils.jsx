@@ -1,7 +1,3 @@
-// jwtUtils.jsx
-
-import API_BASE_URL from '../js/urlHelper';
-
 // Función para decodificar el payload de un JWT manualmente
 const decodeToken = (token) => {
   try {
@@ -17,16 +13,6 @@ const decodeToken = (token) => {
   }
 };
 
-// Función para obtener el perfil (imagen de perfil) con la URL base concatenada
-export const getPerfil = (token) => {
-  const decodedToken = decodeToken(token);
-  if (decodedToken) {
-    const baseUrl = `${API_BASE_URL}/storage/`;
-    return decodedToken.perfil ? `${baseUrl}${decodedToken.perfil}` : ''; // Concatenamos la URL base con el perfil
-  }
-  return '';
-};
-
 // Función para obtener el ID del usuario
 export const getIdUsuario = (token) => decodeToken(token)?.idUsuario ?? null;
 
@@ -34,7 +20,14 @@ export const getIdUsuario = (token) => decodeToken(token)?.idUsuario ?? null;
 export const getUsername = (token) => decodeToken(token)?.username ?? null;
 
 // Función para obtener el rol del usuario
-export const getUserRole = (token) => decodeToken(token)?.rol ?? null;
+export const getUserRole = (token) => {
+  const decodedToken = decodeToken(token);
+  if (decodedToken && decodedToken.roles) {
+    // Si el rol es una cadena, devolverlo como está
+    return Array.isArray(decodedToken.roles) ? decodedToken.roles : [decodedToken.roles];
+  }
+  return null;
+};
 
 // Función para verificar si el token está expirado
 export const isTokenExpired = (token) => {
@@ -65,16 +58,11 @@ export const verifyToken = (token) => {
   return { valid: true, message: "Token válido" };
 };
 
-
-export const getIdCarrito = (token) => decodeToken(token)?.idCarrito ?? null;
-
 export default {
-  getPerfil,
   getIdUsuario,
   getUsername,
   getUserRole,
   isTokenExpired,
   getTokenExpirationDate,
   verifyToken,
-  getIdCarrito  // Exportamos la nueva función
 };

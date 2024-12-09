@@ -1,22 +1,42 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import API_BASE_URL from '../js/urlHelper';
-
+import { API_AUTH_URL } from '../js/urlHelper'; // Importar las URLs
+import { getUserRole } from '../utilities/jwtUtils'; // Función para obtener el rol
+import { useNavigate } from 'react-router-dom'; // Para redirección
 
 function Login() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [clave, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate(); // Hook para redirigir
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/login`, {
+      const response = await axios.post(`${API_AUTH_URL}/login`, {
         email,
-        password,
+        clave,
       });
-      console.log('Respuesta de la API:', response.data);
-      // Maneja el token o redirección aquí si es necesario
+
+      // Si el login es exitoso, guardar el accessToken en localStorage
+      const token = response.data.data.accessToken; // Asumiendo que el token está en 'data.accessToken'
+      localStorage.setItem('jwt', token);
+
+      // Obtener el rol del usuario desde el token
+      const role = getUserRole(token)[0]; // Asegúrate de tomar el primer rol del array
+      console.log('Rol del usuario:', role);
+
+      // Redirigir según el rol
+      if (role === 'ADMINISTRATOR') {
+        navigate('/AdminUi');
+      } else if (role === 'SELLER') {
+        navigate('/ventas'); // Suponiendo que tienes una ruta '/vendedor'
+      } else if (role === 'WAREHOUSE CLERK') {
+        navigate('/AlmaceneroUI'); // Suponiendo que tienes una ruta '/vendedor'
+      }else {
+        navigate('/'); // Redirige a la página principal si no tiene rol adecuado
+      }
+      
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
       setErrorMessage('Credenciales incorrectas, por favor intente nuevamente.');
@@ -27,15 +47,15 @@ function Login() {
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-green-200 to-blue-400">
       <div className="bg-white shadow-lg rounded-lg flex w-11/12 max-w-5xl">
 
-      {/* Imagen / Logo */}
-      <div className="w-full sm:w-1/2 p-12 flex flex-col items-center justify-center bg-gradient-to-t from-yellow-200 to-green-300">
-        <img
-          src="/img/logo.png"
-          alt="Comercial Hiroqui"
-          className="w-56 h-auto mb-8" // Aumentado el tamaño del logo
-        />
-        <h2 className="text-2xl font-extrabold text-gray-700">Equipando tus ideas</h2> {/* Tamaño de texto aumentado */}
-      </div>
+        {/* Imagen / Logo */}
+        <div className="w-full sm:w-1/2 p-12 flex flex-col items-center justify-center bg-gradient-to-t from-yellow-200 to-green-300">
+          <img
+            src="/img/logo.png"
+            alt="Comercial Hiroqui"
+            className="w-56 h-auto mb-8" // Aumentado el tamaño del logo
+          />
+          <h2 className="text-2xl font-extrabold text-gray-700">Equipando tus ideas</h2> {/* Tamaño de texto aumentado */}
+        </div>
 
         {/* Formulario de Login */}
         <div className="w-1/2 p-12 flex flex-col justify-center">
@@ -78,7 +98,7 @@ function Login() {
             </div>
 
             <div className="mb-6">
-              <label htmlFor="password" className="block text-gray-700 font-medium mb-3">
+              <label htmlFor="clave" className="block text-gray-700 font-medium mb-3">
                 Contraseña
               </label>
               <div className="flex items-center border rounded-lg overflow-hidden">
@@ -100,10 +120,10 @@ function Login() {
                 </span>
                 <input
                   type="password"
-                  id="password"
+                  id="clave"
                   className="w-full px-4 py-3 focus:outline-none"
                   placeholder="Contraseña"
-                  value={password}
+                  value={clave}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
