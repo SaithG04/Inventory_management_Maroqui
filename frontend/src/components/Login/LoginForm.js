@@ -44,33 +44,31 @@ const LoginForm = ({ onLogin }) => {
     // useEffect para mostrar notificaciones y redirigir después de un inicio de sesión exitoso
     useEffect(() => {
         if (state.success) {
+            toast.dismiss(); // Cierra notificaciones previas
             toast.success('Inicio de sesión exitoso');
             navigate('/dashboard');
         }
         if (state.error) {
+            toast.dismiss(); // Cierra notificaciones previas
             toast.error(state.error);
         }
         if (state.emailError) {
+            toast.dismiss(); // Cierra notificaciones previas
             toast.warn(state.emailError);
         }
         if (state.passwordError) {
+            toast.dismiss(); // Cierra notificaciones previas
             toast.warn(state.passwordError);
         }
     }, [state, navigate]);
 
-    // Validación del formato de email
-    const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // Verifica si los campos están vacíos
         if (!state.email || !state.password) {
+            toast.dismiss(); // Cierra notificaciones previas
             toast.warn('Por favor, complete todos los campos.');
-            return;
-        }
-
-        if (!isValidEmail(state.email)) {
-            toast.warn('Por favor, ingrese un email válido.');
             return;
         }
 
@@ -78,11 +76,25 @@ const LoginForm = ({ onLogin }) => {
 
         try {
             // Llama a la función onLogin del componente padre (App.js)
-            await onLogin(state.email, state.password);
-            dispatch({ type: 'SET_SUCCESS', value: true });
+            const response = await onLogin(state.email, state.password);
+
+            // Valida la respuesta del backend
+            if (response && response.token) {
+                dispatch({ type: 'SET_SUCCESS', value: true });
+            } else {
+                throw new Error('Credenciales inválidas.');
+            }
         } catch (error) {
             console.error('Error en el envío del formulario:', error);
-            dispatch({ type: 'SET_ERROR', message: 'Error al procesar la solicitud.' });
+
+            // Aquí mostramos el mensaje de error del backend si está disponible
+            const errorMessage =
+                error.response?.data?.message || 'Credenciales incorrectas.';
+            dispatch({ type: 'SET_ERROR', message: errorMessage });
+
+            // Limpia los campos después de un error
+            dispatch({ type: 'SET_FIELD', field: 'email', value: '' });
+            dispatch({ type: 'SET_FIELD', field: 'password', value: '' });
         } finally {
             dispatch({ type: 'SET_LOADING', value: false });
         }
@@ -112,6 +124,8 @@ const LoginForm = ({ onLogin }) => {
                                     value={state.email}
                                     onChange={(e) => {
                                         dispatch({ type: 'SET_FIELD', field: 'email', value: e.target.value });
+                                        dispatch({ type: 'SET_ERROR', message: '' }); // Limpia el error general
+                                        dispatch({ type: 'SET_EMAIL_ERROR', message: '' }); // Limpia errores específicos
                                     }}
                                     autoComplete="email"
                                     className={`login-input-field ${state.emailError ? 'input-error' : ''}`}
@@ -128,6 +142,8 @@ const LoginForm = ({ onLogin }) => {
                                     value={state.password}
                                     onChange={(e) => {
                                         dispatch({ type: 'SET_FIELD', field: 'password', value: e.target.value });
+                                        dispatch({ type: 'SET_ERROR', message: '' }); // Limpia el error general
+                                        dispatch({ type: 'SET_PASSWORD_ERROR', message: '' }); // Limpia errores específicos
                                     }}
                                     autoComplete="current-password"
                                     className={`login-input-field ${state.passwordError ? 'input-error' : ''}`}
