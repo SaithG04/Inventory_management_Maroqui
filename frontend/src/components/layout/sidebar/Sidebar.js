@@ -1,21 +1,18 @@
 import React from 'react';
 import { FaChartLine, FaClipboardList, FaShoppingCart, FaSignOutAlt, FaUsers, FaUser, FaBox } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';  
+import { useNavigate, useLocation } from 'react-router-dom';  
 import './Sidebar.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import Modal from '../../shared/modal/Modal';
 
-const Sidebar = ({ onButtonClick, userRole = '', activeSection: parentActiveSection, onLogout }) => {
+const Sidebar = ({ onButtonClick, userRole = '', onLogout }) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
   const [showLogoutModal, setShowLogoutModal] = React.useState(false);
-  const [activeSection, setActiveSection] = React.useState(parentActiveSection || 'dashboard');
 
-  React.useEffect(() => {
-    if (parentActiveSection) {
-      setActiveSection(parentActiveSection);
-    }
-  }, [parentActiveSection]);
+  // Use location to sync with current active section based on URL
+  const location = useLocation();
+  const activeSection = location.pathname.replace('/', '') || 'dashboard';  // Extract active section from URL
 
   // Configuración de módulos según el rol
   const modulesByRole = {
@@ -44,8 +41,9 @@ const Sidebar = ({ onButtonClick, userRole = '', activeSection: parentActiveSect
 
   const handleClick = (module) => {
     if (module !== 'salir') {
-      setActiveSection(module);
-      navigate(`/${module}`);
+      console.log(`Navegando a la sección: ${module}`);
+      navigate(`/${module}`);  // Navegar a la sección correspondiente
+      onButtonClick(module);  // Llamar a onButtonClick para manejar la sección activa
     } else {
       setShowLogoutModal(true);
     }

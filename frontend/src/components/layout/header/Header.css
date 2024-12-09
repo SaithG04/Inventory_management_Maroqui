@@ -72,7 +72,7 @@
 .header-user-box {
   display: flex;
   align-items: center;
-  gap: 25px; /* Espaciado entre icono y detalles */
+  gap: 10px; /* Espaciado entre icono y detalles */
   overflow: hidden; /* Asegura que el contenido no desborde */
   transform: translateX(-40px); /* Ajusta el valor según lo que necesites */
 }
@@ -118,4 +118,18 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.header-user-name, .header-user-role {
+  margin: 0; /* Elimina el margen por defecto */
+  padding: 0; /* Elimina el padding por defecto */
+  display: inline-block; /* Opcional, si quieres que estén en la misma línea */
+  vertical-align: top; /* Alinea los elementos en la parte superior */
+}
+
+/* Alternativa usando flexbox */
+.header-container {
+  display: flex;
+  align-items: center; /* Alinea los elementos verticalmente al centro */
+  gap: 4px; /* Ajusta el espacio entre los elementos */
 }

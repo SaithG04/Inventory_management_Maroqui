@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import './App.css';
 import Header from './components/layout/header/Header';
 import Sidebar from './components/layout/sidebar/Sidebar';
@@ -8,201 +8,200 @@ import ParentComponentOrder from './orders/infrastructure/components/ParentCompo
 import ParentComponentProduct from './products/infraestructure/components/ParentComponentProduct';
 import ParentComponentEmployee from './employees/infrastructure/components/ParentComponentEmployee';
 import Sales from './components/Sales/Sales';
-import ParentComponentProvider from './providers/infrastructure/components/ParentComponentProvider'; // Importamos el componente de proveedores
+import ParentComponentProvider from './providers/infrastructure/components/ParentComponentProvider';
 import LoginForm from './components/Login/LoginForm';
 import { AuthPort } from './ports/authPort';
 import { ProductProvider } from './context/ProductContext';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
 import { toast, ToastContainer } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import Logo from './assets/logo.png'; // Importar el logo de la aplicación
-import config from './config'; // Importar el archivo de configuración centralizada
+import Logo from './assets/logo.png';
+import config from './config';
 
-// Obtenemos el rol predeterminado desde el archivo de configuración
-const DEFAULT_ROLE = config.DEFAULT_ROLE; // Usar la configuración centralizada
+const DEFAULT_ROLE = config.DEFAULT_ROLE;
 
 function App() {
-  // Definición de los estados locales
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Estado para verificar si el usuario está autenticado
-  const [userRole, setUserRole] = useState(DEFAULT_ROLE); // Estado para el rol del usuario
-  const [userName, setUserName] = useState(''); // Estado para el nombre del usuario
-  const [activeSection, setActiveSection] = useState('dashboard'); // Estado para la sección activa, inicialmente en "dashboard"
-  const [isLoading, setIsLoading] = useState(false); // Estado para manejar el indicador de carga
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [userRole, setUserRole] = useState(DEFAULT_ROLE);
+    const [userName, setUserName] = useState('');
+    const [activeSection, setActiveSection] = useState('dashboard');
+    const [isLoading, setIsLoading] = useState(false);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const navigate = useNavigate();
+    const navigateRef = useRef(navigate);
 
-  // Hook para verificar si el usuario ya tiene un token almacenado (sesión activa)
-  useEffect(() => {
-    const token = Cookies.get('jwtToken');
-    console.log("Token obtenido:", token);  // Log para ver el token
-  
-    if (token) {
-      try {
-        // Si el token existe, se decodifica y se configuran los estados correspondientes
-        const decodedToken = jwtDecode(token);
-        console.log("Token decodificado:", decodedToken);  // Log para ver el contenido del token decodificado
-  
-        const role = decodedToken.roles;
-        console.log("Rol del usuario:", role);  // Log para ver el rol
-  
-        setIsAuthenticated(true);
-        setUserRole(role);
-        setUserName(decodedToken.name);
-        setDefaultSection(role); // Actualiza la sección predeterminada después de establecer la autenticación
-      } catch (error) {
-        console.error('Error decodificando el token:', error);  // Log de error si falla la decodificación
-        setIsAuthenticated(false);
-        Cookies.remove('jwtToken');
-      }
-    } else {
-      console.log("No se encontró el token.");  // Log si no hay token
-      setIsAuthenticated(false); // Asegúrate de limpiar el estado si no hay token
-    }
-  }, []); // Solo ejecutarse una vez al cargar el componente
-  
-  // Función para configurar la sección predeterminada en función del rol del usuario
-  const setDefaultSection = (roles) => {
-    if (roles === 'ADMINISTRATOR') {
-      setActiveSection('dashboard');
-    } else if (roles === 'SELLER') {
-      setActiveSection('ventas');
-    } else if (roles === 'WAREHOUSE CLERK') {
-      setActiveSection('producto');
-    }
-  };
-  
+    useEffect(() => {
+        navigateRef.current = navigate;
+    }, [navigate]);
 
-  // Función para manejar el inicio de sesión
-  const handleLogin = async (email, password) => {
-    setIsLoading(true); // Iniciar el indicador de carga
-  
-    try {
-      const result = await AuthPort.loginUser(email, password);
-  
-      if (result.success) {
-        console.log("Inicio de sesión exitoso.");
+    // Verificar autenticación y establecer la sección activa
+    useEffect(() => {
         const token = Cookies.get('jwtToken');
         if (token) {
-          const decodedToken = jwtDecode(token);
-          const role = decodedToken.roles;
-  
-          // Actualizar estados después del inicio de sesión exitoso
-          setIsAuthenticated(true);
-          setUserRole(role);
-          setUserName(decodedToken.name);
-  
-          // Configurar la sección predeterminada después de actualizar los estados
-          setDefaultSection(role);
-          console.log("Autenticación exitosa, usuario autenticado:", decodedToken.name);
-  
-          // Detener el indicador de carga después de la autenticación exitosa
-          setIsLoading(false);
+            try {
+                const decodedToken = jwtDecode(token);
+                console.log('Token decodificado:', decodedToken);
+                setIsAuthenticated(true);
+                setUserRole(decodedToken.roles || []);
+                setUserName(decodedToken.fullname || '');
+                setDefaultSection(decodedToken.roles);
+            } catch (err) {
+                console.error('Error al decodificar el token:', err);
+                Cookies.remove('jwtToken');
+                setIsAuthenticated(false);
+            }
         } else {
-          throw new Error("Token no disponible después de autenticación exitosa.");
+            setIsAuthenticated(false);
         }
-      } else {
-        // Si las credenciales no son válidas, detener la carga y mostrar el error
-        setIsLoading(false);
-  
-        // Mostrar notificación de error después de un pequeño retraso
-        setTimeout(() => {
-          toast.error(result.message || 'Credenciales incorrectas. Por favor, intente nuevamente.', {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
-        }, 200); // Retraso de 200ms
-      }
-    } catch (error) {
-      console.error('Error durante el proceso de inicio de sesión:', error);
-      setIsLoading(false);
-  
-      // Mostrar notificación de error de conexión después de un pequeño retraso
-      setTimeout(() => {
-        toast.error('Ha ocurrido un error. Por favor, intente nuevamente.', {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-      }, 200); // Retraso de 200ms
-    }
-  };
-  
-  // Función para cambiar de sección en la interfaz
-  const handleButtonClick = (section) => {
-    if (section !== activeSection) {
-      setActiveSection(section);
-    }
-  };
+        setIsLoaded(true);
+    }, []);
+    
+    
 
-  // Función para cerrar sesión
-  const handleLogout = () => {
-    Cookies.remove('jwtToken');
-    setIsAuthenticated(false);
-    setUserRole(DEFAULT_ROLE);
-    setActiveSection('dashboard');
-    toast.success('Has cerrado sesión exitosamente.');
-  };
+    useEffect(() => {
+        console.log('isAuthenticated has changed:', isAuthenticated);
 
-  // Definir qué contenido mostrar en función de la sección activa
-  const renderModuleContent = useMemo(() => {
-    switch (activeSection) {
-      case 'dashboard':
-        return <Dashboard />;
-      case 'pedidos':
-        return <ParentComponentOrder />;
-      case 'producto':
-        return <ParentComponentProduct />;
-      case 'ventas':
-        return <Sales />;
-      case 'empleados':
-        return <ParentComponentEmployee />;
-      case 'proveedores':
-        return <ParentComponentProvider />;
-      default:
-        return <Dashboard />;
+        if (isAuthenticated) {
+            console.log('User is authenticated, checking roles...');
+            if (Array.isArray(userRole)) {
+                console.log('User roles:', userRole);
+                if (userRole.includes('ADMINISTRATOR')) {
+                    console.log('Redirecting to /dashboard');
+                    navigateRef.current('/dashboard');
+                } else if (userRole.includes('SELLER')) {
+                    console.log('Redirecting to /ventas');
+                    navigateRef.current('/ventas');
+                } else if (userRole.includes('WAREHOUSE CLERK')) {
+                    console.log('Redirecting to /producto');
+                    navigateRef.current('/producto');
+                } else {
+                    console.log('No matching role, redirecting to default');
+                    navigateRef.current('/');
+                }
+            } else {
+                console.log('User role:', userRole);
+                switch (userRole) {
+                    case 'ADMINISTRATOR':
+                        console.log('Redirecting to /dashboard');
+                        navigateRef.current('/dashboard');
+                        break;
+                    case 'SELLER':
+                        console.log('Redirecting to /ventas');
+                        navigateRef.current('/ventas');
+                        break;
+                    case 'WAREHOUSE CLERK':
+                        console.log('Redirecting to /producto');
+                        navigateRef.current('/producto');
+                        break;
+                    default:
+                        console.log('No matching role, redirecting to default');
+                        navigateRef.current('/');
+                        break;
+                }
+            }
+        }
+    }, [isAuthenticated, userRole]);
+
+    const setDefaultSection = (roles) => {
+        console.log('Setting default section based on roles:', roles);
+        const roleToSectionMap = {
+            ADMINISTRATOR: 'dashboard',
+            SELLER: 'ventas',
+            'WAREHOUSE CLERK': 'producto',
+        };
+        if (Array.isArray(roles)) {
+            const validRole = roles.find((role) => roleToSectionMap[role]);
+            setActiveSection(validRole ? roleToSectionMap[validRole] : 'dashboard');
+        } else {
+            setActiveSection(roleToSectionMap[roles] || 'dashboard');
+        }
+    };
+
+    const handleLogin = async (email, password) => {
+        try {
+            const response = await AuthPort.loginUser(email, password);
+            
+            if (response.success) {
+                const token = Cookies.get('jwtToken');
+                if (token) {
+                    console.log('Token recibido en handleLogin:', token);
+                    setIsAuthenticated(true);
+                    const decodedToken = jwtDecode(token);
+                    setUserRole(decodedToken.roles || []);
+                    setUserName(decodedToken.fullname || '');
+                    setDefaultSection(decodedToken.roles);
+                } else {
+                    throw new Error('No se recibió un token de acceso.');
+                }
+            } else {
+                console.error('Error en la respuesta de autenticación:', response.message);
+                setIsAuthenticated(false);
+            }
+        } catch (error) {
+            console.error('Error en la autenticación:', error);
+            setIsAuthenticated(false);
+        }
+    };
+    
+
+
+
+    const handleLogout = () => {
+        console.log('Logging out...');
+        Cookies.remove('jwtToken');
+        setIsAuthenticated(false);
+        setUserRole(DEFAULT_ROLE);
+        setActiveSection('dashboard');
+        toast.success('Has cerrado sesión exitosamente.');
+        navigateRef.current('/');
+    };
+
+    const renderModuleContent = useMemo(() => {
+        console.log('Rendering module content for section:', activeSection);
+        const sectionMap = {
+            dashboard: <Dashboard />,
+            pedidos: <ParentComponentOrder />,
+            producto: <ParentComponentProduct />,
+            ventas: <Sales />,
+            empleados: <ParentComponentEmployee />,
+            proveedores: <ParentComponentProvider />,
+        };
+        return sectionMap[activeSection] || <Dashboard />;
+    }, [activeSection]);
+
+    if (!isLoaded) {
+        return <div>Cargando...</div>;
     }
-  }, [activeSection]);
-  
 
-  // Renderizado principal de la aplicación
-  return (
-    <ProductProvider>
-      <div className="app-container">
-        <ToastContainer />
-        {isLoading ? (
-          // Mostrar el indicador de carga mientras se procesa el inicio de sesión
-          <div className="loading-container">
-            <img src={Logo} alt="Loading..." className="loading-logo" />
-          </div>
-        ) : isAuthenticated ? (
-          // Mostrar la aplicación una vez autenticado
-          <>
-            <Header userName={userName} userRole={userRole} />
-            <div className="main-layout">
-              <Sidebar
-                userRole={userRole}
-                userName={userName}
-                onButtonClick={handleButtonClick}
-                onLogout={handleLogout}
-              />
-              <MainContent>{renderModuleContent}</MainContent>
+    return (
+        <ProductProvider>
+            <div className="app-container">
+                <ToastContainer />
+                {isLoading ? (
+                    <div className="loading-container">
+                        <img src={Logo} alt="Loading..." className="loading-logo" />
+                    </div>
+                ) : isAuthenticated ? (
+                    <>
+                        <Header userName={userName} userRole={userRole} />
+                        <div className="main-layout">
+                            <Sidebar
+                                userRole={userRole}
+                                userName={userName}
+                                onButtonClick={setActiveSection}
+                                onLogout={handleLogout}
+                            />
+                            <MainContent>{renderModuleContent}</MainContent>
+                        </div>
+                    </>
+                ) : (
+                    <LoginForm onLogin={handleLogin} />
+                )}
             </div>
-          </>
-        ) : (
-          // Mostrar el formulario de inicio de sesión si el usuario no está autenticado
-          <LoginForm onLogin={handleLogin} />
-        )}
-      </div>
-    </ProductProvider>
-  );
+        </ProductProvider>
+    );
 }
 
 export default App;
