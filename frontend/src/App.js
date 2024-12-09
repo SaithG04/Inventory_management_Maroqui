@@ -4,7 +4,7 @@ import Header from './components/layout/header/Header';
 import Sidebar from './components/layout/sidebar/Sidebar';
 import MainContent from './components/layout/maincontent/MainContent';
 import Dashboard from './components/DashboardCard/DashboardCard';
-import ParentComponentOrder from './orders/infrastructure/components/ParentComponentOrder'; // NUEVO
+import ParentComponentOrder from './orders/infrastructure/components/ParentComponentOrder';
 import ParentComponentProduct from './products/infraestructure/components/ParentComponentProduct';
 import ParentComponentEmployee from './employees/infrastructure/components/ParentComponentEmployee';
 import Sales from './components/Sales/Sales';
@@ -33,31 +33,40 @@ function App() {
   // Hook para verificar si el usuario ya tiene un token almacenado (sesión activa)
   useEffect(() => {
     const token = Cookies.get('jwtToken');
+    console.log("Token obtenido:", token);  // Log para ver el token
+  
     if (token) {
       try {
         // Si el token existe, se decodifica y se configuran los estados correspondientes
         const decodedToken = jwtDecode(token);
+        console.log("Token decodificado:", decodedToken);  // Log para ver el contenido del token decodificado
+  
         const role = decodedToken.roles;
+        console.log("Rol del usuario:", role);  // Log para ver el rol
+  
         setIsAuthenticated(true);
         setUserRole(role);
         setUserName(decodedToken.name);
-        setDefaultSection(role);
+        setDefaultSection(role); // Actualiza la sección predeterminada después de establecer la autenticación
       } catch (error) {
-        console.error('Error decodificando el token:', error);
+        console.error('Error decodificando el token:', error);  // Log de error si falla la decodificación
         setIsAuthenticated(false);
         Cookies.remove('jwtToken');
       }
+    } else {
+      console.log("No se encontró el token.");  // Log si no hay token
+      setIsAuthenticated(false); // Asegúrate de limpiar el estado si no hay token
     }
-  }, []);
-
+  }, []); // Solo ejecutarse una vez al cargar el componente
+  
   // Función para configurar la sección predeterminada en función del rol del usuario
   const setDefaultSection = (roles) => {
-    if (roles === 'Administrator') {
+    if (roles === 'ADMINISTRATOR') {
       setActiveSection('dashboard');
-    } else if (roles === 'Vendedor') {
+    } else if (roles === 'SELLER') {
       setActiveSection('ventas');
-    } else if (roles === 'Almacenero') {
-      setActiveSection('pedidos'); // NUEVO
+    } else if (roles === 'WAREHOUSE CLERK') {
+      setActiveSection('producto');
     }
   };
   
@@ -65,24 +74,26 @@ function App() {
   // Función para manejar el inicio de sesión
   const handleLogin = async (email, password) => {
     setIsLoading(true); // Iniciar el indicador de carga
-
+  
     try {
       const result = await AuthPort.loginUser(email, password);
-
+  
       if (result.success) {
         console.log("Inicio de sesión exitoso.");
         const token = Cookies.get('jwtToken');
         if (token) {
           const decodedToken = jwtDecode(token);
           const role = decodedToken.roles;
-
+  
           // Actualizar estados después del inicio de sesión exitoso
           setIsAuthenticated(true);
           setUserRole(role);
           setUserName(decodedToken.name);
+  
+          // Configurar la sección predeterminada después de actualizar los estados
           setDefaultSection(role);
           console.log("Autenticación exitosa, usuario autenticado:", decodedToken.name);
-
+  
           // Detener el indicador de carga después de la autenticación exitosa
           setIsLoading(false);
         } else {
@@ -91,7 +102,7 @@ function App() {
       } else {
         // Si las credenciales no son válidas, detener la carga y mostrar el error
         setIsLoading(false);
-
+  
         // Mostrar notificación de error después de un pequeño retraso
         setTimeout(() => {
           toast.error(result.message || 'Credenciales incorrectas. Por favor, intente nuevamente.', {
@@ -108,7 +119,7 @@ function App() {
     } catch (error) {
       console.error('Error durante el proceso de inicio de sesión:', error);
       setIsLoading(false);
-
+  
       // Mostrar notificación de error de conexión después de un pequeño retraso
       setTimeout(() => {
         toast.error('Ha ocurrido un error. Por favor, intente nuevamente.', {
@@ -123,7 +134,7 @@ function App() {
       }, 200); // Retraso de 200ms
     }
   };
-
+  
   // Función para cambiar de sección en la interfaz
   const handleButtonClick = (section) => {
     if (section !== activeSection) {
@@ -145,7 +156,7 @@ function App() {
     switch (activeSection) {
       case 'dashboard':
         return <Dashboard />;
-      case 'pedidos': // NUEVO
+      case 'pedidos':
         return <ParentComponentOrder />;
       case 'producto':
         return <ParentComponentProduct />;
@@ -158,7 +169,7 @@ function App() {
       default:
         return <Dashboard />;
     }
-  }, [activeSection]); // Solo activeSection como dependencia
+  }, [activeSection]);
   
 
   // Renderizado principal de la aplicación
@@ -189,7 +200,6 @@ function App() {
           // Mostrar el formulario de inicio de sesión si el usuario no está autenticado
           <LoginForm onLogin={handleLogin} />
         )}
-
       </div>
     </ProductProvider>
   );

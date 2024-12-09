@@ -1,10 +1,9 @@
-// Importamos las dependencias necesarias
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
 import config from '../config'; // Importar el archivo de configuración centralizada
 
 // Definimos la URL base de la API a partir del archivo de configuración
-const API_AUTH = config.API_AUTH;
+const API_AUTH = config.API_AUTH_BASE_URL+config.API_AUTH_PATH; // Usamos la variable correcta
 
 // Objeto `AuthPort` que contiene las funciones para interactuar con la API de autenticación
 export const AuthPort = {
@@ -12,6 +11,7 @@ export const AuthPort = {
   loginUser: async (email, clave) => {
     try {
       // Realizar una solicitud HTTP POST a la API de inicio de sesión
+      console.log('Datos enviados:', { email, clave });
       const response = await fetch(`${API_AUTH}/login`, { // Usa la URL base desde config
         method: 'POST', // Método POST para enviar credenciales
         headers: {
@@ -38,8 +38,8 @@ export const AuthPort = {
       const data = await response.json();
 
       // Verificar si la respuesta contiene un token de autenticación
-      if (data.data && data.data.token) {
-        const token = data.data.token;
+      if (data.data && data.data.accessToken) {
+        const token = data.data.accessToken;
 
         // Guardar el token en cookies con una expiración de 1 día
         Cookies.set('jwtToken', token, { expires: 1, sameSite: 'Lax' });

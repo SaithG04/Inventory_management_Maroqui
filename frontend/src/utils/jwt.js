@@ -2,6 +2,7 @@ import Cookies from 'js-cookie'; // Manejo de cookies para el token
 
 // Obtiene el token desde las cookies
 export const getToken = () => {
+    console.log('Token guardado:', Cookies.get('jwtToken'));
     return Cookies.get('jwtToken'); // Cambia 'jwtToken' si usas otra clave en tus cookies
 };
 

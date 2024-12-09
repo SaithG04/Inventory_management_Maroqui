@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaChartLine, FaClipboardList, FaShoppingCart, FaSignOutAlt, FaUsers, FaUser, FaBox } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';  
 import './Sidebar.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
@@ -10,43 +11,43 @@ const Sidebar = ({ onButtonClick, userRole = '', activeSection: parentActiveSect
   const [showLogoutModal, setShowLogoutModal] = React.useState(false);
   const [activeSection, setActiveSection] = React.useState(parentActiveSection || 'dashboard');
 
-  // Sincroniza con el estado del padre si se proporciona
   React.useEffect(() => {
     if (parentActiveSection) {
       setActiveSection(parentActiveSection);
     }
   }, [parentActiveSection]);
 
+  // Configuración de módulos según el rol
   const modulesByRole = {
-    Administrator: [
+    ADMINISTRATOR: [
       { key: 'dashboard', label: 'Dashboard', icon: <FaChartLine className="sidebar-icon" /> },
-      { key: 'pedidos', label: 'Pedidos', icon: <FaBox className="sidebar-icon" /> }, // NUEVO
+      { key: 'pedidos', label: 'Pedidos', icon: <FaBox className="sidebar-icon" /> },
       { key: 'producto', label: 'Productos', icon: <FaClipboardList className="sidebar-icon" /> },
       { key: 'ventas', label: 'Ventas', icon: <FaShoppingCart className="sidebar-icon" /> },
       { key: 'empleados', label: 'Empleados', icon: <FaUsers className="sidebar-icon" /> },
       { key: 'proveedores', label: 'Proveedores', icon: <FaUser className="sidebar-icon" /> },
     ],
-    Almacenero: [
+    'WAREHOUSE CLERK': [
       { key: 'producto', label: 'Productos', icon: <FaClipboardList className="sidebar-icon" /> },
-      { key: 'pedidos', label: 'Pedidos', icon: <FaBox className="sidebar-icon" /> }, // NUEVO
+      { key: 'pedidos', label: 'Pedidos', icon: <FaBox className="sidebar-icon" /> },
     ],
-    Vendedor: [
+    SELLER: [
       { key: 'producto', label: 'Productos', icon: <FaClipboardList className="sidebar-icon" /> },
       { key: 'ventas', label: 'Ventas', icon: <FaShoppingCart className="sidebar-icon" /> },
     ],
   };
-  
-  const normalizedRole = userRole
-    ? userRole.charAt(0).toUpperCase() + userRole.slice(1).toLowerCase()
-    : 'Guest';
+
+  const normalizedRole = userRole ? userRole.toUpperCase() : 'GUEST';
   const allowedModules = modulesByRole[normalizedRole] || [];
 
+  const navigate = useNavigate();
+
   const handleClick = (module) => {
-    if (module === 'salir') {
-      setShowLogoutModal(true);
+    if (module !== 'salir') {
+      setActiveSection(module);
+      navigate(`/${module}`);
     } else {
-      setActiveSection(module); // Actualiza el estado interno
-      onButtonClick(module); // Notifica al componente padre
+      setShowLogoutModal(true);
     }
   };
 
