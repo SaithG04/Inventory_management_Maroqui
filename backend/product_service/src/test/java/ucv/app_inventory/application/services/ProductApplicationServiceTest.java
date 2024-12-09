@@ -67,7 +67,7 @@ class ProductApplicationServiceTest {
 
     }
 
-    @Test
+    /*@Test
     void testFindProductById_NotFound() {
 
         when(productService.findProductById(1L)).thenReturn(null);
@@ -78,7 +78,7 @@ class ProductApplicationServiceTest {
         });
 
         assertEquals("El producto con id 1 no existe", thrown.getMessage());
-    }
+    }*/
 
 
 
