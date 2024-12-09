@@ -113,16 +113,20 @@
 }
 
 /* Estilos para el módulo activo */
+/* Módulo activo */
 .menu-list li.active {
   background-color: #537c8f; /* Fondo azul para el elemento activo */
   color: white; /* Texto en blanco para contraste */
+  border-left: 5px solid #f0e68c; /* Línea amarilla para destacar */
+  font-weight: bold; /* Negrita para resaltar */
   transform: none; /* Sin transformación al estar activo */
 }
 
-/* Estilo para el ícono dentro del módulo activo */
+/* Ícono del módulo activo */
 .menu-list li.active .sidebar-icon {
   color: #ffffff; /* El ícono también debe ser blanco en el módulo activo */
 }
+
 
 /* Estilos para la sección del perfil */
 .profile-section {
