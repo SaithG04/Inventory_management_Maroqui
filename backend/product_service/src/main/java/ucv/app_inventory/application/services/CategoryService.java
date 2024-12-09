@@ -8,9 +8,10 @@ import java.util.List;
 
 public interface CategoryService {
     List<Category> listCategories(int page, int size);
-    Category saveCategory(Category category);
+    Category createCategory(Category category);
+    Category updateCategory(Category category);
     Category findCategoryById(Long id);
-    void deleteCategory(Long id);
+    void deleteCategory(Category category);
     Page<Category> findByName(String name, Pageable pageable);
     Page<Category> findByStatus(Category.Status status, int page, int size);
     Page<Category> findByNameAndStatus(String name, Category.Status status, int page, int size);

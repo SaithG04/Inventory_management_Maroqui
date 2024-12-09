@@ -30,7 +30,7 @@ public class LoggingAspect {
      * @return The value returned by the intercepted method.
      * @throws Throwable If an exception occurs during the method execution.
      */
-    @Around("execution(* ucv.app_inventory.supplier_service..*(..))")
+    @Around("execution(* ucv.app_inventory..*(..))")
     public Object logMethodExecution(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         String methodName = proceedingJoinPoint.getSignature().getName();
         Object[] methodArgs = proceedingJoinPoint.getArgs();
@@ -64,7 +64,7 @@ public class LoggingAspect {
      * @param joinPoint Execution point of the method where the exception occurred.
      * @param ex        The exception thrown during method execution.
      */
-    @AfterThrowing(pointcut = "execution(* ucv.app_inventory.supplier_service..*(..))", throwing = "ex")
+    @AfterThrowing(pointcut = "execution(* ucv.app_inventory..*(..))", throwing = "ex")
     public void logException(JoinPoint joinPoint, Throwable ex) {
         String methodName = joinPoint.getSignature().getName();
         logger.error("Exception thrown in method: {} with message: {}", methodName, ex.getMessage(), ex);

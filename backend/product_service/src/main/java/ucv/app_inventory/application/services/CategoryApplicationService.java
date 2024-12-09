@@ -1,18 +1,25 @@
 package ucv.app_inventory.application.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ucv.app_inventory.application.DTO.CategoryDTO;
 import ucv.app_inventory.domain.entities.Category;
+import ucv.app_inventory.domain.entities.Product;
+import ucv.app_inventory.exception.CategoryNotFoundException;
+import ucv.app_inventory.exception.ProductNotFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class CategoryApplicationService {
+
     private final CategoryService categoryService;
+    private static final Logger logger = LoggerFactory.getLogger(CategoryApplicationService.class);
+
 
     public CategoryApplicationService(CategoryService categoryService) {
         this.categoryService = categoryService;
@@ -39,14 +46,14 @@ public class CategoryApplicationService {
             categoryToUpdate.setStatus(categoryDto.getStatus());
         }
 
-        Category updatedCategory = categoryService.saveCategory(categoryToUpdate);
+        Category updatedCategory = categoryService.updateCategory(categoryToUpdate);
         return convertToDto(updatedCategory);
     }
 
 
     public CategoryDTO saveCategory(CategoryDTO categoryDto) {
         Category category = convertToEntity(categoryDto);
-        Category savedCategory = categoryService.saveCategory(category);
+        Category savedCategory = categoryService.createCategory(category);
         return convertToDto(savedCategory);
     }
 
@@ -56,7 +63,23 @@ public class CategoryApplicationService {
     }
 
     public void deleteCategory(Long id) {
-        categoryService.deleteCategory(id);
+        getInfo(id);
+        Category category = categoryService.findCategoryById(id);
+        if (category == null) {
+            getWarn(id);
+            throw new CategoryNotFoundException("Categoría no encontrada con id: " + id);
+        }
+        logger.info("Deleting category");
+        categoryService.deleteCategory(category);
+        logger.info("Category deleted");
+    }
+
+    private static void getWarn(Long id) {
+        logger.warn("Categoría no encontrada con id: {}", id);
+    }
+
+    private static void getInfo(Long id) {
+        logger.info("Buscando categoría por id: {}", id);
     }
 
     private CategoryDTO convertToDto(Category category) {
