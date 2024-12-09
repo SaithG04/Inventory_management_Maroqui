@@ -1,18 +1,31 @@
 package ucv.app_inventory.login.domain.auth;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ucv.app_inventory.login.adapters.persistance.TokenRevocationRepository;
+import ucv.app_inventory.login.domain.model.RevokedToken;
 
-import java.util.HashSet;
-import java.util.Set;
 
 @Service
 public class TokenRevocationService {
 
-    private final Set<String> revokedTokens = new HashSet<>();
+    private final TokenRevocationRepository tokenRevocationRepository;
+
+    @Autowired
+    public TokenRevocationService(TokenRevocationRepository tokenRevocationRepository) {
+        this.tokenRevocationRepository = tokenRevocationRepository;
+    }
 
     public boolean isTokenRevoked(String token) {
-        return revokedTokens.contains(token);
+        return tokenRevocationRepository.existsByToken(token);
+    }
+
+    public void revokeToken(String token) {
+        RevokedToken revokedToken = new RevokedToken();
+        revokedToken.setToken(token);
+        revokedToken.setRevokedAt(System.currentTimeMillis());
+        tokenRevocationRepository.save(revokedToken);
     }
 
     public String extractTokenFromRequest(HttpServletRequest request) {

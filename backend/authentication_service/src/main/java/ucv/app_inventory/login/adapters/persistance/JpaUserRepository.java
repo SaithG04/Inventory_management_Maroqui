@@ -26,6 +26,8 @@ public interface JpaUserRepository extends JpaRepository<User, Long> {
 
     List<User> findByCreatedAtAfter(LocalDateTime date);
 
+    Optional<User> findByRefreshToken(String refreshToken);
+
     @Modifying
     @Transactional
     @Query("UPDATE User u SET u.refreshToken = null WHERE u.email = ?1")

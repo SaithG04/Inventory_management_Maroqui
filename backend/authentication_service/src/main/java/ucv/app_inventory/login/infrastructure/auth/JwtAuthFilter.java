@@ -1,4 +1,4 @@
-package ucv.app_inventory.login.infraestructure.auth;
+package ucv.app_inventory.login.infrastructure.auth;
 
 import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
