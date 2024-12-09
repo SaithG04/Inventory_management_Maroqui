@@ -10,9 +10,11 @@ public interface ProductService {
 
     Page<Product> listProducts(int page, int size);
 
-    Product saveProduct(final Product product);
+    Product createProduct(final Product product);
 
-    void deleteProduct(final Long id);
+    Product updateProduct(final Product product);
+
+    void deleteProduct(Product product);
 
     Product findProductById(final Long id);
 

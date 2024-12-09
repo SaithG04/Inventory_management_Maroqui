@@ -10,7 +10,6 @@ import ucv.app_inventory.domain.entities.Product;
 import ucv.app_inventory.exception.ProductNotFoundException;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,22 +31,36 @@ public class ProductApplicationService {
     public ProductDTO saveProduct(ProductDTO productDto) {
         logger.info("Saving product");
         Product product = convertToEntity(productDto);
-        Product savedProduct = productService.saveProduct(product);
+        Product savedProduct = productService.createProduct(product);
         logger.info("Product saved");
         return convertToDto(savedProduct);
     }
 
     public void deleteProduct(Long id) {
+        getInfo(id);
+        Product product = productService.findProductById(id);
+        if (product == null) {
+            getWarn(id);
+            throw new ProductNotFoundException("Producto no encontrado con id: " + id);
+        }
         logger.info("Deleting product");
-        productService.deleteProduct(id);
+        productService.deleteProduct(product);
         logger.info("Product deleted");
     }
 
-    public ProductDTO findProductById(Long id) {
+    private static void getWarn(Long id) {
+        logger.warn("Producto no encontrado con id: {}", id);
+    }
+
+    private static void getInfo(Long id) {
         logger.info("Buscando producto por id: {}", id);
+    }
+
+    public ProductDTO findProductById(Long id) {
+        getInfo(id);
         Product product = productService.findProductById(id);
         if (product == null) {
-            logger.warn("Producto no encontrado con id: {}", id);
+            getWarn(id);
             throw new ProductNotFoundException("Producto no encontrado con id: " + id);
         }
         return convertToDto(product);
@@ -106,7 +119,7 @@ public class ProductApplicationService {
             existingProduct.setStatus(Product.Status.ACTIVE);
         }
         
-        Product updatedProduct = productService.saveProduct(existingProduct);
+        Product updatedProduct = productService.updateProduct(existingProduct);
         logger.info("Product updated");
         return convertToDto(updatedProduct);
     }

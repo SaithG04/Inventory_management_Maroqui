@@ -31,7 +31,7 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public Product saveProduct(Product product) {
+    public Product createProduct(Product product) {
         if (product.getCode() == null || product.getCode().isEmpty()) {
             product.setCode(getNextProductCode());
         }
@@ -41,9 +41,20 @@ public class ProductServiceImpl implements ProductService{
         return productRepository.save(product);
     }
 
+    @Override
+    public Product updateProduct(Product product) {
+        if (product.getCode() == null || product.getCode().isEmpty()) {
+            product.setCode(getNextProductCode());
+        }
+        if (product.getStock() == null) {
+            product.setStock(0);
+        }
+        return productRepository.save(product);
+    }
 
     @Override
-    public void deleteProduct(Long id) {
+    public void deleteProduct(Product product) {
+        Long id = product.getId();
         productRepository.deleteById(id);
     }
 
