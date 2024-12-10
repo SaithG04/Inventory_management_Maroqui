@@ -13,6 +13,7 @@ const ProductList = ({ onEditProduct, refreshTrigger, products }) => {
 
   const fetchProducts = useCallback(async () => {
     try {
+
       // Obtener productos
       const productResponse = await productService.getAllProducts();
       const fetchedProducts = productResponse?.data || [];
@@ -65,24 +66,25 @@ const ProductList = ({ onEditProduct, refreshTrigger, products }) => {
         <Column field="descripcion" header="Description" />
         <Column field="unidad_medida" header="Unit Measurement" />
         <Column field="stock" header="Stock" />
-        <Column field="nombre_categoria" header="Category Name" sortable />
+        <Column field="nombre_categoria" header="Category Name" />
         <Column field="estado" header="Status" />
         <Column
           body={(rowData) => (
             <div className="products-button-container">
               <Button
                 icon="pi pi-pencil"
+                label="Editar"
                 className="p-button-rounded p-button-success products-button-edit"
-                onClick={() => onEditProduct(rowData.id_producto)}
-              />
+                onClick={() => onEditProduct(rowData.id_producto)} // Pasar el ID del producto
+                />
               <Button
                 icon="pi pi-trash"
+                label="Eliminar"
                 className="p-button-rounded p-button-danger products-button-delete"
                 onClick={() => onDeleteProduct(rowData.id_producto)}
               />
             </div>
           )}
-          header="Actions"
         />
       </DataTable>
     </div>

@@ -1,5 +1,4 @@
 import Cookies from 'js-cookie';
-import { jwtDecode } from 'jwt-decode';
 import config from '../config';  // Asegúrate de que esta importación sea correcta
 
 // Concatenar la URL base de la API de autenticación

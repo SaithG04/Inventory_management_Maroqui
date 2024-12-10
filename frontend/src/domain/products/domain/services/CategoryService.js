@@ -6,8 +6,11 @@ class CategoryService {
   }
 
   async getAllCategories() {
-    return await this.categoryRepository.getAll();
+    const categories = await this.categoryRepository.getAll();
+    console.log("Categorías devueltas por el repositorio:", categories);
+    return categories;
   }
+  
 
   async getCategoryById(id) {
     return await this.categoryRepository.getById(id);

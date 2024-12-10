@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
@@ -8,85 +8,106 @@ import { CategoryDTO } from "../../dto/CategoryDTO";
 import Modal from "../../../../../infrastructure/shared/modal/Modal";
 import "./CategoryForm.css";
 
-const CategoryForm = ({ categoryId, onCategorySaved, onCancel }) => {
-  const [categoryData, setCategoryData] = useState({
+const CategoryForm = ({ categoryId, initialData, onCategorySaved, onCancel }) => {
+  const [formData, setFormData] = useState({
     name: "",
     description: "",
     status: "ACTIVE",
   });
   const [isEditMode, setIsEditMode] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showCancelModal, setShowCancelModal] = useState(false); // Controla la visibilidad del modal
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [isDuplicate, setIsDuplicate] = useState(false); // Estado para manejar la duplicidad
   const categoryService = useMemo(() => new CategoryService(), []);
   const toast = useRef(null);
 
-  const fetchCategory = useCallback(async () => {
-    if (!categoryId) return;
-    setLoading(true);
-    try {
-      const response = await categoryService.getCategoryById(categoryId);
-      setCategoryData(response.data);
-
-      toast.current.show({
-        severity: "info",
-        summary: "Category Loaded",
-        detail: "Category details loaded successfully.",
+  // Cargar datos iniciales al abrir el formulario
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        name: initialData.name || "",
+        description: initialData.description || "",
+        status: initialData.status || "ACTIVE",
       });
-    } catch (err) {
+      setIsEditMode(!!categoryId); // Configura el modo de edición según el ID
+    }
+  }, [initialData, categoryId]);
+
+  // Verificar duplicidad de nombre de categoría
+  const checkDuplicateCategory = async (categoryName) => {
+    try {
+      const existingCategories = await categoryService.getAllCategories();
+      const isCategoryDuplicate = existingCategories.some(
+        (category) => category.nombre.toLowerCase() === categoryName.toLowerCase()
+      );
+      setIsDuplicate(isCategoryDuplicate); // Actualizar el estado si ya existe una categoría con el mismo nombre
+    } catch (error) {
       toast.current.show({
         severity: "error",
         summary: "Error",
-        detail: "Failed to fetch category details.",
+        detail: "Error al verificar duplicados.",
       });
-    } finally {
-      setLoading(false);
     }
-  }, [categoryId, categoryService]);
+  };
 
-  useEffect(() => {
-    if (categoryId) {
-      setIsEditMode(true);
-      fetchCategory();
-    } else {
-      setIsEditMode(false);
-      setCategoryData({
-        name: "",
-        description: "",
-        status: "ACTIVE",
-      });
+  // Manejo de cambios en el input
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+    if (id === "name") {
+      checkDuplicateCategory(value); // Verificar duplicidad cuando se cambia el nombre
     }
-  }, [categoryId, fetchCategory]);
+  };
+
+  const handleDropdownChange = (e) => {
+    setFormData((prev) => ({ ...prev, status: e.value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    if (!categoryData.name.trim()) {
+    if (!formData.name.trim()) {
       toast.current.show({
         severity: "warn",
         summary: "Validation Error",
-        detail: "Category Name is required.",
+        detail: "El nombre de la categoría es obligatorio.",
       });
       setLoading(false);
       return;
     }
 
-    const categoryDTO = new CategoryDTO(categoryData);
+    // Si el nombre ya existe, mostrar el mensaje de advertencia
+    if (isDuplicate) {
+      toast.current.show({
+        severity: "warn",
+        summary: "Validation Error",
+        detail: "Ya existe una categoría con ese nombre.",
+      });
+      setLoading(false);
+      return;
+    }
+
+    const categoryDTO = new CategoryDTO({
+      nombre: formData.name.trim(),
+      descripcion: formData.description.trim(),
+      estado: formData.status,
+    });
 
     try {
       if (isEditMode) {
-        await categoryService.updateCategory(categoryId, categoryDTO.toDomain());
+        const response = await categoryService.updateCategory(categoryId, categoryDTO.toDomain());
         toast.current.show({
           severity: "success",
-          summary: "Category Updated",
-          detail: "Category updated successfully.",
+          summary: "Categoría Actualizada",
+          detail: `La categoría "${response.nombre}" fue actualizada correctamente.`,
         });
       } else {
-        await categoryService.createCategory(categoryDTO.toDomain());
+        const response = await categoryService.createCategory(categoryDTO.toDomain());
         toast.current.show({
           severity: "success",
-          summary: "Category Created",
-          detail: "Category created successfully.",
+          summary: "Categoría Creada",
+          detail: `La categoría "${response.nombre}" fue creada correctamente.`,
         });
       }
       onCategorySaved();
@@ -94,7 +115,7 @@ const CategoryForm = ({ categoryId, onCategorySaved, onCancel }) => {
       toast.current.show({
         severity: "error",
         summary: "Error",
-        detail: "Failed to save category.",
+        detail: err.response?.data?.message || "Error al guardar la categoría.",
       });
     } finally {
       setLoading(false);
@@ -102,20 +123,12 @@ const CategoryForm = ({ categoryId, onCategorySaved, onCancel }) => {
   };
 
   const handleCancel = () => {
-    // Verifica si hay texto en los campos `name` o `description`
-    if (categoryData.name.trim() || categoryData.description.trim()) {
-      setShowCancelModal(true); // Muestra el modal si hay datos
+    if (formData.name.trim() || formData.description.trim()) {
+      setShowCancelModal(true);
     } else {
-      // Cancela directamente y cierra el formulario
-      setCategoryData({
-        name: "",
-        description: "",
-        status: "ACTIVE",
-      }); // Reinicia los datos del formulario
-      onCancel(); // Llama al método de cancelación sin acciones adicionales
+      onCancel();
     }
   };
-
 
   return (
     <div className="category-form">
@@ -126,21 +139,8 @@ const CategoryForm = ({ categoryId, onCategorySaved, onCancel }) => {
           <InputText
             id="name"
             placeholder="Enter category name"
-            value={categoryData.name}
-            onChange={(e) => {
-              const value = e.target.value;
-
-              if (new RegExp("^[a-zA-Z\\s]*$").test(value)) {
-                setCategoryData({ ...categoryData, name: value });
-              } else {
-                toast.current.show({
-                  severity: "warn",
-                  summary: "Invalid Input",
-                  detail: "Only letters and spaces are allowed in the Name field.",
-                  life: 2000,
-                });
-              }
-            }}
+            value={formData.name}
+            onChange={handleInputChange}
           />
         </div>
 
@@ -149,34 +149,22 @@ const CategoryForm = ({ categoryId, onCategorySaved, onCancel }) => {
             id="description"
             className="category-form-textarea"
             placeholder="Enter Description (Optional)"
-            value={categoryData.description}
+            value={formData.description}
             rows="5"
-            onChange={(e) => {
-              const value = e.target.value;
-              if (value.length <= 255) {
-                setCategoryData({ ...categoryData, description: value });
-              } else {
-                toast.current.show({
-                  severity: "warn",
-                  summary: "Text Too Long",
-                  detail: "Description cannot exceed 255 characters.",
-                  life: 2000,
-                });
-              }
-            }}
+            onChange={handleInputChange}
           />
         </div>
 
         <div className="category-form-row">
           <Dropdown
             id="status"
-            value={categoryData.status}
+            value={formData.status}
             className="category-form-dropdown"
             options={[
               { label: "Active", value: "ACTIVE" },
               { label: "Inactive", value: "INACTIVE" },
             ]}
-            onChange={(e) => setCategoryData({ ...categoryData, status: e.value })}
+            onChange={handleDropdownChange}
             placeholder="Select Status"
           />
         </div>
@@ -187,7 +175,7 @@ const CategoryForm = ({ categoryId, onCategorySaved, onCancel }) => {
             icon="pi pi-check"
             type="submit"
             className="p-button-success"
-            disabled={loading}
+            disabled={loading} // No bloqueamos el botón, solo mostramos el mensaje de advertencia
           />
           <Button
             label="Cancel"
@@ -199,24 +187,16 @@ const CategoryForm = ({ categoryId, onCategorySaved, onCancel }) => {
         </div>
       </form>
 
-      {/* Modal para confirmar cancelación */}
       <Modal
         show={showCancelModal}
-        onClose={() => setShowCancelModal(false)} // Cierra el modal sin cancelar
+        onClose={() => setShowCancelModal(false)}
         onConfirm={() => {
-          // Confirma la cancelación
-          setShowCancelModal(false); // Cierra el modal
-          setCategoryData({
-            name: "",
-            description: "",
-            status: "ACTIVE",
-          }); // Reinicia los datos del formulario
-          onCancel(); // Llama al método de cancelación para cerrar el formulario
+          setShowCancelModal(false);
+          onCancel();
         }}
         title="Confirmación"
         message="Hay datos ingresados en el formulario. ¿Estás seguro de que deseas cancelar?"
       />
-
     </div>
   );
 };

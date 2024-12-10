@@ -1,12 +1,17 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
+import { Toast } from "primereact/toast";
 import CategoryService from "../../../domain/services/CategoryService";
+import Modal from "../../../../../infrastructure/shared/modal/Modal";
 import "./CategoryList.css";
 
 const CategoryList = ({ onEditCategory, refreshTrigger }) => {
   const [categories, setCategories] = useState([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null); // ID de la categoría seleccionada para eliminar
+  const [showModal, setShowModal] = useState(false); // Estado para mostrar/ocultar el modal
+  const toast = useRef(null); // Ref para manejar notificaciones
 
   // Memoriza la instancia de CategoryService
   const categoryService = useMemo(() => new CategoryService(), []);
@@ -15,25 +20,50 @@ const CategoryList = ({ onEditCategory, refreshTrigger }) => {
   const fetchCategories = useCallback(async () => {
     try {
       const fetchedCategories = await categoryService.getAllCategories();
-      setCategories(fetchedCategories || []);
+      setCategories(fetchedCategories || []); // Actualiza el estado con las categorías
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Error al cargar las categorías.",
+      });
     }
   }, [categoryService]);
 
   // Manejo de eliminación de una categoría
-  const handleDeleteCategory = async (categoryId) => {
+  const confirmDeleteCategory = (categoryId) => {
+    setSelectedCategoryId(categoryId);
+    setShowModal(true); // Mostrar el modal
+  };
+
+  const handleDeleteCategory = async () => {
+    if (!selectedCategoryId) {
+      toast.current.show({
+        severity: "warn",
+        summary: "Advertencia",
+        detail: "No hay una categoría seleccionada para eliminar.",
+      });
+      return;
+    }
+
     try {
-      const confirmDelete = window.confirm(
-        "Are you sure you want to delete this category?"
+      await categoryService.deleteCategory(selectedCategoryId);
+      setCategories((prevCategories) =>
+        prevCategories.filter((category) => category.id_categoria !== selectedCategoryId)
       );
-      if (confirmDelete) {
-        await categoryService.deleteCategory(categoryId);
-        setCategories((prevCategories) =>
-          prevCategories.filter((category) => category.id !== categoryId)
-        );
-      }
+      toast.current.show({
+        severity: "success",
+        summary: "Éxito",
+        detail: "Categoría eliminada correctamente.",
+      });
+      setShowModal(false); // Cerrar el modal después de eliminar
+      setSelectedCategoryId(null); // Limpiar la categoría seleccionada
     } catch (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Error al eliminar la categoría.",
+      });
       console.error("Error deleting category:", error);
     }
   };
@@ -44,16 +74,16 @@ const CategoryList = ({ onEditCategory, refreshTrigger }) => {
       <div className="actions">
         <Button
           icon="pi pi-pencil"
-          label="Editar" // Texto para el botón de Editar
+          label="Editar"
           className="p-button-rounded p-button-success"
-          onClick={() => onEditCategory(rowData.id)}
+          onClick={() => onEditCategory(rowData)} // Pasa la categoría completa
           tooltip="Editar esta categoría"
         />
         <Button
           icon="pi pi-trash"
-          label="Eliminar" // Texto para el botón de Eliminar
+          label="Eliminar"
           className="p-button-rounded p-button-danger"
-          onClick={() => handleDeleteCategory(rowData.id)}
+          onClick={() => confirmDeleteCategory(rowData.id_categoria)} // rowData.id_categoria debe tener el valor correcto
           tooltip="Eliminar esta categoría"
         />
       </div>
@@ -64,7 +94,7 @@ const CategoryList = ({ onEditCategory, refreshTrigger }) => {
   const descriptionBodyTemplate = (rowData) => {
     return (
       <div className="description-wrapper" title={rowData.descripcion}>
-        {rowData.descripcion}
+        {rowData.descripcion || "Sin descripción"}
       </div>
     );
   };
@@ -72,12 +102,11 @@ const CategoryList = ({ onEditCategory, refreshTrigger }) => {
   // Efecto para cargar las categorías al montar y cuando refreshTrigger cambia
   useEffect(() => {
     fetchCategories();
-  }, [fetchCategories, refreshTrigger]);
-
-  console.log("Categorías cargadas:", categories);
+  }, [fetchCategories, refreshTrigger]); // Se actualiza cada vez que refreshTrigger cambia
 
   return (
     <div className="category-list">
+      <Toast ref={toast} /> {/* Componente Toast */}
       <DataTable
         value={categories}
         paginator
@@ -85,12 +114,36 @@ const CategoryList = ({ onEditCategory, refreshTrigger }) => {
         responsiveLayout="scroll"
         className="p-datatable-striped"
       >
-        <Column field="nombre" header="Name" sortable headerStyle={{ textAlign: 'center' }} />
-        <Column field="descripcion" header="Description" body={descriptionBodyTemplate} headerStyle={{ textAlign: 'center' }} />
-        <Column field="estado" header="Status" sortable headerStyle={{ textAlign: 'center' }} />
-        <Column body={actionBodyTemplate} headerStyle={{ textAlign: 'center' }} />
-
+        <Column field="nombre" header="Nombre" sortable headerStyle={{ textAlign: "center" }} />
+        <Column
+          field="descripcion"
+          header="Descripción"
+          body={descriptionBodyTemplate}
+          headerStyle={{ textAlign: "center" }}
+        />
+        <Column field="estado" header="Estado" sortable headerStyle={{ textAlign: "center" }} />
+        <Column body={actionBodyTemplate} headerStyle={{ textAlign: "center" }} />
       </DataTable>
+
+      {/* Modal para confirmación de eliminación */}
+      <Modal
+        show={showModal}
+        onClose={() => {
+          setShowModal(false); // Cerrar el modal cuando se cancela
+          setSelectedCategoryId(null); // Limpiar la categoría seleccionada
+        }}
+        onConfirm={handleDeleteCategory} // Pasamos la función para eliminar la categoría
+        title="Confirmación de Eliminación"
+        message="¿Estás seguro de que deseas eliminar esta categoría? Esta acción no se puede deshacer."
+        cancelButtonProps={{
+          label: "Cancelar",
+          className: "p-button-secondary",
+        }}
+        confirmButtonProps={{
+          label: "Eliminar",
+          className: "p-button-danger",
+        }}
+      />
     </div>
   );
 };

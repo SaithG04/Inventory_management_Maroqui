@@ -71,7 +71,7 @@ const ProductForm = ({ productId, onProductSaved, onCancel }) => {
 
   useEffect(() => {
     fetchCategories();
-
+  
     if (productId) {
       setIsEditMode(true);
       fetchProduct();
@@ -87,6 +87,7 @@ const ProductForm = ({ productId, onProductSaved, onCancel }) => {
       });
     }
   }, [productId, fetchProduct, fetchCategories]);
+  
 
   // Manejo del formulario
   const handleSubmit = async (e) => {

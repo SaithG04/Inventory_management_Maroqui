@@ -1,28 +1,28 @@
 class Category {
-  constructor({ id, name, description, status }) {
+  constructor({ id, nombre, descripcion, estado }) {
     this.id = id || null;
-    this.name = name || '';
-    this.description = description || '';
-    this.status = status || 'ACTIVE'; // ACTIVE, INACTIVE
+    this.nombre = nombre || ''; // Cambiado a 'nombre'
+    this.descripcion = descripcion || ''; // Cambiado a 'descripcion'
+    this.estado = estado || 'ACTIVE'; // Cambiado a 'estado'
   }
 
-  validateName() {
-    const nameRegex = /^[a-zA-Z\s]+$/; // Solo letras y espacios
-    if (!nameRegex.test(this.name)) {
-      throw new Error('Name must only contain letters and spaces.');
+  validateNombre() {
+    const nameRegex = /^[a-zA-ZÀ-ÿ\s]+$/; // Permitir letras, acentos y espacios
+    if (!nameRegex.test(this.nombre)) {
+      throw new Error('El nombre solo puede contener letras y espacios.');
     }
   }
 
-  validateStatus() {
+  validateEstado() {
     const validStatuses = ['ACTIVE', 'INACTIVE'];
-    if (!validStatuses.includes(this.status)) {
-      throw new Error('Status must be either ACTIVE or INACTIVE.');
+    if (!validStatuses.includes(this.estado.toUpperCase())) {
+      throw new Error('El estado debe ser ACTIVE o INACTIVE.');
     }
   }
 
   validate() {
-    this.validateName();
-    this.validateStatus();
+    this.validateNombre();
+    this.validateEstado();
   }
 }
 
