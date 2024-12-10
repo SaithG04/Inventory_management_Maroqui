@@ -122,13 +122,16 @@ function App() {
     const handleLogin = async (email, password) => {
         try {
             const response = await AuthPort.loginUser(email, password);
-            
+    
             if (response.success) {
-                const token = Cookies.get('jwtToken');
+                const token = Cookies.get('jwtToken'); // Asegúrate de que el token existe
+                console.log('Token recibido en handleLogin:', token);
+    
                 if (token) {
-                    console.log('Token recibido en handleLogin:', token);
-                    setIsAuthenticated(true);
                     const decodedToken = jwtDecode(token);
+                    console.log('Token decodificado:', decodedToken);
+    
+                    setIsAuthenticated(true);
                     setUserRole(decodedToken.roles || []);
                     setUserName(decodedToken.fullname || '');
                     setDefaultSection(decodedToken.roles);
@@ -137,17 +140,17 @@ function App() {
                 }
             } else {
                 console.error('Error en la respuesta de autenticación:', response.message);
+                toast.error(response.message || 'Error de autenticación.');
                 setIsAuthenticated(false);
             }
         } catch (error) {
             console.error('Error en la autenticación:', error);
+            toast.error('Ocurrió un error al iniciar sesión.');
             setIsAuthenticated(false);
         }
     };
     
-
-
-
+    
     const handleLogout = () => {
         console.log('Logging out...');
         Cookies.remove('jwtToken');

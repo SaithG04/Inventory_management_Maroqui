@@ -44,7 +44,9 @@ const LoginForm = ({ onLogin }) => {
     // useEffect para mostrar notificaciones y redirigir después de un inicio de sesión exitoso
     useEffect(() => {
         if (state.success) {
-            toast.dismiss(); // Cierra notificaciones previas
+            dispatch({ type: 'SET_ERROR', message: '' }); // Limpia los errores
+            dispatch({ type: 'SET_EMAIL_ERROR', message: '' });
+            dispatch({ type: 'SET_PASSWORD_ERROR', message: '' });
             toast.success('Inicio de sesión exitoso');
             navigate('/dashboard');
         }
@@ -60,14 +62,13 @@ const LoginForm = ({ onLogin }) => {
             toast.dismiss(); // Cierra notificaciones previas
             toast.warn(state.passwordError);
         }
-    }, [state, navigate]);
+    }, [state.success, state.error, state.emailError, state.passwordError, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Verifica si los campos están vacíos
         if (!state.email || !state.password) {
-            toast.dismiss(); // Cierra notificaciones previas
+            toast.dismiss();
             toast.warn('Por favor, complete todos los campos.');
             return;
         }
@@ -75,26 +76,18 @@ const LoginForm = ({ onLogin }) => {
         dispatch({ type: 'SET_LOADING', value: true });
 
         try {
-            // Llama a la función onLogin del componente padre (App.js)
             const response = await onLogin(state.email, state.password);
 
-            // Valida la respuesta del backend
-            if (response && response.token) {
+            // Valida la estructura de la respuesta
+            if (response.success && response.token) {
                 dispatch({ type: 'SET_SUCCESS', value: true });
             } else {
-                throw new Error('Credenciales inválidas.');
+                throw new Error(response.message || 'Credenciales inválidas.');
             }
         } catch (error) {
-            console.error('Error en el envío del formulario:', error);
-
-            // Aquí mostramos el mensaje de error del backend si está disponible
-            const errorMessage =
-                error.response?.data?.message || 'Credenciales incorrectas.';
+            console.log('Detalles del error:', error);
+            const errorMessage = error.message || 'Ocurrió un error inesperado.';
             dispatch({ type: 'SET_ERROR', message: errorMessage });
-
-            // Limpia los campos después de un error
-            dispatch({ type: 'SET_FIELD', field: 'email', value: '' });
-            dispatch({ type: 'SET_FIELD', field: 'password', value: '' });
         } finally {
             dispatch({ type: 'SET_LOADING', value: false });
         }
@@ -129,7 +122,10 @@ const LoginForm = ({ onLogin }) => {
                                     }}
                                     autoComplete="email"
                                     className={`login-input-field ${state.emailError ? 'input-error' : ''}`}
+                                    aria-invalid={!!state.emailError}
+                                    aria-describedby="email-error"
                                 />
+                                {state.emailError && <p id="email-error" className="error-message">{state.emailError}</p>}
                             </div>
                             <div className="login-input-container">
                                 <div className="login-icon-container">
@@ -147,13 +143,17 @@ const LoginForm = ({ onLogin }) => {
                                     }}
                                     autoComplete="current-password"
                                     className={`login-input-field ${state.passwordError ? 'input-error' : ''}`}
+                                    aria-invalid={!!state.passwordError}
+                                    aria-describedby="password-error"
                                 />
+                                {state.passwordError && <p id="password-error" className="error-message">{state.passwordError}</p>}
                             </div>
                             <div className="mt-8">
                                 <button
                                     type="submit"
                                     className="login-button"
                                     disabled={state.isLoading}
+                                    aria-busy={state.isLoading}
                                 >
                                     {state.isLoading ? 'Cargando...' : 'Ingresar'}
                                 </button>
