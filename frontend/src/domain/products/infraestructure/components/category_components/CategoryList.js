@@ -3,7 +3,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import CategoryService from "../../../domain/services/CategoryService";
-import "./CategoryList.css"; // Estilos personalizados aplicados
+import "./CategoryList.css";
 
 const CategoryList = ({ onEditCategory, refreshTrigger }) => {
   const [categories, setCategories] = useState([]);
@@ -44,15 +44,17 @@ const CategoryList = ({ onEditCategory, refreshTrigger }) => {
       <div className="actions">
         <Button
           icon="pi pi-pencil"
+          label="Editar" // Texto para el botón de Editar
           className="p-button-rounded p-button-success"
           onClick={() => onEditCategory(rowData.id)}
-          tooltip="Edit"
+          tooltip="Editar esta categoría"
         />
         <Button
           icon="pi pi-trash"
+          label="Eliminar" // Texto para el botón de Eliminar
           className="p-button-rounded p-button-danger"
           onClick={() => handleDeleteCategory(rowData.id)}
-          tooltip="Delete"
+          tooltip="Eliminar esta categoría"
         />
       </div>
     );
@@ -61,8 +63,8 @@ const CategoryList = ({ onEditCategory, refreshTrigger }) => {
   // Renderización personalizada para la descripción
   const descriptionBodyTemplate = (rowData) => {
     return (
-      <div className="description-wrapper" title={rowData.description}>
-        {rowData.description}
+      <div className="description-wrapper" title={rowData.descripcion}>
+        {rowData.descripcion}
       </div>
     );
   };
@@ -71,6 +73,8 @@ const CategoryList = ({ onEditCategory, refreshTrigger }) => {
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories, refreshTrigger]);
+
+  console.log("Categorías cargadas:", categories);
 
   return (
     <div className="category-list">
@@ -81,14 +85,11 @@ const CategoryList = ({ onEditCategory, refreshTrigger }) => {
         responsiveLayout="scroll"
         className="p-datatable-striped"
       >
-        <Column field="name" header="Name" sortable />
-        <Column
-          field="description"
-          header="Description"
-          body={descriptionBodyTemplate}
-        />
-        <Column field="status" header="Status" sortable />
-        <Column body={actionBodyTemplate} header="Actions" />
+        <Column field="nombre" header="Name" sortable headerStyle={{ textAlign: 'center' }} />
+        <Column field="descripcion" header="Description" body={descriptionBodyTemplate} headerStyle={{ textAlign: 'center' }} />
+        <Column field="estado" header="Status" sortable headerStyle={{ textAlign: 'center' }} />
+        <Column body={actionBodyTemplate} headerStyle={{ textAlign: 'center' }} />
+
       </DataTable>
     </div>
   );

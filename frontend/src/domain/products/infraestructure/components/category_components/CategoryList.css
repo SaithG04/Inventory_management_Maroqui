@@ -1,15 +1,16 @@
-/* ============================
-   Estilo General del Contenedor
-============================ */
+/* Estilo General del Contenedor */
 .category-list .p-datatable {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    width: 80%; /* Ajusta el ancho al 80% del contenedor padre */
+    margin: 0 auto; /* Centra horizontalmente */
+    max-width: 1200px; /* Ancho máximo */
+    padding: 20px; /* Espaciado interno */
 }
 
-.category-list .p-datatable .p-datatable-tbody > tr > td {
-    text-align: center; /* Asegura que el texto esté centrado */
-}
+
+
 
 /* ============================
    Estilos de Botones de Acción
@@ -27,10 +28,11 @@
     border: none;
     color: #fff;
     border-radius: 5px;
-    padding: 0.5rem 1rem;
-    font-size: 14px;
+    padding: 0.7rem 1.2rem; /* Tamaño ajustado */
+    font-size: 16px; /* Tamaño ajustado */
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 120px; /* Anchura fija */
 }
 
 .category-list .p-button-success:hover {
@@ -43,10 +45,11 @@
     border: none;
     color: #fff;
     border-radius: 5px;
-    padding: 0.5rem 1rem;
-    font-size: 14px;
+    padding: 0.7rem 1.2rem; /* Tamaño ajustado */
+    font-size: 16px; /* Tamaño ajustado */
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 120px; /* Anchura fija */
 }
 
 .category-list .p-button-danger:hover {

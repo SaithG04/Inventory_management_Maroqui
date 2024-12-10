@@ -33,7 +33,7 @@ const ProductForm = ({ productId, onProductSaved, onCancel }) => {
     try {
       const response = await categoryService.getAllCategories();
       const categoryOptions = response.map((category) => ({
-        label: category.name,
+        label: category.nombre,
         value: category.id,
       }));
       setCategories(categoryOptions);

@@ -1,29 +1,35 @@
-import CategoryRepository from "../../infraestructure/repositories/CategoryRepository";
+import { CategoriesHttp } from "../../../../utils/ConHttp";
+import { CategoryDTO } from "../dto/CategoryDTO";
 
-class CategoryService {
-  constructor() {
-    this.categoryRepository = CategoryRepository; // Usa la instancia directamente
+class CategoryRepository {
+  async getAll() {
+    const response = await CategoriesHttp.get("/list");
+    return response.data.map((category) => new CategoryDTO(category).toDomain());
   }
 
-  async getAllCategories() {
-    return await this.categoryRepository.getAll();
+  async getById(id) {
+    const response = await CategoriesHttp.get(`/findCategoryById/${id}`);
+    return new CategoryDTO(response.data).toDomain();
   }
 
-  async getCategoryById(id) {
-    return await this.categoryRepository.getById(id);
+  async create(category) {
+    const categoryDTO = CategoryDTO.fromDomain(category);
+    const response = await CategoriesHttp.post("/saveCategory", categoryDTO);
+    return new CategoryDTO(response.data).toDomain();
   }
 
-  async createCategory(category) {
-    return await this.categoryRepository.create(category);
+  async update(id, category) {
+    const categoryDTO = CategoryDTO.fromDomain(category);
+    const response = await CategoriesHttp.put(
+      `/updateCategory/${id}`,
+      categoryDTO
+    );
+    return new CategoryDTO(response.data).toDomain();
   }
 
-  async updateCategory(id, category) {
-    return await this.categoryRepository.update(id, category);
-  }
-
-  async deleteCategory(id) {
-    return await this.categoryRepository.delete(id);
+  async delete(id) {
+    await CategoriesHttp.delete(`/deleteCategory/${id}`);
   }
 }
 
-export default CategoryService;
+export default CategoryRepository;

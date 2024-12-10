@@ -1,9 +1,9 @@
 export class CategoryDTO {
   constructor({ id, name, description, status }) {
     this.id = id;
-    this.name = name;
-    this.description = description;
-    this.status = status;
+    this.nombre = name;
+    this.descripcion = description;
+    this.estado = status;
   }
 
   static fromDomain(category) {

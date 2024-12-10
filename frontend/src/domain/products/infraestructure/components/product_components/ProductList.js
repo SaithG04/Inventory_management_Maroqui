@@ -1,58 +1,41 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import ProductService from "../../../domain/services/ProductService";
-import { ProductDTO } from "../../dto/ProductDTO";
+import CategoryService from "../../../domain/services/CategoryService";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
-import './ProductList';  // Asegúrate de importar el archivo de estilo
+import './ProductList.css';
 
 const ProductList = ({ onEditProduct, refreshTrigger, products }) => {
   const [allProducts, setAllProducts] = useState([]);
   const productService = useMemo(() => new ProductService(), []);
+  const categoryService = useMemo(() => new CategoryService(), []);
 
   const fetchProducts = useCallback(async () => {
     try {
-      const response = await productService.getAllProducts();
-      const fetchedProducts = response?.data || [];
-      console.log(fetchedProducts);
+      // Obtener productos
+      const productResponse = await productService.getAllProducts();
+      const fetchedProducts = productResponse?.data || [];
 
-      if (fetchedProducts.length === 0) {
-        console.log('No products found');
-        setAllProducts([]);
-        return;
-      }
+      // Obtener categorías
+      const categoryResponse = await categoryService.getAllCategories();
+      const fetchedCategories = categoryResponse || [];
 
-      const validProducts = fetchedProducts
-        .map((productData) => {
-          if (
-            !productData.id_producto ||
-            !productData.nombre ||
-            !productData.estado ||
-            typeof productData.id_producto !== 'number' ||
-            typeof productData.nombre !== 'string' || productData.nombre.trim() === '' ||
-            !['ACTIVE', 'DISCONTINUED', 'OUT_OF_STOCK'].includes(productData.estado)
-          ) {
-            console.error('Invalid product data:', productData);
-            return null;
-          }
+      // Mapear productos con nombres de categorías
+      const validProducts = fetchedProducts.map((productData) => {
+        const category = fetchedCategories.find((cat) => cat.id === productData.id_categoria);
+        return {
+          ...productData,
+          nombre_categoria: category ? category.nombre : "Unknown", // Agregar nombre de categoría
+        };
+      });
 
-          try {
-            const productDTO = new ProductDTO(productData);
-            return productDTO.toDomain();
-          } catch (err) {
-            console.error('Error converting product to domain:', productData, err);
-            return null;
-          }
-        })
-        .filter((product) => product !== null);
-
-      console.log("Valid Products:", validProducts);
       setAllProducts(validProducts);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error("Error fetching products or categories:", error);
       setAllProducts([]);
     }
-  }, [productService]);
+  }, [productService, categoryService]);
 
   const onDeleteProduct = async (productId) => {
     try {
@@ -82,7 +65,7 @@ const ProductList = ({ onEditProduct, refreshTrigger, products }) => {
         <Column field="descripcion" header="Description" />
         <Column field="unidad_medida" header="Unit Measurement" />
         <Column field="stock" header="Stock" />
-        <Column field="id_categoria" header="Category ID" />
+        <Column field="nombre_categoria" header="Category Name" sortable />
         <Column field="estado" header="Status" />
         <Column
           body={(rowData) => (
