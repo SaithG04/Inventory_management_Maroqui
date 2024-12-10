@@ -2,6 +2,9 @@ package ucv.app_inventory.supplier_service.domain.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.List;
 
 @Entity
 @Table(name = "suppliers")
@@ -36,4 +39,5 @@ public class Supplier {
     protected void onCreate() {
         this.state = SupplierState.ACTIVE;
     }
+
 }
