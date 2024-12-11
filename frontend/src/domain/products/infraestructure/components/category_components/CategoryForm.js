@@ -172,7 +172,7 @@ const CategoryForm = ({ categoryId, initialData, onCategorySaved, onCancel }) =>
         <div className="category-form-buttons">
           <Button
             label={loading ? "Saving..." : "Save"}
-            icon="pi pi-check"
+            icon="pi pi-save"
             type="submit"
             className="p-button-success"
             disabled={loading} // No bloqueamos el botón, solo mostramos el mensaje de advertencia

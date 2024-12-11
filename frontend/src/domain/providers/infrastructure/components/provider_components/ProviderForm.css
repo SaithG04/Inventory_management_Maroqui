@@ -59,7 +59,7 @@ Estilos para el Formulario Crear Proveedor
 
 .form-row input:focus,
 .form-row select:focus {
-    border-color: #007bff; /* Color de foco */
+    border-color: var(--color-borde-focus); /* Color de foco */
     outline: none;
 }
 

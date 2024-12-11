@@ -19,6 +19,7 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
     });
     const [isEditMode, setIsEditMode] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [isCanceling, setIsCanceling] = useState(false); // Agregar estado para manejar el cancelado
     const [showCancelModal, setShowCancelModal] = useState(false);
 
     const providerService = useMemo(() => new ProviderService(), []);
@@ -70,9 +71,16 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
 
-        // Validación de campos requeridos
+        // No hacer nada si estamos en el proceso de cancelación
+        if (isCanceling || showCancelModal) {
+            return; // Salir de la función si estamos cancelando
+        }
+        if (!providerData.conditions || providerData.conditions.trim() === '') {
+            providerData.conditions = 'Sin condiciones';
+        }
+
+        // Continuar con el envío si no estamos cancelando
         if (!providerData.name || !providerData.contact || !providerData.phone || !providerData.email) {
             toast.current.show({
                 severity: "warn",
@@ -84,8 +92,22 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
             return;
         }
 
-        // Validación específica para el número de teléfono
-        if (!/^\d{9}$/.test(providerData.phone)) {
+        // Validación de correo electrónico
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(providerData.email)) {
+            toast.current.show({
+                severity: "warn",
+                summary: "Validation Error",
+                detail: "Please enter a valid email address.",
+                life: 3000,
+            });
+            setLoading(false);
+            return;
+        }
+
+        // Limpiar el número de teléfono eliminando caracteres no numéricos
+        const cleanedPhone = providerData.phone.replace(/\D/g, "");
+        if (!/^\d{9}$/.test(cleanedPhone)) {
             toast.current.show({
                 severity: "warn",
                 summary: "Validation Error",
@@ -96,36 +118,27 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
             return;
         }
 
+        setProviderData({ ...providerData, phone: cleanedPhone });
+
         const providerDTO = new ProviderDTO(providerData);
 
         try {
+            let savedProvider;
+
             if (isEditMode) {
-                const updatedProvider = await providerService.updateProvider(providerId, providerDTO.toDomain());
-                if (updatedProvider && updatedProvider.data) {
-                    toast.current.show({
-                        severity: "success",
-                        summary: "Success",
-                        detail: "Provider updated successfully!",
-                        life: 3000,
-                    });
-                    onProviderSaved(updatedProvider.data);
-                } else {
+                savedProvider = await providerService.updateProvider(providerId, providerDTO.toDomain());
+                if (!savedProvider || !savedProvider.data) {
                     throw new Error("Update failed. No data returned.");
                 }
             } else {
-                const newProvider = await providerService.createProvider(providerDTO.toDomain());
-                if (newProvider && newProvider.data) {
-                    toast.current.show({
-                        severity: "success",
-                        summary: "Success",
-                        detail: "Provider created successfully!",
-                        life: 3000,
-                    });
-                    onProviderSaved(newProvider.data);
-                } else {
+                savedProvider = await providerService.createProvider(providerDTO.toDomain());
+                if (!savedProvider || !savedProvider.data) {
                     throw new Error("Creation failed. No data returned.");
                 }
             }
+
+            // Pasar el proveedor guardado al padre para manejar las notificaciones
+            onProviderSaved(savedProvider.data); // Aquí solo pasas el objeto del proveedor guardado (sin el toast)
         } catch (err) {
             toast.current.show({
                 severity: "error",
@@ -138,13 +151,34 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
         }
     };
 
+
     const handleCancel = () => {
-        setShowCancelModal(true); // Mostrar el modal para confirmar cancelación
+        // Verificar si los campos obligatorios están vacíos
+        const { name, contact, email, phone } = providerData;
+
+        // Si los campos obligatorios están vacíos, cancelamos directamente sin mostrar el modal
+        if (!name && !contact && !email && !phone) {
+            onCancel(); // Cierra el formulario sin mostrar el modal
+            return;
+        }
+
+        // Si hay datos en los campos obligatorios, mostramos el modal de confirmación
+        setShowCancelModal(true);
     };
 
     const handleConfirmCancel = () => {
-        setShowCancelModal(false); // Cerrar el modal
-        onCancel(); // Llamar la función de cancelación
+        setIsCanceling(true); // Marcamos que estamos en el proceso de cancelación
+        setShowCancelModal(false); // Cerrar el modal de confirmación
+        setProviderData({
+            name: "",
+            contact: "",
+            phone: "",
+            email: "",
+            address: "",
+            state: "ACTIVE",
+            conditions: "",
+        }); // Limpiar los campos del formulario
+        onCancel(); // Ejecuta la lógica de cancelación (ocultar formulario)
     };
 
     return (
@@ -157,38 +191,63 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
                             <InputText
                                 placeholder="Provider Name *"
                                 value={providerData.name}
-                                onChange={(e) =>
-                                    setProviderData({ ...providerData, name: e.target.value })
-                                }
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    // Validamos que solo contenga letras (y espacios)
+                                    if (/^[A-Za-z\s]*$/.test(value)) {
+                                        setProviderData({ ...providerData, name: value });
+                                    }
+                                }}
                             />
                         </div>
+
                         <div className="form-row">
                             <InputText
                                 placeholder="Contact Person *"
                                 value={providerData.contact}
-                                onChange={(e) =>
-                                    setProviderData({ ...providerData, contact: e.target.value })
-                                }
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    // Validamos que solo contenga letras y espacios
+                                    if (/^[A-Za-z\s]*$/.test(value)) {
+                                        setProviderData({ ...providerData, contact: value });
+                                    }
+                                }}
                             />
                         </div>
+
                         <div className="form-row">
                             <InputText
                                 placeholder="Phone *"
                                 value={providerData.phone}
-                                onChange={(e) =>
-                                    setProviderData({ ...providerData, phone: e.target.value })
-                                }
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    // Permitir solo números, el signo '+' al principio y los espacios
+                                    if (/^[\d\s+]*$/.test(value)) { // Solo números, espacios y '+'
+                                        setProviderData({ ...providerData, phone: value });
+                                    }
+                                }}
                             />
                         </div>
+
                         <div className="form-row">
                             <InputText
+                                type="email"
                                 placeholder="Email *"
                                 value={providerData.email}
-                                onChange={(e) =>
-                                    setProviderData({ ...providerData, email: e.target.value })
-                                }
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    // Validar que el email tenga al menos un '@'
+                                    if (value.includes('@')) {
+                                        setProviderData({ ...providerData, email: value });
+                                    } else {
+                                        // Si no tiene '@', puedes dejar el campo vacío o manejarlo de alguna forma
+                                        setProviderData({ ...providerData, email: value });
+                                    }
+                                }}
                             />
                         </div>
+
+
                     </div>
                     <div className="form-column">
                         <div className="form-row">
@@ -203,9 +262,12 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
                         <div className="form-row">
                             <InputText
                                 placeholder="Conditions (optional)"
-                                value={providerData.conditions}
+                                value={providerData.conditions}  // Mostrar directamente lo que contiene 'conditions'
                                 onChange={(e) =>
-                                    setProviderData({ ...providerData, conditions: e.target.value })
+                                    setProviderData({
+                                        ...providerData,
+                                        conditions: e.target.value,  // Actualizar el valor ingresado directamente
+                                    })
                                 }
                             />
                         </div>
@@ -224,32 +286,35 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
                         </div>
                     </div>
                 </div>
-                <div className="form-buttons">
+                {/* Botón de Guardar */}
+                <div className="form-buttons"> {/* Cambié provider-form-buttons por form-buttons */}
                     <Button
-                        label={loading ? "Saving..." : "Save"}
-                        icon="pi pi-check"
                         type="submit"
+                        label={isEditMode ? "Update Provider" : "Save Provider"}
+                        icon="pi pi-save"
                         className="p-button-success"
-                        disabled={loading}
+                        loading={loading}
+                        onClick={handleSubmit}
                     />
                     <Button
                         label="Cancel"
                         icon="pi pi-times"
                         className="p-button-secondary"
-                        onClick={handleCancel} // Mostrar el modal
+                        onClick={handleCancel}
                     />
                 </div>
-            </form>
+
+            </form >
 
             {/* Modal de confirmación */}
-            <Modal
+            < Modal
                 show={showCancelModal} // Propiedad show para controlar visibilidad
                 onClose={() => setShowCancelModal(false)} // Cerrar el modal
                 onConfirm={handleConfirmCancel} // Confirmar cancelación
                 title="Confirm Cancel"
                 message="Are you sure you want to cancel the operation?"
             />
-        </div>
+        </div >
     );
 };
 

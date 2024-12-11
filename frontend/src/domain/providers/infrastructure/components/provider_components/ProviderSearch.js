@@ -1,76 +1,62 @@
-import React, { useState, useRef, useCallback, useMemo } from 'react'; // Agregar useMemo
+import React, { useState, useRef, useMemo } from 'react';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
-import { Toast } from 'primereact/toast'; // Importar Toast
+import { Toast } from 'primereact/toast';
 import ProviderService from '../../../domain/services/ProviderService'; // Asegúrate de importar el servicio
-import { ProviderDTO } from '../../dto/ProviderDTO'; // Asegúrate de importar el DTO
 import './ProviderSearch.css'; // Asegúrate de importar el archivo CSS
 
-const ProviderSearch = ({ onSearchResults }) => {
-  const [searchType, setSearchType] = useState(''); // Tipo de búsqueda por 'name' o 'status'
-  const [query, setQuery] = useState('');
-  const [status, setStatus] = useState('ACTIVE');
-  const [loading, setLoading] = useState(false);
+const ProviderSearch = ({ onSearchResults, onClearSearch }) => {
+  const [searchType, setSearchType] = useState('name'); // Inicializamos con 'name'
+  const [query, setQuery] = useState(''); // Valor de búsqueda
+  const [status, setStatus] = useState('ACTIVE'); // Estado del proveedor
+  const [loading, setLoading] = useState(false); // Indicador de carga
   const toast = useRef(null); // Referencia para el Toast
 
-  // Memorizar la instancia de ProviderService con useMemo
-  const providerService = useMemo(() => new ProviderService(), []); // Crear la instancia una sola vez
+  // Memorizar la instancia de ProviderService
+  const providerService = useMemo(() => new ProviderService(), []);
 
-  // Uso de useCallback para evitar la recreación de la función handleSearch en cada render
-  const handleSearch = useCallback(async () => {
+  // Función de búsqueda
+  const handleSearch = async () => {
     setLoading(true);
+  
     try {
       let response = [];
-
-      // Realizar búsqueda según el tipo seleccionado
-      if (searchType === 'name') {
+  
+      // Búsqueda por nombre
+      if (searchType === 'name' && query) {
         response = await providerService.findByName(query, 0, 15);
-      } else if (searchType === 'status') {
+      }
+      // Búsqueda por estado
+      else if (searchType === 'status') {
         response = await providerService.findByStatus(status, 0, 15);
       }
-
-      // Verificar y validar la respuesta
-      if (response && Array.isArray(response.data)) {
-        const providers = response.data
-          .map((providerData) => {
-            try {
-              const providerDTO = new ProviderDTO(providerData); // Convertir la respuesta con el DTO
-              return providerDTO.toDomain(); // Convertir a dominio
-            } catch (err) {
-              console.error("Error converting provider to domain:", err);
-              return null;
-            }
-          })
-          .filter((provider) => provider !== null); // Filtrar los datos válidos
-
-        // Pasar los resultados al componente padre
-        onSearchResults(providers);
+  
+      // Aquí ya no necesitas acceder a response.data.content, porque la respuesta es un array directo
+      if (Array.isArray(response)) {
+        onSearchResults(response); // Pasar los resultados al componente padre
       } else {
-        // Mostrar notificación de error
-        toast.current.show({ severity: 'error', summary: 'Error', detail: 'No providers found or invalid response structure.', life: 3000 });
-        onSearchResults([]); // Limpiar resultados en caso de error
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'No providers found.', life: 3000 });
+        onSearchResults([]); // Si no hay resultados, vaciar la lista
       }
-    } catch (err) {
-      console.error("Error fetching providers:", err);
-      // Mostrar notificación de error
+    } catch (error) {
       toast.current.show({ severity: 'error', summary: 'Error', detail: 'Error fetching results.', life: 3000 });
-      onSearchResults([]); // Limpiar resultados en error
+      onSearchResults([]); // Si ocurre un error, vaciar la lista
     } finally {
       setLoading(false);
     }
-  }, [searchType, query, status, providerService, onSearchResults]);
-
+  };
+  
   // Función para limpiar los campos de búsqueda
   const handleClearSearch = () => {
-    setQuery(""); // Limpiar query de búsqueda
-    setStatus("ACTIVE"); // Resetear estado a 'ACTIVE'
-    onSearchResults([]); // Limpiar los proveedores filtrados
+    setQuery('');
+    setStatus('ACTIVE');
+    onClearSearch(); // Limpiar los resultados en el componente padre
   };
 
   return (
     <div className="provider-search-section">
-      <Toast ref={toast} /> {/* Coloca el Toast en el componente */}
+      <Toast ref={toast} />
 
       <div className="provider-search-dropdown">
         <label>
@@ -80,13 +66,14 @@ const ProviderSearch = ({ onSearchResults }) => {
               { label: 'Name', value: 'name' },
               { label: 'Status', value: 'status' },
             ]}
-            onChange={(e) => setSearchType(e.value)}
+            onChange={(e) => {
+              setSearchType(e.value);
+            }}
             placeholder="Select Search Type"
           />
         </label>
       </div>
 
-      {/* Mostrar input o dropdown dependiendo del tipo de búsqueda */}
       {searchType === 'status' ? (
         <div className="provider-input">
           <label>
@@ -96,7 +83,9 @@ const ProviderSearch = ({ onSearchResults }) => {
                 { label: 'Active', value: 'ACTIVE' },
                 { label: 'Inactive', value: 'INACTIVE' },
               ]}
-              onChange={(e) => setStatus(e.value)}
+              onChange={(e) => {
+                setStatus(e.value);
+              }}
               placeholder="Select Status"
             />
           </label>
@@ -105,25 +94,27 @@ const ProviderSearch = ({ onSearchResults }) => {
         <div className="provider-input">
           <InputText
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+            }}
             placeholder={`Search by ${searchType}`}
           />
         </div>
       )}
 
       {/* Botones de búsqueda y limpiar */}
-      <div className="search-clear-buttons"> {/* Usar la clase global del contenedor */}
+      <div className="search-clear-buttons">
         <Button
-          label={loading ? 'Searching...' : 'Search'} // Texto dinámico para el estado de carga
-          onClick={handleSearch} // Evento para realizar la búsqueda
-          disabled={loading} // Desactiva el botón mientras está cargando
-          className="search-button" // Clase global para el botón de búsqueda
+          label={loading ? 'Searching...' : 'Search'}
+          onClick={handleSearch}
+          disabled={loading}
+          className="search-button"
         />
         <Button
-          label="Clear" // Texto para limpiar búsqueda
-          onClick={handleClearSearch} // Evento para limpiar
-          disabled={loading} // Desactiva el botón mientras está cargando
-          className="clear-button" // Clase global para el botón de limpiar
+          label="Clear"
+          onClick={handleClearSearch}
+          disabled={loading}
+          className="clear-button"
         />
       </div>
     </div>

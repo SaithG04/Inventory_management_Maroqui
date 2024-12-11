@@ -25,6 +25,18 @@ class ProviderService {
   async deleteProvider(id) {
     return await this.providerRepository.delete(id);
   }
+
+  // Método para buscar proveedores por nombre
+  async findByName(name) {
+    const response = await this.providerRepository.findByName(name);
+    return response?.data?.content || [];  // Acceder a los datos correctamente
+  }
+
+  // Método para buscar proveedores por estado
+  async findByStatus(status, page = 0, size = 15) {
+    const response = await this.providerRepository.findByStatus(status, page, size);
+    return response?.data?.content || [];  // Acceder a los datos correctamente
+  }
 }
 
 export default ProviderService;
