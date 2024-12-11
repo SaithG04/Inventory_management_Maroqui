@@ -31,7 +31,8 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserDto>> registerUser(@Valid @RequestBody UserRegistration userRegistration) {
         UserDto registeredUser = userService.registerUser(userRegistration);
-        return ResponseEntity.status(201).body(new ApiResponse<>("success", "Usuario registrado exitosamente", registeredUser));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponse<>("success", "Usuario registrado exitosamente", registeredUser));
     }
 
     // 2. Obtener todos los usuarios (requiere rol ADMIN)
