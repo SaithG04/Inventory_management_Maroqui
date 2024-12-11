@@ -64,4 +64,24 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
             productSupplierRepository.delete(productSupplier);
         }
     }
+
+    @Override
+    public boolean existsByProductAndSupplier(Long productId, Long supplierId) {
+        return productSupplierRepository.existsByProductIdAndSupplierId(productId, supplierId);
+    }
+
+    @Override
+    public List<ProductSupplier> getRelationsByProductId(Long productId) {
+        return productSupplierRepository.findByProductId(productId);
+    }
+
+    @Override
+    public List<ProductSupplier> getRelationsBySupplierId(Long supplierId) {
+        return productSupplierRepository.findBySupplierId(supplierId);
+    }
+
+    @Override
+    public ProductSupplier getRelationByProductAndSupplier(Long productId, Long supplierId) {
+        return productSupplierRepository.findByProductIdAndSupplierId(productId, supplierId);
+    }
 }

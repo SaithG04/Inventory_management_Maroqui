@@ -12,4 +12,12 @@ public interface ProductSupplierService {
     ProductSupplier addSupplierToProduct(Long productId, Long supplierId, Double price);
 
     void removeSupplierFromProduct(Long productId, Long supplierId);
+
+    boolean existsByProductAndSupplier(Long productId, Long supplierId);
+
+    List<ProductSupplier> getRelationsByProductId(Long productId);
+
+    List<ProductSupplier> getRelationsBySupplierId(Long supplierId);
+
+    ProductSupplier getRelationByProductAndSupplier(Long productId, Long supplierId);
 }

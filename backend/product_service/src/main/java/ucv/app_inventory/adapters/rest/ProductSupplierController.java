@@ -7,6 +7,7 @@ import ucv.app_inventory.application.DTO.ProductSupplierDTO;
 import ucv.app_inventory.application.DTO.SupplierDTO;
 import ucv.app_inventory.application.services.ProductSupplierService;
 import ucv.app_inventory.adapters.outbounds.SupplierClient;
+import ucv.app_inventory.domain.entities.ProductSupplier;
 
 import java.util.List;
 
@@ -59,4 +60,36 @@ public class ProductSupplierController {
         productSupplierService.removeSupplierFromProduct(productId, supplierId);
         return ResponseEntity.noContent().build();
     }
+
+    // Obtener todas las relaciones por ID del producto
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<List<ProductSupplier>> getRelationsByProductId(@PathVariable Long productId) {
+        List<ProductSupplier> relations = productSupplierService.getRelationsByProductId(productId);
+        return relations.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(relations);
+    }
+
+    // Obtener todas las relaciones por ID del proveedor
+    @GetMapping("/supplier/{supplierId}")
+    public ResponseEntity<List<ProductSupplier>> getRelationsBySupplierId(@PathVariable Long supplierId) {
+        List<ProductSupplier> relations = productSupplierService.getRelationsBySupplierId(supplierId);
+        return relations.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(relations);
+    }
+
+    // Verificar si existe una relación entre un producto y un proveedor
+    @GetMapping("/{productId}/suppliers/{supplierId}/exists")
+    public ResponseEntity<Boolean> checkRelationExists(@PathVariable Long productId, @PathVariable Long supplierId) {
+        boolean exists = productSupplierService.existsByProductAndSupplier(productId, supplierId);
+        return ResponseEntity.ok(exists);
+    }
+
+    // Buscar una relación por ID del producto y proveedor
+    @GetMapping("/{productId}/suppliers/{supplierId}")
+    public ResponseEntity<ProductSupplier> getRelationByProductAndSupplier(
+            @PathVariable Long productId, @PathVariable Long supplierId) {
+        ProductSupplier relation = productSupplierService.getRelationByProductAndSupplier(productId, supplierId);
+        return relation == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(relation);
+    }
+
+
+
 }
