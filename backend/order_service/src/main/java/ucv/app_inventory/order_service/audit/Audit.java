@@ -23,13 +23,13 @@ public class Audit {
     private Long id;
 
     @Column(name = "entity", nullable = false)
-    private String entity;  // Example: Order, Customer, etc.
+    private String entity;  // Example: Supplier, Customer, etc.
 
     @Column(name = "action_type", nullable = false)
     private String actionType;  // Example: CREATE, UPDATE, DELETE
 
-    @Column(name = "user", nullable = false)
-    private String user;  // User performing the action
+    @Column(name = "user_id", nullable = false)
+    private Long user_id;  // User performing the action
 
     @Column(name = "timestamp", nullable = false)
     private LocalDateTime timestamp;  // Date and time of the event
@@ -39,15 +39,15 @@ public class Audit {
 
     /**
      * Additional constructor to facilitate creating Audit objects with key fields.
-     * @param entity The entity affected by the action (e.g., Order, Customer)
+     * @param entity The entity affected by the action (e.g., Supplier, Customer)
      * @param actionType The type of action performed (e.g., CREATE, UPDATE, DELETE)
-     * @param user The name of the user who performed the action
+     * @param user_id The ID of the user who performed the action
      * @param details Additional details of the event (optional)
      */
-    public Audit(String entity, String actionType, String user, String details) {
+    public Audit(String entity, String actionType, Long user_id, String details) {
         this.entity = entity;
         this.actionType = actionType;
-        this.user = user;
+        this.user_id = user_id;
         this.details = details;
         this.timestamp = LocalDateTime.now();  // Records the current date and time
     }
