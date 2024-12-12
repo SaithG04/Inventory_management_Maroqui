@@ -23,10 +23,7 @@ const config = {
   // URLs para Pedidos
   API_ORDERS_BASE_URL: process.env.REACT_APP_API_ORDERS_BASE_URL,
   API_ORDERS_PATH: process.env.REACT_APP_API_ORDERS_PATH,
-
-  // URLs para Empleados
-  API_EMPLOYEES_BASE_URL: process.env.REACT_APP_API_EMPLOYEES_BASE_URL,
-  API_EMPLOYEES_PATH: process.env.REACT_APP_API_EMPLOYEES_PATH,
+  
 };
 
 export default config;

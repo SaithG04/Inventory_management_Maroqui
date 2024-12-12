@@ -1,41 +1,57 @@
-// src/repositories/EmployeeRepository.js
-import { EmployeesHttp } from "../../../../utils/ConHttp";
+import { UsersHttp } from "../../../../utils/ConHttp"; // Asegúrate de que la ruta sea correcta
 
-class EmployeeRepository {
-  // Obtener todos los empleados
+class UserRepository {
+  // Obtener todos los usuarios
   async getAll(page = 0, size = 15) {
-    const response = await EmployeesHttp.get(`/listAll?page=${page}&size=${size}`);
+    const response = await UsersHttp.get(/*`?page=${page}&size=${size}`*/);
     return response;
   }
 
-  // Obtener un empleado por ID
-  async getById(id) {
-    const response = await EmployeesHttp.get(`/getById/${id}`);
+  // Registrar un nuevo usuario
+  async create(user) {
+    const response = await UsersHttp.post("/register", user);
     return response;
   }
 
-  // Crear un nuevo empleado
-  async create(employee) {
-    const response = await EmployeesHttp.post("/create", employee);
+  // Actualizar un usuario específico
+  async update(id, user) {
+    const response = await UsersHttp.put(`/update/${id}`, user);
     return response;
   }
 
-  // Actualizar un empleado
-  async update(id, employee) {
-    const response = await EmployeesHttp.put(`/update/${id}`, employee);
-    return response;
-  }
-
-  // Eliminar un empleado
+  // Eliminar un usuario
   async delete(id) {
-    await EmployeesHttp.delete(`/delete/${id}`);
+    const response = await UsersHttp.delete(`/delete/${id}`);
+    return response;
   }
 
-  // Actualizar el estado de un empleado
+  // Asignar un rol a un usuario
+  async assignRole(id, roleName) {
+    const response = await UsersHttp.put(`/assign-role/${id}?roleName=${roleName}`);
+    return response;
+  }
+
+  // Obtener todos los roles disponibles
+  async getAllRoles() {
+    const response = await UsersHttp.get("/roles");
+    return response;
+  }
+
+  // Obtener el perfil del usuario autenticado
+  async getProfile(token) {
+    const response = await UsersHttp.get("/profile", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response;
+  }
+
+  // Activar o desactivar un usuario
   async updateStatus(id, status) {
-    const response = await EmployeesHttp.patch(`/updateStatus/${id}`, { status });
+    const response = await UsersHttp.put(`/activate/${id}`, { status });
     return response;
   }
 }
 
-export default EmployeeRepository;
+export default UserRepository;

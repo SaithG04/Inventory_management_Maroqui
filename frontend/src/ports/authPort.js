@@ -1,44 +1,39 @@
 import Cookies from 'js-cookie';
-import config from '../config';  // Asegúrate de que esta importación sea correcta
-
-// Concatenar la URL base de la API de autenticación
-const API_AUTH_URL = `${config.API_AUTH_BASE_URL}${config.API_AUTH_PATH}`;
-console.log('API_AUTH_URL:', API_AUTH_URL);
+import { AuthHttp } from '../utils/ConHttp'
 
 export const AuthPort = {
     loginUser: async (email, clave) => {
         try {
             console.log('Datos enviados:', { email, clave });
-    
-            const response = await fetch(`${API_AUTH_URL}/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, clave }),
-                credentials: 'include',
-            });
-    
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error('Error HTTP:', response.status, errorData.message);
-                throw new Error(errorData.message || 'Error al autenticarse.');
-            }
-    
-            const data = await response.json();
-            console.log('Datos de respuesta:', data);
-    
-            const token = data?.data?.accessToken;
-            if (token) {
-                Cookies.set('jwtToken', token, { expires: 7, sameSite: 'Lax' });
-                console.log('Token guardado en la cookie:', token);
-                return { success: true, token, ...data.data };
+        
+            const credentials = JSON.stringify({ email, clave });
+            const response = await AuthHttp.post("login", credentials);
+        
+            console.log('Respuesta del servidor:', response.data);
+        
+            const data = response.data;
+        
+            if (data?.status === 'success') {
+                const accessToken = data?.data?.accessToken;
+                const refreshToken = data?.data?.refreshToken;
+        
+                if (accessToken && refreshToken) {
+                    Cookies.set('jwtToken', accessToken, { expires: 7, sameSite: 'Lax' });
+                    Cookies.set('jwtRefToken', refreshToken, { expires: 7, sameSite: 'Lax' });
+        
+                    console.log('Access Token guardado en la cookie:', accessToken);
+                    console.log('Refresh token guardado en la cookie:', refreshToken);
+        
+                    return { success: true, token: accessToken, ...data.data };
+                } else {
+                    throw new Error('No se recibió tokens de acceso.');
+                }
             } else {
-                throw new Error('No se recibió un token de acceso.');
+                throw new Error('Autenticación fallida.');
             }
         } catch (error) {
             console.error('Error en la solicitud:', error);
             return { success: false, message: error.message || 'Error de conexión.' };
-        }
+        }        
     }
 };

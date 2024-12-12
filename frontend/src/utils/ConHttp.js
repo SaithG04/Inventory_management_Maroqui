@@ -52,7 +52,9 @@ export const CategoriesHttp = createHttpInstance(
 );
 
 // Configuración HTTP para autenticación
-export const AuthHttp = createHttpInstance(config.API_AUTH_BASE_URL);
+export const AuthHttp = createHttpInstance(
+  `${config.API_AUTH_BASE_URL}${config.API_AUTH_PATH}`
+);
 
 // Configuración HTTP para proveedores
 export const SuppliersHttp = createHttpInstance(
@@ -64,8 +66,8 @@ export const OrdersHttp = createHttpInstance(
   `${config.API_ORDERS_BASE_URL}${config.API_ORDERS_PATH}`
 );
 
-// Configuración HTTP para empleados
-export const EmployeesHttp = createHttpInstance(
-  `${config.API_EMPLOYEES_BASE_URL}${config.API_EMPLOYEES_PATH}`
+// Configuración HTTP para empleados / usuarios
+export const UsersHttp = createHttpInstance(
+  `${config.API_AUTH_BASE_URL}${config.API_USERS_PATH}`
 );
 

@@ -8,10 +8,12 @@ import './ParentComponentEmployee.css';
 
 const ParentComponentEmployee = () => {
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
-  const [allEmployees, setAllEmployees] = useState([]);
+  const [allEmployees, setAllEmployees] = useState([]); // Estado de empleados
   const [isFormVisible, setIsFormVisible] = useState(false); // Controla la visibilidad del formulario
   const [isModalVisible, setIsModalVisible] = useState(false); // Control del modal de confirmación
   const [employeeToDelete, setEmployeeToDelete] = useState(null); // Almacena el empleado a eliminar
+  const [page, setPage] = useState(0); // Paginación
+  const [rowsPerPage, setRowsPerPage] = useState(10); // Cantidad de filas por página
 
   const employeeService = useMemo(() => new EmployeeService(), []);
 
@@ -29,15 +31,32 @@ const ParentComponentEmployee = () => {
 
   // Función para eliminar un empleado
   const handleDeleteEmployee = (employeeId) => {
-    setEmployeeToDelete(employeeId); // Guardamos el ID del empleado a eliminar
-    setIsModalVisible(true); // Mostramos el modal de confirmación
+    console.log("Empleado a eliminar:", employeeId);  // Verificar el ID
+    setEmployeeToDelete(employeeId);
+    setIsModalVisible(true);
   };
 
-  // Función para obtener todos los empleados
-  const fetchAllEmployees = useCallback(async () => {
-    const response = await employeeService.getAllEmployees();
-    setAllEmployees(response?.data || []);
+  // Función para obtener los empleados de la API
+  const fetchAllEmployees = useCallback(async (page, size) => {
+    try {
+      const response = await employeeService.getAllEmployees(page, size);
+      console.log("Empleados recibidos:", response); // Verifica toda la respuesta
+
+      // Asegurarse de que la respuesta tiene la propiedad "data" y que esta contiene empleados
+      if (response?.data?.data && Array.isArray(response.data.data)) {
+        setAllEmployees(response.data.data); // Extraemos solo los empleados
+      } else {
+        setAllEmployees([]); // Si no hay empleados o hay un error, seteamos un array vacío
+      }
+    } catch (error) {
+      console.error("Error al obtener empleados:", error);
+      setAllEmployees([]); // En caso de error, se vacía la lista
+    }
   }, [employeeService]);
+
+  useEffect(() => {
+    fetchAllEmployees(page, rowsPerPage); // Obtener empleados al cargar el componente
+  }, [fetchAllEmployees, page, rowsPerPage]);
 
   // Función para manejar los resultados de búsqueda
   const handleSearchResults = (results) => {
@@ -50,10 +69,15 @@ const ParentComponentEmployee = () => {
       await employeeService.deleteEmployee(employeeToDelete);
       setIsModalVisible(false);
       setEmployeeToDelete(null);
-      fetchAllEmployees(); // Actualiza la lista de empleados después de la eliminación
+      fetchAllEmployees(page, rowsPerPage); // Actualiza la lista de empleados después de la eliminación
     } catch (error) {
       console.error("Error al eliminar el empleado:", error);
     }
+  };
+
+  const handlePageChange = (newPage, size) => {
+    setPage(newPage); // Actualiza la página actual
+    setRowsPerPage(size); // Actualiza el número de filas por página
   };
 
   // Función para cancelar la eliminación
@@ -61,10 +85,6 @@ const ParentComponentEmployee = () => {
     setIsModalVisible(false);
     setEmployeeToDelete(null); // Limpiamos el empleado seleccionado para eliminar
   };
-
-  useEffect(() => {
-    fetchAllEmployees();
-  }, [fetchAllEmployees]);
 
   return (
     <div className="employees-container">
@@ -92,7 +112,7 @@ const ParentComponentEmployee = () => {
             employeeId={selectedEmployeeId}
             onEmployeeSaved={() => { // Cuando se guarda o cancela el empleado
               setIsFormVisible(false); // Oculta el formulario
-              fetchAllEmployees(); // Actualiza la lista de empleados
+              fetchAllEmployees(page, rowsPerPage); // Actualiza la lista de empleados
             }}
           />
         </div>
@@ -100,11 +120,17 @@ const ParentComponentEmployee = () => {
 
       {/* Lista de empleados */}
       <div className="employees-list">
-        <EmployeeList
-          employees={allEmployees}
-          onEditEmployee={handleEditEmployee}
-          onDeleteEmployee={handleDeleteEmployee}
-        />
+        {/* Aseguramos que el componente solo se renderice cuando tengamos datos válidos */}
+        {allEmployees.length > 0 ? (
+          <EmployeeList
+            employees={allEmployees} // Aseguramos que solo se pase el array de empleados
+            onEditEmployee={handleEditEmployee}
+            onDeleteEmployee={handleDeleteEmployee}
+            onPageChange={handlePageChange} // Paginación
+          />
+        ) : (
+          <p>No employees found.</p> // Mensaje en caso de que no haya empleados
+        )}
       </div>
 
       {/* Modal de confirmación de eliminación */}

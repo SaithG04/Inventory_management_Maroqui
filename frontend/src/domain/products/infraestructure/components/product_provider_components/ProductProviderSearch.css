@@ -1,0 +1,49 @@
+/* ============================
+Sección de Búsqueda de Productos-Proveedores
+============================ */
+
+/* Contenedor general */
+.product-provider-search-section {
+    display: flex;
+    flex-direction: column; /* Elementos en columna para uniformidad */
+    align-items: stretch; /* Asegura que todo ocupe el ancho completo */
+    gap: 10px; /* Separación uniforme entre elementos */
+    padding: 15px;
+    background-color: #f9f9f9; /* Fondo claro para destacar */
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    width: 100%; /* Usar todo el ancho disponible */
+    box-sizing: border-box;
+}
+
+/* Estilo del dropdown */
+.product-provider-dropdown {
+    width: 100%; /* Ocupa todo el ancho disponible */
+    padding: 5px;
+    font-size: 14px;
+}
+
+.product-provider-dropdown .p-dropdown {
+    width: 100%; /* Ajustar el ancho del dropdown */
+}
+
+/* Botones */
+.search-clear-buttons {
+    display: flex;
+    gap: 10px; /* Espaciado uniforme entre botones */
+    justify-content: center; /* Centrar los botones */
+}
+
+.search-clear-buttons .p-button {
+    flex-grow: 1; /* Hacer que ambos botones tengan el mismo ancho */
+    font-size: 14px; /* Tamaño de fuente uniforme */
+}
+
+/* ============================
+Ajustes Responsivos
+============================ */
+@media (max-width: 768px) {
+    .product-provider-search-section {
+        padding: 10px; /* Reducir el padding en pantallas pequeñas */
+    }
+}
