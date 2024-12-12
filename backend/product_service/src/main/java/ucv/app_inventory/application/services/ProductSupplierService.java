@@ -20,4 +20,8 @@ public interface ProductSupplierService {
     List<ProductSupplier> getRelationsBySupplierId(Long supplierId);
 
     ProductSupplier getRelationByProductAndSupplier(Long productId, Long supplierId);
+
+    ProductSupplier getById(Long id);
+
+
 }

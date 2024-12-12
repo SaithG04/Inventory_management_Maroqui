@@ -8,9 +8,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ucv.app_inventory.adapters.outbounds.SupplierClient;
 import ucv.app_inventory.adapters.repositories.ProductRepository;
+import ucv.app_inventory.adapters.repositories.ProductSupplierRepository;
 import ucv.app_inventory.application.DTO.SupplierDTO;
 import ucv.app_inventory.domain.entities.Product;
+import ucv.app_inventory.domain.entities.ProductSupplier;
+import ucv.app_inventory.exception.InvalidFieldException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -18,11 +22,13 @@ import java.util.NoSuchElementException;
 public class ProductServiceImpl implements ProductService{
     private final ProductRepository productRepository;
     private final SupplierClient supplierClient;
+    private final ProductSupplierRepository productSupplierRepository;
 
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, SupplierClient supplierClient) {
+    public ProductServiceImpl(ProductRepository productRepository, SupplierClient supplierClient, ProductSupplierRepository productSupplierRepository) {
         this.productRepository = productRepository;
         this.supplierClient = supplierClient;
+        this.productSupplierRepository = productSupplierRepository;
     }
 
     @Override
@@ -37,6 +43,9 @@ public class ProductServiceImpl implements ProductService{
         }
         if (product.getStock() == null) {
             product.setStock(0);
+        }
+        if (product.getSalePrice() == null){
+            product.setSalePrice(0.0);
         }
         return productRepository.save(product);
     }
@@ -90,7 +99,17 @@ public class ProductServiceImpl implements ProductService{
     @Override
     @Cacheable(value = "suppliers", key = "#productId")
     public List<SupplierDTO> getSuppliersForProduct(Long productId) {
-        return supplierClient.getSuppliersByProductId(productId);
+        List<ProductSupplier> productSuppliers = productSupplierRepository.findByProductId(productId);
+        if(productSuppliers==null|| productSuppliers.isEmpty()){
+            throw new InvalidFieldException("Not found suppliers for product with ID: "+ productId);
+        }
+        List<SupplierDTO>supplierDTOList=new ArrayList<>();
+        productSuppliers.forEach(productSupplier -> {
+            Long supplierId = productSupplier.getSupplierId();
+            SupplierDTO supplierDTO = supplierClient.getSupplierById(supplierId);
+            supplierDTOList.add(supplierDTO);
+        });
+        return supplierDTOList;
     }
 
     public String getNextProductCode() {

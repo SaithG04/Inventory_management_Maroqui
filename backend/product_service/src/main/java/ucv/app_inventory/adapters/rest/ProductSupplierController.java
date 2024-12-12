@@ -90,6 +90,13 @@ public class ProductSupplierController {
         return relation == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(relation);
     }
 
+    // Obtener por ID
+    @GetMapping("/findById/{id}")
+    public ResponseEntity<ProductSupplier> getById(@PathVariable Long id) {
+        ProductSupplier productSupplier = productSupplierService.getById(id);
+        return productSupplier == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(productSupplier);
+    }
+
 
 
 }

@@ -28,4 +28,5 @@ public interface ProductService {
 
     List<SupplierDTO> getSuppliersForProduct(Long productId);
 
+
 }

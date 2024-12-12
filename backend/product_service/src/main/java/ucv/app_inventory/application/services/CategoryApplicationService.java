@@ -102,4 +102,9 @@ public class CategoryApplicationService {
         return categoryService.findByNameAndStatus(name, status, page, size).stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
+    public Long getCategoryIdByName(String name) {
+        return categoryService.findIdByName(name);
+    }
+
+
 }

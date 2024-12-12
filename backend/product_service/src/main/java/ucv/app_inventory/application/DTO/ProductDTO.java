@@ -32,8 +32,11 @@ public class ProductDTO implements Serializable {
     @JsonProperty("stock")
     private Integer stock;
 
-    @JsonProperty("id_categoria")
-    private Long categoryId;
+    @JsonProperty("precio_venta")
+    private Double salePrice;
+
+    @JsonProperty("nombre_categoria")
+    private String categoryName;
 
     @JsonProperty("estado")
     private Product.Status status;

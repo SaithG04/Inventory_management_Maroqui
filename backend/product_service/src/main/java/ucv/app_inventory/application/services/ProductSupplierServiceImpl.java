@@ -84,4 +84,14 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
     public ProductSupplier getRelationByProductAndSupplier(Long productId, Long supplierId) {
         return productSupplierRepository.findByProductIdAndSupplierId(productId, supplierId);
     }
+
+    @Override
+    public ProductSupplier getById(Long id) {
+        return productSupplierRepository.findById(id).orElse(null);
+
+
+}
+
+
+
 }

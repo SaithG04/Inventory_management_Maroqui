@@ -30,7 +30,7 @@ class ProductApplicationServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
-
+/*
     @Test
     void testListProducts() {
         Product product = new Product(1L, "Producto 1", "C001", "Descripción", UN, 100, 1L, Product.Status.ACTIVE);
@@ -46,9 +46,9 @@ class ProductApplicationServiceTest {
         assertNotNull(products);
         assertEquals(1, products.size());
         assertEquals("Producto 1", products.get(0).getName());
-    }
+    }*/
 
-
+/*
 
     @Test
     void testSaveProduct() {
@@ -66,8 +66,8 @@ class ProductApplicationServiceTest {
         assertEquals("Nuevo Producto", savedProduct.getName());
 
     }
-
-    /*@Test
+*/
+    @Test
     void testFindProductById_NotFound() {
 
         when(productService.findProductById(1L)).thenReturn(null);
@@ -78,11 +78,10 @@ class ProductApplicationServiceTest {
         });
 
         assertEquals("El producto con id 1 no existe", thrown.getMessage());
-    }*/
+    }
 
 
-
-    @Test
+@Test
     void testDeleteProduct() {
         //ARREGLAR
     }

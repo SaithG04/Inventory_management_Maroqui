@@ -15,4 +15,5 @@ public interface CategoryService {
     Page<Category> findByName(String name, Pageable pageable);
     Page<Category> findByStatus(Category.Status status, int page, int size);
     Page<Category> findByNameAndStatus(String name, Category.Status status, int page, int size);
+    Long findIdByName(String name);
 }

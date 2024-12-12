@@ -60,4 +60,13 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.findByNameAndStatus(name, status, pageable);
     }
 
+    @Override
+    public Long findIdByName(String name) {
+        return categoryRepository.findByNameStartingWith(name, Pageable.unpaged())
+                .stream()
+                .findFirst()
+                .map(Category::getId)
+                .orElse(null);
+    }
+
 }

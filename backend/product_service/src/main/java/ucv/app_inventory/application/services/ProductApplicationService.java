@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ucv.app_inventory.application.DTO.ProductDTO;
 import ucv.app_inventory.domain.entities.Product;
+import ucv.app_inventory.exception.CategoryNotFoundException;
 import ucv.app_inventory.exception.ProductNotFoundException;
 
 import java.util.List;
@@ -15,11 +16,14 @@ import java.util.stream.Collectors;
 @Service
 @Component
 public class ProductApplicationService {
+
     private final ProductService productService;
+    private final CategoryService categoryService;
     private static final Logger logger = LoggerFactory.getLogger(ProductApplicationService.class);
 
-    public ProductApplicationService(ProductService productService) {
+    public ProductApplicationService(ProductService productService, CategoryService categoryService) {
         this.productService = productService;
+        this.categoryService = categoryService;
     }
 
     public List<ProductDTO> listProducts(int page, int size) {
@@ -67,18 +71,23 @@ public class ProductApplicationService {
     }
 
     private ProductDTO convertToDto(Product product) {
+        String categoryName = categoryService.findCategoryById(product.getCategoryId()).getName();
         return new ProductDTO(
                 product.getId(), product.getName(), product.getCode(), product.getDescription(),
-                product.getUnitMeasurement(), product.getStock()
-                , product.getCategoryId(), product.getStatus()
+                product.getUnitMeasurement(), product.getStock(), product.getSalePrice(),
+                categoryName, product.getStatus()
         );
     }
 
     private Product convertToEntity(ProductDTO productDto) {
+        Long categoryId = categoryService.findIdByName(productDto.getCategoryName());
+        if (categoryId == null) {
+            throw new CategoryNotFoundException("Categoría no encontrada con nombre: " + productDto.getCategoryName());
+        }
         return new Product(
                 productDto.getId(), productDto.getName(), productDto.getCode(), productDto.getDescription(),
-                productDto.getUnitMeasurement(), productDto.getStock()
-                , productDto.getCategoryId(), productDto.getStatus()
+                productDto.getUnitMeasurement(), productDto.getStock(), productDto.getSalePrice(),
+                categoryId, productDto.getStatus()
         );
     }
 
@@ -106,8 +115,15 @@ public class ProductApplicationService {
         if (productDto.getStock() != null) {
             existingProduct.setStock(productDto.getStock());
         }
-        if (productDto.getCategoryId() != null) {
-            existingProduct.setCategoryId(productDto.getCategoryId());
+        if (productDto.getSalePrice() != null){
+            existingProduct.setSalePrice(productDto.getSalePrice());
+        }
+        if (productDto.getCategoryName() != null) {
+            Long categoryId = categoryService.findIdByName(productDto.getCategoryName());
+            if (categoryId == null) {
+                throw new CategoryNotFoundException("Categoría no encontrada con nombre: " + productDto.getCategoryName());
+            }
+            existingProduct.setCategoryId(categoryId);
         }
         if (productDto.getStatus() != null) {
             existingProduct.setStatus(productDto.getStatus());

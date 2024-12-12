@@ -37,6 +37,9 @@ public class Product implements Serializable {
     @Column(nullable = true)
     private Integer stock;
 
+    @Column(nullable = true)
+    private Double salePrice;
+
     @Column(nullable = false)
     private Long categoryId;
 
@@ -58,6 +61,10 @@ public class Product implements Serializable {
 
     @PrePersist
     public void prePersist() {
+        if (salePrice == null) {
+            salePrice = 0.0;
+        }
+
         if (unitMeasurement == null) {
             unitMeasurement = UnitMeasurement.UN;
         }
@@ -66,6 +73,7 @@ public class Product implements Serializable {
         }
         if (stock == 0) {
             status = Status.OUT_OF_STOCK;
+
         } else if (status == null) {
             status = Status.ACTIVE;
         }
