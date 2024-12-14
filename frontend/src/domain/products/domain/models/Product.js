@@ -1,52 +1,47 @@
 class Product {
-  constructor({ id, name, code, description, unitMeasurement, stock, category_id, status }) {
+  constructor({ id, nombre, descripcion, unidad_medida, stock, nombre_categoria, estado, precio_venta }) {
     this.id = id || null;
-    this.name = name || '';
-    this.code = code || '';
-    this.description = description || '';
-    this.unitMeasurement = unitMeasurement || 'UN'; // UN, MT, CJ
+    this.nombre = nombre || ""; // Asegúrate de que aquí se está asignando 'nombre'
+    this.descripcion = descripcion || "";
+    this.unidad_medida = unidad_medida || "UN";
     this.stock = stock || 0;
-    this.category_id = category_id || null;
-    this.status = status || 'ACTIVE'; // ACTIVE, DISCONTINUED, OUT_OF_STOCK
+    this.nombre_categoria = nombre_categoria || "";
+    this.estado = estado || "ACTIVE";
+    this.precio_venta = precio_venta || 0;
   }
 
-  // Verificar si el producto está agotado
   isOutOfStock() {
     return this.stock === 0;
   }
 
-  // Establecer el estado predeterminado basado en el stock
   setDefaultStatus() {
     this.status = this.isOutOfStock() ? 'OUT_OF_STOCK' : 'ACTIVE';
   }
 
-  // Validar que el nombre permita letras, números, espacios, guiones y diagonales
   validateName() {
-    const nameRegex = new RegExp('^[a-zA-Z0-9\\s\\-/]+$'); // Permitir letras, números, espacios, guiones y diagonales
-    if (!nameRegex.test(this.name)) {
-      throw new Error('Name can only contain letters, numbers, spaces, hyphens, and slashes.');
+    const nameRegex = new RegExp('^[a-zA-Z0-9\\s\\-/]+$');
+    console.log("Validando nombre:", this.nombre); // <-- Aquí debería imprimir el valor correcto
+    if (!nameRegex.test(this.nombre)) {
+      throw new Error("El nombre solo puede contener letras, números, espacios, guiones y barras.");
     }
   }
 
-  // Validar que el stock sea un número no negativo
   validateStock() {
     if (!Number.isInteger(this.stock) || this.stock < 0) {
       throw new Error('Stock must be a non-negative integer.');
     }
   }
 
-  // Validar que la categoría sea válida
   validateCategory() {
-    if (!this.category_id) {
-      throw new Error('Category is required.');
+    if (!this.nombre_categoria || this.nombre_categoria.trim() === "") {
+      throw new Error("Category is required.");
     }
   }
 
-  // Método para validar todos los campos relevantes
   validate() {
-    this.validateName(); // Validar el nombre
-    this.validateStock(); // Validar el stock
-    this.validateCategory(); // Validar la categoría
+    this.validateName();
+    this.validateStock();
+    this.validateCategory();
   }
 }
 

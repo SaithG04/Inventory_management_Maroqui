@@ -42,13 +42,11 @@ function App() {
         if (token) {
             try {
                 const decodedToken = jwtDecode(token);
-                console.log('Token decodificado:', decodedToken);
                 setIsAuthenticated(true);
                 setUserRole(decodedToken.roles || []);
                 setUserName(decodedToken.fullname || '');
                 setDefaultSection(decodedToken.roles);
             } catch (err) {
-                console.error('Error al decodificar el token:', err);
                 Cookies.remove('jwtToken');
                 setIsAuthenticated(false);
             }
@@ -61,42 +59,30 @@ function App() {
     
 
     useEffect(() => {
-        console.log('isAuthenticated has changed:', isAuthenticated);
 
         if (isAuthenticated) {
-            console.log('User is authenticated, checking roles...');
             if (Array.isArray(userRole)) {
-                console.log('User roles:', userRole);
                 if (userRole.includes('ADMINISTRATOR')) {
-                    console.log('Redirecting to /dashboard');
                     navigateRef.current('/dashboard');
                 } else if (userRole.includes('SELLER')) {
-                    console.log('Redirecting to /ventas');
                     navigateRef.current('/ventas');
                 } else if (userRole.includes('WAREHOUSE CLERK')) {
-                    console.log('Redirecting to /producto');
                     navigateRef.current('/producto');
                 } else {
-                    console.log('No matching role, redirecting to default');
                     navigateRef.current('/');
                 }
             } else {
-                console.log('User role:', userRole);
                 switch (userRole) {
                     case 'ADMINISTRATOR':
-                        console.log('Redirecting to /dashboard');
                         navigateRef.current('/dashboard');
                         break;
                     case 'SELLER':
-                        console.log('Redirecting to /ventas');
                         navigateRef.current('/ventas');
                         break;
                     case 'WAREHOUSE CLERK':
-                        console.log('Redirecting to /producto');
                         navigateRef.current('/producto');
                         break;
                     default:
-                        console.log('No matching role, redirecting to default');
                         navigateRef.current('/');
                         break;
                 }
@@ -105,7 +91,6 @@ function App() {
     }, [isAuthenticated, userRole]);
 
     const setDefaultSection = (roles) => {
-        console.log('Setting default section based on roles:', roles);
         const roleToSectionMap = {
             ADMINISTRATOR: 'dashboard',
             SELLER: 'ventas',
@@ -125,11 +110,9 @@ function App() {
     
             if (response.success) {
                 const token = Cookies.get('jwtToken'); // Asegúrate de que el token existe
-                console.log('Token recibido en handleLogin:', token);
     
                 if (token) {
                     const decodedToken = jwtDecode(token);
-                    console.log('Token decodificado:', decodedToken);
     
                     setIsAuthenticated(true);
                     setUserRole(decodedToken.roles || []);
@@ -139,12 +122,10 @@ function App() {
                     throw new Error('No se recibió un token de acceso.');
                 }
             } else {
-                console.error('Error en la respuesta de autenticación:', response.message);
                 toast.error(response.message || 'Error de autenticación.');
                 setIsAuthenticated(false);
             }
         } catch (error) {
-            console.error('Error en la autenticación:', error);
             toast.error('Ocurrió un error al iniciar sesión.');
             setIsAuthenticated(false);
         }
@@ -152,7 +133,6 @@ function App() {
     
     
     const handleLogout = () => {
-        console.log('Logging out...');
         Cookies.remove('jwtToken');
         setIsAuthenticated(false);
         setUserRole(DEFAULT_ROLE);
@@ -162,7 +142,6 @@ function App() {
     };
 
     const renderModuleContent = useMemo(() => {
-        console.log('Rendering module content for section:', activeSection);
         const sectionMap = {
             dashboard: <Dashboard />,
             pedidos: <ParentComponentOrder />,

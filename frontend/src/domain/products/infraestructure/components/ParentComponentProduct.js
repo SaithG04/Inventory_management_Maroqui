@@ -50,13 +50,97 @@ const ParentComponentProduct = () => {
       const fetchedProducts = await productService.getAllProducts();
       setAllProducts(fetchedProducts);
     } catch (error) {
-      toast.current.show({
+      console.error("Error al obtener productos:", error);
+      toast.current?.show({
         severity: "error",
         summary: "Error",
-        detail: "Error al obtener los productos.",
+        detail: "Hubo un error al obtener los productos.",
+        life: 3000,
       });
     }
   }, [productService]);
+
+  useEffect(() => {
+    fetchAllProducts();
+  }, [fetchAllProducts]);
+
+  const handleAddProduct = () => {
+    setSelectedProductId(null);
+    setIsFormVisible(true);
+    toast.current?.show({
+      severity: "info",
+      summary: "Agregar Producto",
+      detail: "Abriendo formulario para agregar producto.",
+      life: 3000,
+    });
+  };
+
+  const handleEditProduct = useCallback((product) => {
+    const productId = product.id_producto;
+    const productName = product.nombre; // Obtiene el nombre del producto
+    setSelectedProductId(productId);
+    setIsFormVisible(true);
+    toast.current?.show({
+      severity: "info",
+      summary: "Editar Producto",
+      detail: `Editando producto con Nombre: ${productName}.`, // Usa el nombre del producto
+      life: 3000,
+    });
+  }, []);
+  
+  const handleDeleteProduct = useCallback(async (product) => {
+    try {
+      // Ejecuta la eliminación del producto
+      await productService.deleteProduct(product.id_producto);
+  
+      // Refresca la lista de productos
+      await fetchAllProducts();
+  
+      // Muestra la notificación de éxito
+      toast.current?.show({
+        severity: "success",
+        summary: "Producto Eliminado",
+        detail: `El producto "${product.nombre}" fue eliminado correctamente.`,
+        life: 3000,
+      });
+    } catch (error) {
+      console.error("Error al eliminar el producto:", error);
+  
+      // Muestra la notificación de error
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: "No se pudo eliminar el producto.",
+        life: 3000,
+      });
+    }
+  }, [fetchAllProducts, productService]);
+  
+  
+
+  const handleProductSaved = () => {
+    fetchAllProducts(); // Actualizar lista de productos
+    setIsFormVisible(false);
+    toast.current?.show({
+      severity: "success",
+      summary: "Producto Guardado",
+      detail: "El producto fue guardado correctamente.",
+      life: 3000,
+    });
+  };
+
+  // === BÚSQUEDA ===
+  const handleSearchResults = (results) => {
+    setAllProducts(results); // Actualiza el estado con los resultados de la búsqueda
+    if (results.length === 0) {
+      toast.current?.show({
+        severity: "info",
+        summary: "Sin resultados",
+        detail: "No se encontraron productos que coincidan con la búsqueda.",
+        life: 3000,
+      });
+    }
+  };
 
   // === CATEGORÍAS ===
   const fetchAllCategories = useCallback(async () => {
@@ -64,13 +148,85 @@ const ParentComponentProduct = () => {
       const categories = await categoryService.getAllCategories();
       setAllCategories(categories || []);
     } catch (error) {
-      toast.current.show({
+      toast.current?.show({
         severity: "error",
         summary: "Error",
         detail: "Error al obtener las categorías.",
+        life: 3000,
       });
     }
   }, [categoryService]);
+
+  useEffect(() => {
+    fetchAllCategories();
+  }, [fetchAllCategories]);
+
+  const handleCancelForm = () => {
+    setIsFormVisible(false);
+    toast.current?.show({
+      severity: "info",
+      summary: "Formulario Cerrado",
+      detail: "El formulario se cerró sin guardar cambios.",
+      life: 3000,
+    });
+  };
+
+  const handleAddCategory = () => {
+    setSelectedCategoryId(null);
+    setSelectedCategoryData(null);
+    setIsFormVisible(true);
+    toast.current.show({
+      severity: "info",
+      summary: "Formulario de Categorías",
+      detail: "Formulario de agregar categoría abierto.",
+    });
+  };
+
+  const handleEditCategory = (category) => {
+    setSelectedCategoryId(category.id_categoria);
+    setSelectedCategoryData({
+      name: category.nombre,
+      description: category.descripcion,
+      status: category.estado,
+    });
+    setIsFormVisible(true);
+    toast.current?.show({
+      severity: "info",
+      summary: "Editar Categoría",
+      detail: `Editando la categoría "${category.nombre}".`,
+    });
+  };
+
+  const handleCategorySaved = () => {
+    fetchAllCategories();
+    setIsFormVisible(false);
+    toast.current.show({
+      severity: "success",
+      summary: "Categoría Guardada",
+      detail: "La categoría fue guardada correctamente.",
+    });
+  };
+
+  // Función para eliminar una categoría
+  const handleDeleteCategory = async (categoryId) => {
+    try {
+      await categoryService.deleteCategory(categoryId);
+      toast.current.show({
+        severity: "success",
+        summary: "Categoría Eliminada",
+        detail: "La categoría fue eliminada correctamente.",
+      });
+
+      fetchAllCategories(); // Refresca la lista de categorías
+    } catch (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Error al eliminar la categoría.",
+      });
+      console.error("Error deleting category:", error);
+    }
+  };
 
   // === RELACIÓN PRODUCTO-PROVEEDOR ===
   // Obtener todos los proveedores al montar el componente
@@ -93,32 +249,25 @@ const ParentComponentProduct = () => {
   }, [providerService]);
 
   // Obtener relaciones producto-proveedor para un proveedor específico
-  const fetchProductProviders = async (supplierId) => {
-    console.log("ID del proveedor seleccionado:", supplierId); // Debug: Verificar el ID del proveedor
-  
+  const fetchProductProviders = useCallback(async (supplierId) => {
+    console.log("Fetching product providers for supplier:", supplierId);
     try {
       const relations = await productProviderService.getProductsBySupplierId(supplierId);
-      console.log("Relaciones devueltas por el backend:", relations); // Debug: Verificar relaciones obtenidas
-  
       const enrichedRelations = relations.map((relation) => ({
         ...relation,
         productName: allProducts.find((p) => p.id === relation.productId)?.name || "Producto Desconocido",
         providerName: providers.find((prov) => prov.id === relation.supplierId)?.name || "Proveedor Desconocido",
       }));
-  
-      console.log("Relaciones enriquecidas:", enrichedRelations); // Debug: Verificar relaciones después del enriquecimiento
-  
-      setProductProviders(enrichedRelations); // Actualizar el estado con los datos enriquecidos
+      setProductProviders(enrichedRelations);
     } catch (error) {
-      console.error("Error al obtener relaciones:", error); // Debug: Capturar cualquier error
+      console.error("Error al obtener relaciones:", error);
       toast.current?.show({
         severity: "error",
         summary: "Error",
         detail: "No se pudieron cargar las relaciones.",
       });
     }
-  };
-  
+  }, [productProviderService, allProducts, providers]);
 
 
   // Manejar la selección de un proveedor
@@ -147,91 +296,6 @@ const ParentComponentProduct = () => {
       summary: "Relación Guardada",
       detail: "La relación Producto-Proveedor fue guardada correctamente.",
     });
-  };
-
-  const handleAddProduct = () => {
-    setSelectedProductId(null);
-    setIsFormVisible(true);
-    toast.current.show({
-      severity: "info",
-      summary: "Formulario de Productos",
-      detail: "Formulario de agregar producto abierto.",
-    });
-  };
-
-  const handleEditProduct = (productId) => {
-    setSelectedProductId(productId);
-    setIsFormVisible(true);
-    toast.current.show({
-      severity: "info",
-      summary: "Editar Producto",
-      detail: "Editando el producto seleccionado.",
-    });
-  };
-
-  const handleAddCategory = () => {
-    setSelectedCategoryId(null);
-    setSelectedCategoryData(null);
-    setIsFormVisible(true);
-    toast.current.show({
-      severity: "info",
-      summary: "Formulario de Categorías",
-      detail: "Formulario de agregar categoría abierto.",
-    });
-  };
-
-  const handleEditCategory = (category) => {
-    setSelectedCategoryId(category.id_categoria);
-    setSelectedCategoryData({
-      name: category.nombre,
-      description: category.descripcion,
-      status: category.estado,
-    });
-    setIsFormVisible(true);
-    toast.current.show({
-      severity: "info",
-      summary: "Editar Categoría",
-      detail: `Editando la categoría "${category.nombre}".`,
-    });
-  };
-
-  const handleCancelForm = () => {
-    setIsFormVisible(false);
-    toast.current.show({
-      severity: "info",
-      summary: "Formulario Cerrado",
-      detail: "El formulario fue cerrado sin guardar cambios.",
-    });
-  };
-
-  const handleCategorySaved = () => {
-    fetchAllCategories();
-    setIsFormVisible(false);
-    toast.current.show({
-      severity: "success",
-      summary: "Categoría Guardada",
-      detail: "La categoría fue guardada correctamente.",
-    });
-  };
-
-  // Función para eliminar una categoría
-  const handleDeleteCategory = async (categoryId) => {
-    try {
-      await categoryService.deleteCategory(categoryId);
-      toast.current.show({
-        severity: "success",
-        summary: "Categoría Eliminada",
-        detail: "La categoría fue eliminada correctamente.",
-      });
-      fetchAllCategories(); // Refresca la lista de categorías
-    } catch (error) {
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Error al eliminar la categoría.",
-      });
-      console.error("Error deleting category:", error);
-    }
   };
 
   // Cambiar sección activa
@@ -288,7 +352,10 @@ const ParentComponentProduct = () => {
       {/* Productos*/}
       {activeSection === "products" && (
         <section className="products-section">
-          <ProductSearch products={allProducts} onSearchResults={setAllProducts} />
+          {/* Barra de búsqueda para productos */}
+          <ProductSearch onSearchResults={handleSearchResults} />
+
+          {/* Botón para agregar productos */}
           <div className="button-container">
             <Button
               label="Agregar Producto"
@@ -297,17 +364,27 @@ const ParentComponentProduct = () => {
               onClick={handleAddProduct}
             />
           </div>
+
+          {/* Formulario de producto */}
           {isFormVisible ? (
             <ProductForm
-              productId={selectedProductId}
-              onProductSaved={fetchAllProducts}
-              onCancel={handleCancelForm}
+              productId={selectedProductId} // ID del producto seleccionado (o null para agregar)
+              onProductSaved={handleProductSaved} // Actualizar lista de productos
+              onCancel={handleCancelForm} // Cerrar el formulario sin guardar
             />
           ) : (
-            <ProductList onEditProduct={handleEditProduct} products={allProducts} />
+            /* Lista de productos */
+            <ProductList
+              onEditProduct={handleEditProduct}
+              onDeleteProduct={handleDeleteProduct}
+              products={allProducts} // Pasar la lista de productos
+            />
+
           )}
         </section>
       )}
+
+
 
       {/* Categorias*/}
       {activeSection === "categories" && (
@@ -330,10 +407,11 @@ const ParentComponentProduct = () => {
             />
           ) : (
             <CategoryList
+              categories={allCategories}      // Lista de categorías desde el estado del padre
               onEditCategory={handleEditCategory}
-              onDeleteCategory={handleDeleteCategory} // Pasa la función al hijo
-              refreshTrigger={allCategories}
+              onDeleteCategory={handleDeleteCategory}
             />
+
           )}
         </section>
       )}

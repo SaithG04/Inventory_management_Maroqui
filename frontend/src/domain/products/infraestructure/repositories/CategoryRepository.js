@@ -4,7 +4,6 @@ import { CategoryDTO } from "../dto/CategoryDTO";
 class CategoryRepository {
   async getAll() {
     const response = await CategoriesHttp.get("/list");
-    console.log("Respuesta del backend al listar categorías:", response.data);
     return response.data.map((category) => new CategoryDTO(category).toDomain());
   }
   

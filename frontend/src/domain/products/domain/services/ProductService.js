@@ -9,6 +9,12 @@ class ProductService {
     return await this.productRepository.getAll();
   }
 
+  async isProductNameUnique(name) {
+    const products = await this.productRepository.findByName(name);
+    return Array.isArray(products) ? products : []; // Garantizamos que sea un array
+  }
+
+  
   async getProductById(id) {
     return await this.productRepository.getById(id);
   }

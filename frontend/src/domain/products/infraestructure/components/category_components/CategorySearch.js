@@ -41,7 +41,6 @@ const CategorySearch = ({ onSearchResults }) => {
             const categoryDTO = new CategoryDTO(categoryData);
             return categoryDTO.toDomain();
           } catch (err) {
-            console.error("Error converting category to domain:", err);
             return null;
           }
         })
@@ -60,7 +59,6 @@ const CategorySearch = ({ onSearchResults }) => {
         onSearchResults([]);
       }
     } catch (err) {
-      console.error("Error fetching categories:", err);
       toast.current.show({
         severity: "error",
         summary: "Search Error",

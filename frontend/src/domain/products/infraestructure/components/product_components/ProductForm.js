@@ -8,131 +8,175 @@ import ProductService from "../../../domain/services/ProductService";
 import CategoryService from "../../../domain/services/CategoryService";
 import { ProductDTO } from "../../dto/ProductDTO";
 import Product from '../../../domain/models/Product';
-
 import "./ProductForm.css";
 
 const ProductForm = ({ productId, onProductSaved, onCancel }) => {
   const [productData, setProductData] = useState({
-    name: "",
-    description: "",
-    unit_measurement: "",
+    nombre: "",
+    descripcion: "",
+    unidad_medida: "",
     stock: 0,
-    category_id: 0,
-    status: "OUT_OF_STOCK",
+    nombre_categoria: "",
+    estado: "OUT_OF_STOCK",
+    precio_venta: ""
   });
+
   const [categories, setCategories] = useState([]);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // Estado para bloquear el botón Guardar
+  const [isFetching, setIsFetching] = useState(false); // Estado para indicar carga de datos al editar
   const [showCancelModal, setShowCancelModal] = useState(false);
+
   const productService = useMemo(() => new ProductService(), []);
   const categoryService = useMemo(() => new CategoryService(), []);
   const toast = useRef(null);
 
-  // Obtener categorías disponibles
   const fetchCategories = useCallback(async () => {
     try {
       const response = await categoryService.getAllCategories();
       const categoryOptions = response.map((category) => ({
         label: category.nombre,
-        value: category.id,
+        value: category.nombre // Mantener el nombre de la categoría en español
       }));
       setCategories(categoryOptions);
     } catch (err) {
-      toast.current.show({
+      toast.current?.show({
         severity: "error",
         summary: "Error",
-        detail: "Failed to load categories.",
+        detail: "No se pudieron cargar las categorías.",
       });
     }
   }, [categoryService]);
 
-  // Obtener el producto en modo edición
   const fetchProduct = useCallback(async () => {
     if (!productId) return;
-    setLoading(true);
+    setIsFetching(true); // Activar estado de carga
     try {
       const response = await productService.getProductById(productId);
-      setProductData(response.data);
-      toast.current.show({
-        severity: "info",
-        summary: "Product Loaded",
-        detail: "Product details loaded successfully.",
+      console.log("Producto obtenido para editar:", response); // <-- Verifica el valor aquí
+      setProductData({
+        nombre: response.nombre || "", // Asegúrate de que aquí llega un valor válido
+        descripcion: response.descripcion || "",
+        unidad_medida: response.unidad_medida || "",
+        stock: response.stock ?? 0,
+        nombre_categoria: response.nombre_categoria || "",
+        estado: response.estado || "OUT_OF_STOCK",
+        precio_venta: response.precio_venta != null ? response.precio_venta.toString() : ""
       });
-    } catch (err) {
-      toast.current.show({
+    } catch (error) {
+      toast.current?.show({
         severity: "error",
         summary: "Error",
-        detail: "Failed to fetch product details.",
+        detail: "No se pudieron obtener los detalles del producto.",
+        life: 3000,
       });
     } finally {
-      setLoading(false);
+      setIsFetching(false); // Desactivar estado de carga
     }
   }, [productId, productService]);
 
+
   useEffect(() => {
-    fetchCategories();
-  
-    if (productId) {
-      setIsEditMode(true);
-      fetchProduct();
-    } else {
-      setIsEditMode(false);
-      setProductData({
-        name: "",
-        description: "",
-        unit_measurement: "",
-        stock: 0,
-        category_id: 0,
-        status: "OUT_OF_STOCK",
-      });
-    }
-  }, [productId, fetchProduct, fetchCategories]);
-  
-
-  // Manejo del formulario
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      // Crear el DTO con los datos del formulario
-      const productDTO = new ProductDTO(productData);
-
-      // Convertir al modelo de dominio y validar
-      const product = new Product(productDTO.toDomain());
-      product.validate(); // Lanza errores si los datos no son válidos
-
-      // Ajustar el estado predeterminado
-      product.setDefaultStatus();
-
-      // Guardar el producto
-      if (isEditMode) {
-        await productService.updateProduct(productId, productDTO.toDomain());
-        toast.current.show({
-          severity: 'success',
-          summary: 'Product Updated',
-          detail: 'Product updated successfully.',
-        });
+    (async () => {
+      await fetchCategories();
+      if (productId) {
+        setIsEditMode(true);
+        await fetchProduct();
       } else {
-        await productService.createProduct(productDTO.toDomain());
-        toast.current.show({
-          severity: 'success',
-          summary: 'Product Created',
-          detail: 'Product created successfully.',
+        setIsEditMode(false);
+        setProductData({
+          nombre: "",
+          descripcion: "",
+          unidad_medida: "",
+          stock: 0,
+          nombre_categoria: "",
+          estado: "OUT_OF_STOCK",
+          precio_venta: ""
         });
       }
+    })();
+  }, [productId, fetchProduct, fetchCategories]);
 
-      onProductSaved();
-    } catch (err) {
-      toast.current.show({
-        severity: 'error',
-        summary: 'Validation Error',
-        detail: err.message,
-      });
+  const validateUniqueName = async () => {
+    const productsWithSameName = await productService.isProductNameUnique(productData.nombre);
+
+    if (isEditMode) {
+      // Si estás editando, asegúrate de que el nombre no pertenezca a otro producto
+      const isNameUsedByAnotherProduct = productsWithSameName.some(
+        (product) => product.id_producto !== productId
+      );
+
+      if (isNameUsedByAnotherProduct) {
+        throw new Error("Ya existe otro producto con este nombre.");
+      }
+    } else {
+      // Si estás creando, asegúrate de que no exista ningún producto con el mismo nombre
+      if (productsWithSameName.length > 0) {
+        throw new Error("Ya existe un producto con este nombre.");
+      }
     }
   };
 
+
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true); // Activar estado de carga
+    try {
+      // Validar que el nombre del producto sea único
+      await validateUniqueName();
+
+      // Asegurar que la descripción tenga un valor predeterminado
+      const updatedProductData = {
+        ...productData,
+        descripcion: productData.descripcion.trim() || "Sin descripción", // Si está vacío, asigna "Sin descripción"
+      };
+
+      const productDTO = new ProductDTO(updatedProductData);
+      const product = new Product(productDTO.toDomain());
+      product.validate(); // Validar datos
+
+      if (isEditMode) {
+        await productService.updateProduct(productId, productDTO.toDomain());
+        toast.current?.show({
+          severity: "success",
+          summary: "Producto Actualizado",
+          detail: "El producto fue actualizado correctamente.",
+        });
+      } else {
+        await productService.createProduct(productDTO.toDomain());
+        toast.current?.show({
+          severity: "success",
+          summary: "Producto Creado",
+          detail: "El producto fue creado correctamente.",
+        });
+      }
+
+      onProductSaved(); // Notificar al padre que se guardó
+    } catch (err) {
+      toast.current?.show({
+        severity: "error",
+        summary: "Error de Validación",
+        detail: err.message,
+      });
+    } finally {
+      setIsLoading(false); // Desactivar estado de carga
+    }
+  };
+
+
+
+
   const handleCancel = () => {
-    if (productData.name || productData.category_id || productData.unit_measurement || productData.description || productData.stock !== 0) {
+    if (
+      productData.nombre ||
+      productData.nombre_categoria ||
+      productData.unidad_medida ||
+      productData.descripcion ||
+      productData.stock !== 0 ||
+      productData.precio_venta
+    ) {
       setShowCancelModal(true);
     } else {
       onCancel();
@@ -142,47 +186,61 @@ const ProductForm = ({ productId, onProductSaved, onCancel }) => {
   return (
     <div className="add-product-form">
       <Toast ref={toast} />
-      <h1>{isEditMode ? "Edit Product" : "Add Product"}</h1>
+      <h1>{isEditMode ? "Editar Producto" : "Agregar Producto"}</h1>
       <form onSubmit={handleSubmit}>
         <div className="form-columns">
           <div className="form-column">
             <div className="form-row">
               <InputText
-                id="name"
-                placeholder="Enter product name"
-                value={productData.name}
+                id="nombre"
+                placeholder="Nombre del Producto *"
+                value={productData.nombre}
                 onChange={(e) => {
                   const value = e.target.value;
-
-                  // Validar letras, números, espacios, guiones y diagonales
-                  if (new RegExp('^[a-zA-Z0-9\\s\\-/]*$').test(value)) {
-                    setProductData({ ...productData, name: value });
+                  if (/^[a-zA-Z0-9\s\-/]*$/.test(value)) {
+                    setProductData({ ...productData, nombre: value });
                   }
                 }}
+                disabled={isFetching || isLoading} // Bloquear mientras se cargan los datos
               />
             </div>
-
+  
             <div className="form-row">
               <InputText
-                placeholder="Description (optional)"
-                value={productData.description}
+                placeholder="Descripción (opcional)"
+                value={productData.descripcion}
                 onChange={(e) =>
-                  setProductData({ ...productData, description: e.target.value })
+                  setProductData({ ...productData, descripcion: e.target.value })
                 }
+                disabled={isFetching || isLoading} // Bloquear mientras se cargan los datos
               />
             </div>
             <div className="form-row">
               <Dropdown
-                value={productData.unit_measurement}
+                value={productData.unidad_medida}
                 options={[
-                  { label: "Unit (UN)", value: "UN" },
-                  { label: "Box (CJ)", value: "CJ" },
-                  { label: "Meter (MT)", value: "MT" },
+                  { label: "Unidad (UN)", value: "UN" },
+                  { label: "Caja (CJ)", value: "CJ" },
+                  { label: "Metro (MT)", value: "MT" },
                 ]}
                 onChange={(e) =>
-                  setProductData({ ...productData, unit_measurement: e.value })
+                  setProductData({ ...productData, unidad_medida: e.value })
                 }
-                placeholder="Select Unit *"
+                placeholder="Seleccione la Unidad de Medida *"
+                disabled={isFetching || isLoading} // Bloquear mientras se cargan los datos
+              />
+            </div>
+            <div className="form-row">
+              <InputText
+                placeholder="Precio de Venta (opcional)"
+                value={productData.precio_venta}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (/^\d*\.?\d*$/.test(value)) {
+                    setProductData({ ...productData, precio_venta: value });
+                  }
+                }}
+                disabled={isFetching || isLoading} // Bloquear mientras se cargan los datos
               />
             </div>
           </div>
@@ -190,77 +248,82 @@ const ProductForm = ({ productId, onProductSaved, onCancel }) => {
             <div className="form-row">
               <InputText
                 id="stock"
-                placeholder="Enter stock quantity (e.g., 100)"
-                value={productData.stock} // Permitir 0
+                placeholder="Cantidad en Stock (ej.: 100)"
+                value={productData.stock}
                 onChange={(e) => {
                   const value = e.target.value;
-
-                  // Validar solo números (positivos o 0)
                   if (/^\d*$/.test(value)) {
-                    const stockValue = value === "" ? 0 : parseInt(value, 10); // Manejar vacío como 0
+                    const stockValue = value === "" ? 0 : parseInt(value, 10);
                     setProductData({
                       ...productData,
                       stock: stockValue,
-                      status: stockValue > 0 ? "ACTIVE" : "OUT_OF_STOCK", // Actualizar el estado automáticamente
+                      estado: stockValue > 0 ? "ACTIVE" : "OUT_OF_STOCK",
                     });
                   }
                 }}
+                disabled={isFetching || isLoading} // Bloquear mientras se cargan los datos
               />
             </div>
             <div className="form-row">
               <Dropdown
-                value={productData.category_id}
+                value={productData.nombre_categoria}
                 options={categories}
                 onChange={(e) =>
-                  setProductData({ ...productData, category_id: e.value })
+                  setProductData({ ...productData, nombre_categoria: e.value })
                 }
-                placeholder="Select Category *"
+                placeholder="Seleccione la Categoría *"
+                disabled={isFetching || isLoading} // Bloquear mientras se cargan los datos
               />
             </div>
             <div className="form-row">
               <Dropdown
-                value={productData.status}
+                value={productData.estado}
                 options={[
-                  { label: "Active", value: "ACTIVE" },
-                  { label: "Discontinued", value: "DISCONTINUED" },
-                  { label: "Out of Stock", value: "OUT_OF_STOCK" },
+                  { label: "Activo", value: "ACTIVE" },
+                  { label: "Descontinuado", value: "DISCONTINUED" },
+                  { label: "Sin Stock", value: "OUT_OF_STOCK" },
                 ]}
                 onChange={(e) =>
-                  setProductData({ ...productData, status: e.value })
+                  setProductData({ ...productData, estado: e.value })
                 }
-                placeholder="Select Status"
+                placeholder="Seleccione el Estado"
+                disabled={isFetching || isLoading} // Bloquear mientras se cargan los datos
               />
             </div>
           </div>
         </div>
-
+  
         <div className="form-buttons">
+          {/* Botón Guardar */}
           <Button
-            label={loading ? "Saving..." : "Save"}
+            label={isLoading ? "Guardando..." : isFetching ? "Cargando..." : "Guardar"}
             icon="pi pi-check"
             type="submit"
             className="p-button-success"
-            disabled={loading}
+            disabled={isLoading || isFetching} // Bloquear mientras se carga o guarda
           />
+          {/* Botón Cancelar */}
           <Button
-            label="Cancel"
+            label="Cancelar"
             icon="pi pi-times"
             className="p-button-secondary"
-            onClick={handleCancel} // Ejecuta la lógica de cancelación
-            type="button" // Cambiado de submit a button
+            onClick={handleCancel}
+            type="button"
+            disabled={isLoading || isFetching} // Bloquear mientras se carga o guarda
           />
         </div>
       </form>
-      {/* Modal de confirmación */}
+  
       <Modal
         show={showCancelModal}
         onClose={() => setShowCancelModal(false)}
         onConfirm={onCancel}
-        title="Confirm Cancellation"
-        message="You have unsaved changes. Are you sure you want to cancel?"
+        title="Confirmar Cancelación"
+        message="Tienes cambios sin guardar. ¿Estás seguro de que deseas cancelar?"
       />
     </div>
   );
+  
 };
 
 export default ProductForm;

@@ -85,7 +85,6 @@ const LoginForm = ({ onLogin }) => {
                 throw new Error(response.message || 'Credenciales inválidas.');
             }
         } catch (error) {
-            console.log('Detalles del error:', error);
             const errorMessage = error.message || 'Ocurrió un error inesperado.';
             dispatch({ type: 'SET_ERROR', message: errorMessage });
         } finally {

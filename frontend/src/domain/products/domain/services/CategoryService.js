@@ -7,7 +7,6 @@ class CategoryService {
 
   async getAllCategories() {
     const categories = await this.categoryRepository.getAll();
-    console.log("Categorías devueltas por el repositorio:", categories);
     return categories;
   }
   
