@@ -72,20 +72,26 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // No hacer nada si estamos en el proceso de cancelación
-        if (isCanceling || showCancelModal) {
-            return; // Salir de la función si estamos cancelando
-        }
-        if (!providerData.conditions || providerData.conditions.trim() === '') {
-            providerData.conditions = 'Sin condiciones';
-        }
+        if (loading || isCanceling || showCancelModal) return; // Evitar múltiples envíos
 
-        // Continuar con el envío si no estamos cancelando
-        if (!providerData.name || !providerData.contact || !providerData.phone || !providerData.email) {
+        setLoading(true); // Bloquear el botón inmediatamente
+
+        const fieldMessages = {
+            name: "Nombre",
+            contact: "Contacto",
+            email: "Correo",
+        };
+
+        const missingFields = Object.keys(fieldMessages).filter(
+            (field) => !providerData[field] || providerData[field].trim() === ""
+        );
+
+        if (missingFields.length > 0) {
+            const missingFieldNames = missingFields.map((field) => fieldMessages[field]).join(", ");
             toast.current.show({
                 severity: "warn",
                 summary: "Validation Error",
-                detail: "Please fill in all required fields (Name, Contact, Phone, Email).",
+                detail: `Por favor, rellene los siguientes campos: ${missingFieldNames}.`,
                 life: 3000,
             });
             setLoading(false);
@@ -98,29 +104,43 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
             toast.current.show({
                 severity: "warn",
                 summary: "Validation Error",
-                detail: "Please enter a valid email address.",
+                detail: "Por favor, introduce una dirección de correo electrónico válida.",
                 life: 3000,
             });
             setLoading(false);
             return;
         }
 
-        // Limpiar el número de teléfono eliminando caracteres no numéricos
-        const cleanedPhone = providerData.phone.replace(/\D/g, "");
-        if (!/^\d{9}$/.test(cleanedPhone)) {
+        // Validación de número de teléfono
+        const cleanedPhone = providerData.phone.replace(/\s+/g, ""); // Eliminar espacios
+
+        // Móviles: 9 dígitos que comienzan con 9
+        const isMobile = /^9\d{8}$/.test(cleanedPhone);
+
+        // Fijos: Comienzan con + seguido de dos dígitos y de 6 a 7 dígitos
+        const isLandline = /^\+\d{2}\d{6,7}$/.test(cleanedPhone);
+
+        if (!isMobile && !isLandline) {
             toast.current.show({
                 severity: "warn",
                 summary: "Validation Error",
-                detail: "Phone number must be exactly 9 digits.",
+                detail: "El número debe ser un móvil (9 dígitos, ejemplo: 912345678) o fijo (+XX seguido del número, ejemplo: +011234567).",
                 life: 3000,
             });
             setLoading(false);
             return;
         }
 
-        setProviderData({ ...providerData, phone: cleanedPhone });
 
-        const providerDTO = new ProviderDTO(providerData);
+
+        // Limpieza y ajustes de datos
+        const updatedProviderData = {
+            ...providerData,
+            phone: cleanedPhone,
+            conditions: providerData.conditions.trim() || "Sin condiciones", // Asegurar "Sin condiciones"
+        };
+
+        const providerDTO = new ProviderDTO(updatedProviderData);
 
         try {
             let savedProvider;
@@ -137,8 +157,7 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
                 }
             }
 
-            // Pasar el proveedor guardado al padre para manejar las notificaciones
-            onProviderSaved(savedProvider.data); // Aquí solo pasas el objeto del proveedor guardado (sin el toast)
+            onProviderSaved(savedProvider.data); // Notifica al componente padre
         } catch (err) {
             toast.current.show({
                 severity: "error",
@@ -147,9 +166,10 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
                 life: 3000,
             });
         } finally {
-            setLoading(false);
+            setLoading(false); // Permitir nuevamente clics después de completar la operación
         }
     };
+
 
 
     const handleCancel = () => {
@@ -183,13 +203,13 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
 
     return (
         <div className="add-provider-form">
-            <h1>{isEditMode ? "Edit Provider" : "Add Provider"}</h1>
+            <h1>{isEditMode ? "Editar Proveedor" : "Agregar Proveedor"}</h1>
             <form onSubmit={handleSubmit}>
                 <div className="form-columns">
                     <div className="form-column">
                         <div className="form-row">
                             <InputText
-                                placeholder="Provider Name *"
+                                placeholder="Nombre Proveedor *"
                                 value={providerData.name}
                                 onChange={(e) => {
                                     const value = e.target.value;
@@ -203,7 +223,7 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
 
                         <div className="form-row">
                             <InputText
-                                placeholder="Contact Person *"
+                                placeholder="Contacto *"
                                 value={providerData.contact}
                                 onChange={(e) => {
                                     const value = e.target.value;
@@ -217,7 +237,7 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
 
                         <div className="form-row">
                             <InputText
-                                placeholder="Phone *"
+                                placeholder="Teléfono *"
                                 value={providerData.phone}
                                 onChange={(e) => {
                                     const value = e.target.value;
@@ -232,7 +252,7 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
                         <div className="form-row">
                             <InputText
                                 type="email"
-                                placeholder="Email *"
+                                placeholder="Correo *"
                                 value={providerData.email}
                                 onChange={(e) => {
                                     const value = e.target.value;
@@ -252,7 +272,7 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
                     <div className="form-column">
                         <div className="form-row">
                             <InputText
-                                placeholder="Address"
+                                placeholder="Dirección"
                                 value={providerData.address}
                                 onChange={(e) =>
                                     setProviderData({ ...providerData, address: e.target.value })
@@ -261,7 +281,7 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
                         </div>
                         <div className="form-row">
                             <InputText
-                                placeholder="Conditions (optional)"
+                                placeholder="Condición (opcional)"
                                 value={providerData.conditions}  // Mostrar directamente lo que contiene 'conditions'
                                 onChange={(e) =>
                                     setProviderData({
@@ -287,13 +307,14 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
                     </div>
                 </div>
                 {/* Botón de Guardar */}
-                <div className="form-buttons"> {/* Cambié provider-form-buttons por form-buttons */}
+                <div className="form-buttons">
                     <Button
                         type="submit"
                         label={isEditMode ? "Update Provider" : "Save Provider"}
                         icon="pi pi-save"
                         className="p-button-success"
-                        loading={loading}
+                        loading={loading} // Indicador de carga visual
+                        disabled={loading} // Deshabilitar el botón cuando está cargando
                         onClick={handleSubmit}
                     />
                     <Button
@@ -301,6 +322,7 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
                         icon="pi pi-times"
                         className="p-button-secondary"
                         onClick={handleCancel}
+                        disabled={loading} // También deshabilitar el botón cancelar si está cargando
                     />
                 </div>
 

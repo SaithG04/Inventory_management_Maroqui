@@ -8,14 +8,20 @@ const ProviderList = ({ providers, onEditProvider, onDeleteProvider }) => {
   return (
     <div className="provider-list">
       {/* Tabla de proveedores */}
-      <DataTable value={providers} paginator rows={10} responsiveLayout="scroll">
-        <Column field="name" header="Name" sortable />
-        <Column field="contact" header="Contact" sortable />
-        <Column field="phone" header="Phone" sortable />
-        <Column field="email" header="Email" sortable />
-        <Column field="address" header="Address" />
-        <Column field="conditions" header="Conditions" sortable />
-        <Column field="state" header="Status" />
+      <DataTable
+        value={providers}
+        paginator
+        rows={10}
+        responsiveLayout="scroll"
+        emptyMessage="No hay proveedores disponibles." // Mensaje en español
+      >
+        <Column field="name" header="Nombre" sortable /> {/* Traducción del encabezado */}
+        <Column field="contact" header="Contacto" sortable />
+        <Column field="phone" header="Teléfono" sortable />
+        <Column field="email" header="Correo Electrónico" sortable />
+        <Column field="address" header="Dirección" />
+        <Column field="conditions" header="Condiciones" sortable />
+        <Column field="state" header="Estado" />
         <Column
           body={(rowData) => (
             <div className="providers-button-container">
@@ -33,7 +39,7 @@ const ProviderList = ({ providers, onEditProvider, onDeleteProvider }) => {
               />
             </div>
           )}
-          header="Actions"
+          header="Acciones" // Traducción del encabezado
         />
       </DataTable>
     </div>
