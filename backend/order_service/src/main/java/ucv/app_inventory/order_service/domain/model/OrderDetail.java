@@ -27,6 +27,16 @@ public class OrderDetail {
     private Long productSupplierId;
 
     @Column(name = "quantity", nullable = false)
-    private Integer quantity;
+    private Long quantity;
+
+    @Override
+    public String toString() {
+        return "OrderDetail{" +
+                "id=" + id +
+                ", productSupplierId=" + productSupplierId +
+                ", quantity=" + quantity +
+                '}';
+    }
+
 
 }

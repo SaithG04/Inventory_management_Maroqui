@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;  // Cambiar a LocalDateTime
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ public class Order {
 
     // Stores the date of the order; only the date part (without time).
     @Column(name = "date", nullable = false)
-    private LocalDate orderDate;  // Cambiado a LocalDate para solo fecha
+    private LocalDate orderDate;
 
     // Stores the status of the order using an enumerated type for predefined states.
     @Enumerated(EnumType.STRING)
@@ -51,7 +52,7 @@ public class Order {
 
     // The date and time when the order was created, automatically set on creation.
     @Column(name = "creation_date", nullable = false)
-    private LocalDateTime creationDate;  // Cambiado a LocalDateTime para incluir hora
+    private LocalDateTime creationDate;
 
     /**
      * Sets the date and creationDate fields to the current date and time when the order is created.
@@ -60,5 +61,25 @@ public class Order {
     @PrePersist
     protected void onCreate() {
         this.creationDate = LocalDateTime.now();  // Fecha y hora
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", supplierId=" + supplierId +
+                ", orderDate=" + orderDate +
+                ", status=" + status +
+                ", orderDetailsIDs=" + getOrderDetailIds(orderDetails) +
+                ", total=" + total +
+                ", observations='" + observations + '\'' +
+                ", creationDate=" + creationDate +
+                '}';
+    }
+
+    private String getOrderDetailIds(List<OrderDetail> orderDetails) {
+        List<Long> orderDetailIds = new ArrayList<>();
+        orderDetails.forEach(orderDetail -> orderDetailIds.add(orderDetail.getId()));
+        return orderDetailIds.toString();
     }
 }

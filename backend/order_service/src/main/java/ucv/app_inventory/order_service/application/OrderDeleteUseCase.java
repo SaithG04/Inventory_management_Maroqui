@@ -24,7 +24,6 @@ public class OrderDeleteUseCase {
      * Throws an exception if the order is not found.
      *
      * @param order the order to be deleted.
-     * @throws OrderNotFoundException if the order with the specified ID is not found.
      */
     @Transactional
     public void deleteOrder(Order order) {

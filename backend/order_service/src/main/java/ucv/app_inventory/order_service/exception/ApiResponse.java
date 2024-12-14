@@ -6,7 +6,7 @@ import lombok.Data;
 public class ApiResponse<T> {
     private int statusCode;
     private String message;
-    private T data;  // Can be used for any data if necessary, for now it's `Void`
+    private T data;
 
     public ApiResponse(int statusCode, String message) {
         this.statusCode = statusCode;

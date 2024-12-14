@@ -12,6 +12,6 @@ public class CacheConfig {
 
     @Bean
     public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("ordersByDate", "ordersBySupplier", "ordersByStatus", "ordersBySupplierAndStatus", "ordersByCreationDate");
+        return new ConcurrentMapCacheManager("orders", "ordersByDate", "ordersBySupplier", "ordersByStatus", "ordersBySupplierAndStatus", "ordersByCreationDate");
     }
 }

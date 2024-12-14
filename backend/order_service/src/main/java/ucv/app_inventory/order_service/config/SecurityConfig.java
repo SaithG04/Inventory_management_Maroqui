@@ -26,8 +26,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
     @Autowired
-    private Filter jwtAuthenticationFilter;
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
 
     /**
      * Configures security settings for HTTP requests.
@@ -49,7 +53,7 @@ public class SecurityConfig {
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
 
                                 // Requires authentication for all other endpoints.
-                                .anyRequest().permitAll()
+                                .anyRequest().authenticated()
                 )
 
                 // Adds the JWT authentication filter before the default UsernamePasswordAuthenticationFilter.

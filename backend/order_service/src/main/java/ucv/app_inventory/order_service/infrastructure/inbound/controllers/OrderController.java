@@ -18,8 +18,8 @@ import ucv.app_inventory.order_service.application.OrderCreateUseCase;
 import ucv.app_inventory.order_service.application.OrderUpdateUseCase;
 import ucv.app_inventory.order_service.application.OrderDeleteUseCase;
 import ucv.app_inventory.order_service.application.dto.OrderDTO;
+import ucv.app_inventory.order_service.application.dto.mappers.OrderMapper;
 import ucv.app_inventory.order_service.domain.model.Order;
-import ucv.app_inventory.order_service.domain.model.OrderState;
 import ucv.app_inventory.order_service.exception.ApiResponse;
 import ucv.app_inventory.order_service.exception.InvalidArgumentException;
 import ucv.app_inventory.order_service.exception.InvalidStateException;
@@ -38,31 +38,33 @@ public class OrderController {
     private final OrderCreateUseCase orderCreateUseCase;
     private final OrderUpdateUseCase orderUpdateUseCase;
     private final OrderDeleteUseCase orderDeleteUseCase;
+    private final OrderMapper orderMapper;
 
     @Autowired
     public OrderController(OrderFindUseCase orderFindUseCase, OrderCreateUseCase orderCreateUseCase,
-                           OrderUpdateUseCase orderUpdateUseCase, OrderDeleteUseCase orderDeleteUseCase) {
+                           OrderUpdateUseCase orderUpdateUseCase, OrderDeleteUseCase orderDeleteUseCase, OrderMapper orderMapper) {
         this.orderFindUseCase = orderFindUseCase;
         this.orderCreateUseCase = orderCreateUseCase;
         this.orderUpdateUseCase = orderUpdateUseCase;
         this.orderDeleteUseCase = orderDeleteUseCase;
+        this.orderMapper = orderMapper;
     }
 
     @GetMapping("/listAll")
     @Operation(summary = "Get all orders", description = "Retrieve a paginated list of all orders")
-    public ResponseEntity<ApiResponse<Page<Order>>> findAll(final Pageable pageable) {
+    public ResponseEntity<ApiResponse<Page<OrderDTO>>> findAll(final Pageable pageable) {
         try {
             // Attempt to retrieve the paginated list of orders
-            Page<Order> orders = orderFindUseCase.listOrdersPaginated(pageable);
+            Page<OrderDTO> orders = orderFindUseCase.listOrdersPaginated(pageable);
 
             // If orders are found, return them with a 200 OK status
-            ApiResponse<Page<Order>> response = new ApiResponse<>(HttpStatus.OK.value(), "Orders retrieved successfully.");
+            ApiResponse<Page<OrderDTO>> response = new ApiResponse<>(HttpStatus.OK.value(), "Orders retrieved successfully.");
             response.setData(orders);
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
             // If any unexpected error occurs, return a 500 Internal Server Error response with a general error message
-            ApiResponse<Page<Order>> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+            ApiResponse<Page<OrderDTO>> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -70,7 +72,7 @@ public class OrderController {
 
     @GetMapping("/findByDate")
     @Operation(summary = "Find orders by date range", description = "Retrieve orders within a specified date range")
-    public ResponseEntity<ApiResponse<Page<Order>>> findOrdersByDate(
+    public ResponseEntity<ApiResponse<Page<OrderDTO>>> findOrdersByDate(
             @Parameter(description = "Start date of the range", required = true)
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
 
@@ -81,23 +83,23 @@ public class OrderController {
 
         try {
             // Attempt to retrieve the paginated list of orders within the specified date range
-            Page<Order> orders = orderFindUseCase.findOrdersByDate(startDate, endDate, pageable);
+            Page<OrderDTO> orders = orderFindUseCase.findOrdersByDate(startDate, endDate, pageable);
 
             // If orders are found, return them with a 200 OK status
             if (orders.isEmpty()) {
                 // If no orders were found, return a 404 Not Found status with a message
-                ApiResponse<Page<Order>> response = new ApiResponse<>(HttpStatus.NOT_FOUND.value(), "No orders found within the specified date range.");
+                ApiResponse<Page<OrderDTO>> response = new ApiResponse<>(HttpStatus.NOT_FOUND.value(), "No orders found within the specified date range.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
             // Otherwise, return the found orders with a 200 OK status
-            ApiResponse<Page<Order>> response = new ApiResponse<>(HttpStatus.OK.value(), "Orders retrieved successfully.");
+            ApiResponse<Page<OrderDTO>> response = new ApiResponse<>(HttpStatus.OK.value(), "Orders retrieved successfully.");
             response.setData(orders);
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
             // If any unexpected error occurs, return a 500 Internal Server Error response with a general error message
-            ApiResponse<Page<Order>> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+            ApiResponse<Page<OrderDTO>> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -105,102 +107,95 @@ public class OrderController {
 
     @GetMapping("/findByStatus")
     @Operation(summary = "Find orders by status", description = "Retrieve orders filtered by status")
-    public ResponseEntity<ApiResponse<Page<Order>>> findOrdersByStatus(
+    public ResponseEntity<ApiResponse<Page<OrderDTO>>> findOrdersByStatus(
             @Parameter(description = "Order status", required = true)
-            @RequestParam OrderState status, Pageable pageable) {
+            @RequestParam String status, Pageable pageable) {
 
         try {
             // Attempt to retrieve the paginated list of orders with the given status
-            Page<Order> orders = orderFindUseCase.findOrdersByStatus(status, pageable);
+            Page<OrderDTO> orders = orderFindUseCase.findOrdersByStatus(status, pageable);
 
             // If no orders are found, return a 404 Not Found response
             if (orders.isEmpty()) {
-                ApiResponse<Page<Order>> response = new ApiResponse<>(HttpStatus.NOT_FOUND.value(), "No orders found with the specified status.");
+                ApiResponse<Page<OrderDTO>> response = new ApiResponse<>(HttpStatus.NOT_FOUND.value(), "No orders found with the specified status.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
             // If orders are found, return them with a 200 OK status
-            ApiResponse<Page<Order>> response = new ApiResponse<>(HttpStatus.OK.value(), "Orders retrieved successfully.");
+            ApiResponse<Page<OrderDTO>> response = new ApiResponse<>(HttpStatus.OK.value(), "Orders retrieved successfully.");
             response.setData(orders);
             return ResponseEntity.ok(response);
 
+        } catch (InvalidArgumentException e){
+            ApiResponse<Page<OrderDTO>> response = new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         } catch (Exception e) {
             // If any unexpected error occurs, return a 500 Internal Server Error response
-            ApiResponse<Page<Order>> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+            ApiResponse<Page<OrderDTO>> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
 
     @GetMapping("/findBySupplier")
-    @Operation(summary = "Find orders by supplier ID", description = "Retrieve orders filtered by supplier ID")
-    public ResponseEntity<ApiResponse<Page<Order>>> findOrdersBySupplier(
-            @Parameter(description = "Supplier ID", required = true)
-            @RequestParam Long supplierId, Pageable pageable) {
+    @Operation(summary = "Find orders by supplier name", description = "Retrieve orders filtered by supplier name")
+    public ResponseEntity<ApiResponse<Page<OrderDTO>>> findOrdersBySupplier(
+            @Parameter(description = "Supplier name", required = true)
+            @RequestParam String supplier_name, Pageable pageable) {
 
         try {
-            // Validate that the supplier ID is valid
-            if (supplierId <= 0) {
-                ApiResponse<Page<Order>> response = new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "Invalid supplier ID.");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
 
             // Attempt to retrieve the paginated list of orders for the given supplier ID
-            Page<Order> orders = orderFindUseCase.findOrdersBySupplier(supplierId, pageable);
+            Page<OrderDTO> orders = orderFindUseCase.findOrdersBySupplier(supplier_name, pageable);
 
             // If no orders are found, return a 404 Not Found response
             if (orders.isEmpty()) {
-                ApiResponse<Page<Order>> response = new ApiResponse<>(HttpStatus.NOT_FOUND.value(), "No orders found for the specified supplier.");
+                ApiResponse<Page<OrderDTO>> response = new ApiResponse<>(HttpStatus.NOT_FOUND.value(), "No orders found for the specified supplier.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
             // If orders are found, return them with a 200 OK status
-            ApiResponse<Page<Order>> response = new ApiResponse<>(HttpStatus.OK.value(), "Orders retrieved successfully.");
+            ApiResponse<Page<OrderDTO>> response = new ApiResponse<>(HttpStatus.OK.value(), "Orders retrieved successfully.");
             response.setData(orders);
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
             // If any unexpected error occurs, return a 500 Internal Server Error response
-            ApiResponse<Page<Order>> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+            ApiResponse<Page<OrderDTO>> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
     @GetMapping("/findBySupplierAndStatus")
-    @Operation(summary = "Find orders by supplier and status", description = "Retrieve orders filtered by supplier ID and status")
-    public ResponseEntity<ApiResponse<Page<Order>>> findOrdersBySupplierAndStatus(
-            @Parameter(description = "Supplier ID", required = true)
-            @RequestParam Long supplierId,
+    @Operation(summary = "Find orders by supplier and status", description = "Retrieve orders filtered by supplier name and status")
+    public ResponseEntity<ApiResponse<Page<OrderDTO>>> findOrdersBySupplierAndStatus(
+            @Parameter(description = "Supplier name", required = true)
+            @RequestParam String supplier_name,
 
             @Parameter(description = "Order status", required = true)
-            @RequestParam OrderState status,
+            @RequestParam String status,
 
             Pageable pageable) {
 
         try {
-            // Validate that the supplier ID is valid
-            if (supplierId <= 0) {
-                ApiResponse<Page<Order>> response = new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "Invalid supplier ID.");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
 
-            // Attempt to retrieve the paginated list of orders for the given supplier ID and status
-            Page<Order> orders = orderFindUseCase.findOrdersBySupplierAndStatus(supplierId, status, pageable);
+            // Attempt to retrieve the paginated list of orders for the given supplier name and status
+            Page<OrderDTO> orders = orderFindUseCase.findOrdersBySupplierAndStatus(supplier_name, status, pageable);
 
             // If no orders are found, return a 404 Not Found response
             if (orders.isEmpty()) {
-                ApiResponse<Page<Order>> response = new ApiResponse<>(HttpStatus.NOT_FOUND.value(), "No orders found for the specified supplier and status.");
+                ApiResponse<Page<OrderDTO>> response = new ApiResponse<>(HttpStatus.NOT_FOUND.value(), "No orders found for the specified supplier and status.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
             // If orders are found, return them with a 200 OK status
-            ApiResponse<Page<Order>> response = new ApiResponse<>(HttpStatus.OK.value(), "Orders retrieved successfully.");
+            ApiResponse<Page<OrderDTO>> response = new ApiResponse<>(HttpStatus.OK.value(), "Orders retrieved successfully.");
             response.setData(orders);
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
             // If any unexpected error occurs, return a 500 Internal Server Error response
-            ApiResponse<Page<Order>> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+            ApiResponse<Page<OrderDTO>> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -208,36 +203,32 @@ public class OrderController {
 
     @GetMapping("findById/{id}")
     @Operation(summary = "Get order by ID", description = "Retrieve an order by its ID")
-    public ResponseEntity<ApiResponse<Order>> findById(
+    public ResponseEntity<ApiResponse<OrderDTO>> findById(
             @Parameter(description = "ID of the order", required = true)
-            @PathVariable Long id) {
+            @PathVariable Object id) {
 
         try {
-            // Check if the provided order ID is valid (non-null and greater than zero)
-            if (id <= 0) {
-                ApiResponse<Order> response = new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "Invalid order ID.");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
+            // Attempt to find the orderDTO by its ID using the modified use case method that throws an exception if not found
+            OrderDTO orderDTO = orderMapper.mapToOrderDTO(orderFindUseCase.findById(id));
 
-            // Attempt to find the order by its ID using the modified use case method that throws an exception if not found
-            Order order = orderFindUseCase.findById(id);
-
-            // Return the found order with a 200 OK response
-            ApiResponse<Order> response = new ApiResponse<>(HttpStatus.OK.value(), "Order retrieved successfully.");
-            response.setData(order);
+            // Return the found orderDTO with a 200 OK response
+            ApiResponse<OrderDTO> response = new ApiResponse<>(HttpStatus.OK.value(), "Order retrieved successfully.");
+            response.setData(orderDTO);
             return ResponseEntity.ok(response);
 
+        } catch (InvalidArgumentException e){
+            ApiResponse<OrderDTO> response = new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         } catch (OrderNotFoundException e) {
             // If the order is not found, return a 404 Not Found response with the error message
-            ApiResponse<Order> response = new ApiResponse<>(HttpStatus.NOT_FOUND.value(), e.getMessage());
+            ApiResponse<OrderDTO> response = new ApiResponse<>(HttpStatus.NOT_FOUND.value(), e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-
         } catch (Exception e) {
-            // Log the exception (optional, for better debugging)
+            // Log the exception
             logger.error("Error occurred while retrieving order with ID {}: {}", id, e.getMessage(), e);
 
             // Return a 500 Internal Server Error response for any other unexpected errors
-            ApiResponse<Order> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+            ApiResponse<OrderDTO> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -245,28 +236,30 @@ public class OrderController {
 
     @PostMapping("/create")
     @Operation(summary = "Create a new order", description = "Create a new order and return the created order details")
-    public ResponseEntity<ApiResponse<Order>> createOrder(
+    public ResponseEntity<ApiResponse<OrderDTO>> createOrder(
             @Valid @RequestBody
             @Parameter(description = "Order data to be created", required = true)
             OrderDTO orderDTO) {
 
         try {
             // Attempt to create the new order using the provided OrderDTO
-            Order createdOrder = orderCreateUseCase.createOrder(orderDTO);
 
+            Order newOrder = orderMapper.mapToOrder(orderDTO);
+            Order createdOrder = orderCreateUseCase.createOrder(newOrder);
+            OrderDTO createdOrderDTO =  orderCreateUseCase.getOrderDTO(createdOrder.getId());
             // If the order is created successfully, return a 201 Created response with the order data
-            ApiResponse<Order> response = new ApiResponse<>(HttpStatus.CREATED.value(), "Order created successfully.");
-            response.setData(createdOrder);
+            ApiResponse<OrderDTO> response = new ApiResponse<>(HttpStatus.CREATED.value(), "Order created successfully.");
+            response.setData(createdOrderDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
         } catch (InvalidArgumentException e) {
             // Handle validation or argument errors and return a 400 Bad Request response
-            ApiResponse<Order> response = new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+            ApiResponse<OrderDTO> response = new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 
         } catch (Exception e) {
             // If any unexpected error occurs, return a 500 Internal Server Error response
-            ApiResponse<Order> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+            ApiResponse<OrderDTO> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -279,11 +272,13 @@ public class OrderController {
 
         try {
             // Attempt to update the order with the given ID and order data
-            Order updatedOrder = orderUpdateUseCase.updateOrder(id, orderDTO);
+            Order oldOrder = orderFindUseCase.findById(id);
+            Order orderToUpdate = orderUpdateUseCase.validateChanges(oldOrder, orderDTO);
+            Order updated = orderUpdateUseCase.updateOrder(orderToUpdate);
 
             // If the order is updated successfully, return a 200 OK response with the updated order data
             ApiResponse<Order> response = new ApiResponse<>(HttpStatus.OK.value(), "Order updated successfully.");
-            response.setData(updatedOrder);
+            response.setData(updated);
             return ResponseEntity.ok(response);
 
         } catch (OrderNotFoundException e) {
@@ -313,7 +308,7 @@ public class OrderController {
             // Attempt to find the order by ID and throw an exception if not found
             Order order = orderFindUseCase.findById(id);
 
-            // Attempt to delete the order using the deleteOrder use case
+            // Attempt to delete the orderDTO using the deleteOrder use case
             orderDeleteUseCase.deleteOrder(order);
 
             // If deletion is successful, return a 204 No Content response with a success message

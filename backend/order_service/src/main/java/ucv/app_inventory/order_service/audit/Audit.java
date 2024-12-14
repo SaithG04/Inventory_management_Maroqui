@@ -34,7 +34,8 @@ public class Audit {
     @Column(name = "timestamp", nullable = false)
     private LocalDateTime timestamp;  // Date and time of the event
 
-    @Column(name = "details", nullable = true)
+    @Column(name = "details", nullable = false)
+    @Lob
     private String details;  // Additional details about the change
 
     /**

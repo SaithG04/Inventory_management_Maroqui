@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import ucv.app_inventory.order_service.application.dto.SupplierDTO;
 
+import java.util.Optional;
+
 /**
  * Feign client for interacting with the external Supplier service.
  * Allows retrieving supplier information by supplier ID.
@@ -21,8 +23,8 @@ public interface SupplierAPIClient {
      * @param id The ID of the supplier to retrieve.
      * @return A SupplierDTO containing supplier details.
      */
-    @GetMapping("/api/supplier/findById/{id}")
-    SupplierDTO getSupplierById(@PathVariable("id") Long id);
+    @GetMapping("/api/supplier/getById/{id}")
+    Optional<SupplierDTO> getSupplierById(@PathVariable Long id);
 
     @GetMapping("/api/supplier/findByName")
     Page<SupplierDTO> getSupplierByName(@RequestParam String name, Pageable pageable);
