@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useMemo, useEffect } from "react";
+import React, { useState, useRef, useCallback, useMemo } from "react";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
@@ -22,11 +22,13 @@ const ProductSearch = ({ onSearchResults, onClearTable }) => {
   // Cargar categorías desde el backend
   const fetchCategories = useCallback(async () => {
     try {
+      console.log("Fetching categories..."); // Debug
       const response = await categoryService.getAllCategories();
       const categoryOptions = response.map((category) => ({
         label: category.nombre,
-        value: category.nombre, // Usar el nombre como valor
+        value: category.nombre,
       }));
+      console.log("Fetched categories:", categoryOptions); // Debug
       setCategories(categoryOptions);
     } catch (error) {
       console.error("Error al cargar categorías:", error);
@@ -38,6 +40,7 @@ const ProductSearch = ({ onSearchResults, onClearTable }) => {
       });
     }
   }, [categoryService]);
+
 
   // Manejo de cambio en tipo de búsqueda
   const handleSearchTypeChange = useCallback(
@@ -135,6 +138,7 @@ const ProductSearch = ({ onSearchResults, onClearTable }) => {
       {/* Dropdown para seleccionar el tipo de búsqueda */}
       <div className="product-search-dropdown">
         <Dropdown
+          data-testid="search-type-dropdown" // Agrega este atributo para facilitar las pruebas
           value={searchType}
           options={[
             { label: "Nombre", value: "name" },
@@ -142,8 +146,9 @@ const ProductSearch = ({ onSearchResults, onClearTable }) => {
             { label: "Categoría", value: "category" },
           ]}
           onChange={handleSearchTypeChange}
-          placeholder="Elige el tipo de búsqueda" // Placeholder para seleccionar tipo
+          placeholder="Elige el tipo de búsqueda"
         />
+
       </div>
 
       {/* Inputs dinámicos según el tipo de búsqueda */}
@@ -158,18 +163,22 @@ const ProductSearch = ({ onSearchResults, onClearTable }) => {
             ]}
             onChange={(e) => setStatus(e.value)}
             placeholder="Seleccione Estado"
-            disabled={!searchType || loading} // Bloquear si no hay tipo seleccionado o está cargando
+            data-testid="status-dropdown" // Necesario para las pruebas
+            disabled={!searchType || loading}
           />
+
         </div>
       ) : searchType === "category" ? (
         <div className="product-input">
           <Dropdown
             value={query}
-            options={categories} // Opciones de categorías cargadas
+            options={categories}
             onChange={(e) => setQuery(e.value)}
             placeholder="Seleccione Categoría"
-            disabled={!searchType || loading} // Bloquear si no hay tipo seleccionado o está cargando
+            data-testid="category-dropdown"
+            appendTo="self" // Asegura que las opciones están en el mismo contenedor
           />
+
         </div>
       ) : (
         <div className="product-input">

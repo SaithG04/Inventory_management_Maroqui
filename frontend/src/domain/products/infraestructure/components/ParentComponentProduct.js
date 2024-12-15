@@ -410,8 +410,6 @@ const ParentComponentProduct = () => {
         </section>
       )}
 
-
-
       {/* Categorias*/}
       {activeSection === "categories" && (
         <section className="categories-section">

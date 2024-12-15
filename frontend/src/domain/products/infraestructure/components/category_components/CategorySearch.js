@@ -26,7 +26,7 @@ const CategorySearch = ({ onSearchResults, onClearTable }) => {
       });
       return;
     }
-  
+
     setLoading(true);
     try {
       let response = [];
@@ -37,7 +37,7 @@ const CategorySearch = ({ onSearchResults, onClearTable }) => {
         const result = await categoryService.getCategoryByStatus(status);
         response = result.content || []; // Extrae las categorías del campo content
       }
-  
+
       if (response.length > 0) {
         onSearchResults(response); // Actualizar resultados en el padre
         toast.current?.show({
@@ -68,8 +68,8 @@ const CategorySearch = ({ onSearchResults, onClearTable }) => {
       setLoading(false);
     }
   }, [searchType, query, status, categoryService, onSearchResults]);
-  
-  
+
+
 
   // Limpiar búsqueda
   const handleClearSearch = () => {
@@ -94,6 +94,7 @@ const CategorySearch = ({ onSearchResults, onClearTable }) => {
       {/* Dropdown para seleccionar el tipo de búsqueda */}
       <div className="category-search-dropdown">
         <Dropdown
+          data-testid="search-type-dropdown" // Añadido para pruebas
           value={searchType}
           options={[
             { label: "Nombre", value: "name" },
@@ -108,6 +109,7 @@ const CategorySearch = ({ onSearchResults, onClearTable }) => {
       {searchType === "status" ? (
         <div className="category-input">
           <Dropdown
+            data-testid="status-dropdown" // Añadido para pruebas
             value={status}
             options={[
               { label: "Activo", value: "ACTIVE" },

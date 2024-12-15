@@ -6,6 +6,7 @@ import { Dropdown } from "primereact/dropdown";
 import CategoryService from "../../../domain/services/CategoryService";
 import { CategoryDTO } from "../../dto/CategoryDTO";
 import Modal from "../../../../../infrastructure/shared/modal/Modal";
+
 import "./CategoryForm.css";
 
 const CategoryForm = ({ categoryId, initialData, onCategorySaved, onCancel }) => {
@@ -17,7 +18,7 @@ const CategoryForm = ({ categoryId, initialData, onCategorySaved, onCancel }) =>
   const [isEditMode, setIsEditMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
-  const [isDuplicate, setIsDuplicate] = useState(false); // Estado para manejar la duplicidad
+
   const categoryService = useMemo(() => new CategoryService(), []);
   const toast = useRef(null);
 
@@ -33,30 +34,10 @@ const CategoryForm = ({ categoryId, initialData, onCategorySaved, onCancel }) =>
     }
   }, [initialData, categoryId]);
 
-  // Verificar duplicidad de nombre de categoría
-  const checkDuplicateCategory = async (categoryName) => {
-    try {
-      const existingCategories = await categoryService.getAllCategories();
-      const isCategoryDuplicate = existingCategories.some(
-        (category) => category.nombre.toLowerCase() === categoryName.toLowerCase()
-      );
-      setIsDuplicate(isCategoryDuplicate); // Actualizar el estado si ya existe una categoría con el mismo nombre
-    } catch (error) {
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Error al verificar duplicados.",
-      });
-    }
-  };
-
   // Manejo de cambios en el input
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
-    if (id === "name") {
-      checkDuplicateCategory(value); // Verificar duplicidad cuando se cambia el nombre
-    }
   };
 
   const handleDropdownChange = (e) => {
@@ -66,7 +47,8 @@ const CategoryForm = ({ categoryId, initialData, onCategorySaved, onCancel }) =>
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+  
+    // Validar el nombre antes de enviar
     if (!formData.name.trim()) {
       toast.current.show({
         severity: "warn",
@@ -76,25 +58,47 @@ const CategoryForm = ({ categoryId, initialData, onCategorySaved, onCancel }) =>
       setLoading(false);
       return;
     }
-
-    // Si el nombre ya existe, mostrar el mensaje de advertencia
-    if (isDuplicate) {
-      toast.current.show({
-        severity: "warn",
-        summary: "Validation Error",
-        detail: "Ya existe una categoría con ese nombre.",
-      });
-      setLoading(false);
-      return;
-    }
-
-    const categoryDTO = new CategoryDTO({
-      nombre: formData.name.trim(),
-      descripcion: formData.description.trim(),
-      estado: formData.status,
-    });
-
+  
     try {
+      let isCategoryDuplicate = false;
+  
+      // Verificar duplicidad solo si es necesario
+      if (isEditMode) {
+        // Si estamos editando, verificamos si el nombre cambió
+        if (formData.name.trim() !== initialData?.name?.trim()) {
+          const existingCategories = await categoryService.getAllCategories();
+          isCategoryDuplicate = existingCategories.some(
+            (category) =>
+              category.nombre.toLowerCase() === formData.name.trim().toLowerCase() &&
+              category.id !== categoryId // Ignorar el propio producto si está editando
+          );
+        }
+      } else {
+        // Si estamos creando, simplemente verificamos si ya existe el nombre
+        const existingCategories = await categoryService.getAllCategories();
+        isCategoryDuplicate = existingCategories.some(
+          (category) =>
+            category.nombre.toLowerCase() === formData.name.trim().toLowerCase()
+        );
+      }
+  
+      if (isCategoryDuplicate) {
+        toast.current.show({
+          severity: "warn",
+          summary: "Error Categoría Duplicada",
+          detail: "Ya existe una categoría con ese nombre.",
+        });
+        setLoading(false);
+        return;
+      }
+  
+      const categoryDTO = new CategoryDTO({
+        nombre: formData.name.trim(),
+        descripcion: formData.description.trim(),
+        estado: formData.status,
+      });
+  
+      // Crear o actualizar la categoría
       if (isEditMode) {
         const response = await categoryService.updateCategory(categoryId, categoryDTO.toDomain());
         toast.current.show({
@@ -110,8 +114,10 @@ const CategoryForm = ({ categoryId, initialData, onCategorySaved, onCancel }) =>
           detail: `La categoría "${response.nombre}" fue creada correctamente.`,
         });
       }
+  
       onCategorySaved();
     } catch (err) {
+      console.error("Error:", err);
       toast.current.show({
         severity: "error",
         summary: "Error",
@@ -121,7 +127,7 @@ const CategoryForm = ({ categoryId, initialData, onCategorySaved, onCancel }) =>
       setLoading(false);
     }
   };
-
+  
   const handleCancel = () => {
     if (formData.name.trim() || formData.description.trim()) {
       setShowCancelModal(true);
@@ -133,12 +139,12 @@ const CategoryForm = ({ categoryId, initialData, onCategorySaved, onCancel }) =>
   return (
     <div className="category-form">
       <Toast ref={toast} />
-      <h1>{isEditMode ? "Edit Category" : "Add Category"}</h1>
+      <h1>{isEditMode ? "Editar Categoría" : "Agregar Categoría"}</h1>
       <form onSubmit={handleSubmit}>
         <div className="category-form-row">
           <InputText
             id="name"
-            placeholder="Enter category name"
+            placeholder="Ingrese el nombre de la categoría"
             value={formData.name}
             onChange={handleInputChange}
           />
@@ -148,7 +154,7 @@ const CategoryForm = ({ categoryId, initialData, onCategorySaved, onCancel }) =>
           <textarea
             id="description"
             className="category-form-textarea"
-            placeholder="Enter Description (Optional)"
+            placeholder="Ingrese descripción (opcional)"
             value={formData.description}
             rows="5"
             onChange={handleInputChange}
@@ -157,28 +163,29 @@ const CategoryForm = ({ categoryId, initialData, onCategorySaved, onCancel }) =>
 
         <div className="category-form-row">
           <Dropdown
+            data-testid="status-dropdown"  // Añadido el testid
             id="status"
             value={formData.status}
             className="category-form-dropdown"
             options={[
-              { label: "Active", value: "ACTIVE" },
-              { label: "Inactive", value: "INACTIVE" },
+              { label: "Activo", value: "ACTIVE" },
+              { label: "Inactivo", value: "INACTIVE" },
             ]}
             onChange={handleDropdownChange}
-            placeholder="Select Status"
+            placeholder="Seleccione estado"
           />
         </div>
 
         <div className="category-form-buttons">
           <Button
-            label={loading ? "Saving..." : "Save"}
+            label={loading ? "Guardando..." : "Guardar"}
             icon="pi pi-save"
             type="submit"
             className="p-button-success"
-            disabled={loading} // No bloqueamos el botón, solo mostramos el mensaje de advertencia
+            disabled={loading} // Bloquear botón mientras se guarda
           />
           <Button
-            label="Cancel"
+            label="Cancelar"
             icon="pi pi-times"
             className="p-button-secondary"
             onClick={handleCancel}
