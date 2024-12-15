@@ -1,82 +1,132 @@
-import React, { useState, useRef, useCallback, useMemo } from "react";
+import React, { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { Toast } from "primereact/toast";
 import ProductService from "../../../domain/services/ProductService";
-import { ProductDTO } from "../../dto/ProductDTO";
+import CategoryService from "../../../domain/services/CategoryService";
 import "./ProductSearch.css";
 
-const ProductSearch = ({ onSearchResults }) => {
-  const [searchType, setSearchType] = useState("name");
-  const [query, setQuery] = useState("");
-  const [status, setStatus] = useState("ACTIVE");
-  const [loading, setLoading] = useState(false);
+const ProductSearch = ({ onSearchResults, onClearTable }) => {
+  const [searchType, setSearchType] = useState(""); // Tipo de búsqueda: vacío por defecto
+  const [query, setQuery] = useState(""); // Valor del input de búsqueda o categoría seleccionada
+  const [status, setStatus] = useState(""); // Estado seleccionado
+  const [categories, setCategories] = useState([]); // Lista de categorías
+  const [loading, setLoading] = useState(false); // Estado de carga
   const toast = useRef(null); // Referencia para Toast
 
-  // Memorizar la instancia del servicio para evitar recreaciones innecesarias
+  // Memorizar las instancias de servicio para evitar recreaciones innecesarias
   const productService = useMemo(() => new ProductService(), []);
+  const categoryService = useMemo(() => new CategoryService(), []);
+
+  // Cargar categorías desde el backend
+  const fetchCategories = useCallback(async () => {
+    try {
+      const response = await categoryService.getAllCategories();
+      const categoryOptions = response.map((category) => ({
+        label: category.nombre,
+        value: category.nombre, // Usar el nombre como valor
+      }));
+      setCategories(categoryOptions);
+    } catch (error) {
+      console.error("Error al cargar categorías:", error);
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: "No se pudieron cargar las categorías.",
+        life: 3000,
+      });
+    }
+  }, [categoryService]);
+
+  // Manejo de cambio en tipo de búsqueda
+  const handleSearchTypeChange = useCallback(
+    (e) => {
+      const type = e.value;
+      setSearchType(type);
+      setQuery(""); // Reinicia el valor del input o categoría seleccionada
+      setStatus(""); // Reinicia el estado seleccionado
+      if (type === "category") {
+        fetchCategories(); // Cargar categorías si el tipo de búsqueda es "categoría"
+      }
+    },
+    [fetchCategories]
+  );
 
   // Manejo de búsqueda
   const handleSearch = useCallback(async () => {
-    setLoading(true);
-    try {
-      let response = [];
-
-      // Realizar la búsqueda según el tipo seleccionado
-      if (searchType === "name") {
-        response = await productService.findByName(query, 0, 15);
-      } else if (searchType === "status") {
-        response = await productService.findByStatus(status, 0, 15);
-      } else if (searchType === "category") {
-        response = await productService.findByCategoryName(query, 0, 15);
-      }
-
-      // Validar y mapear resultados
-      if (response && Array.isArray(response.data)) {
-        const products = response.data
-          .map((productData) => {
-            try {
-              const productDTO = new ProductDTO(productData);
-              return productDTO.toDomain();
-            } catch (err) {
-              console.error("Error converting product to domain:", err);
-              return null;
-            }
-          })
-          .filter((product) => product !== null);
-
-        // Enviar resultados al componente padre
-        onSearchResults(products);
-      } else {
-        toast.current.show({
-          severity: "warn",
-          summary: "No Products Found",
-          detail: "No products match the search criteria.",
-          life: 3000,
-        });
-        onSearchResults([]);
-      }
-    } catch (err) {
-      console.error("Error fetching products:", err);
-      toast.current.show({
-        severity: "error",
-        summary: "Search Error",
-        detail: "Failed to fetch products. Please try again.",
+    if (!searchType) {
+      toast.current?.show({
+        severity: "warn",
+        summary: "Tipo de Búsqueda Requerido",
+        detail: "Por favor, seleccione un tipo de búsqueda.",
         life: 3000,
       });
-      onSearchResults([]);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      let results = [];
+      if (searchType === "name") {
+        results = await productService.searchByName(query);
+      } else if (searchType === "status") {
+        results = await productService.searchByStatus(status);
+      } else if (searchType === "category") {
+        results = await productService.searchByCategory(query);
+      }
+
+      if (results.length > 0) {
+        onSearchResults(results); // Actualizar resultados en el padre
+
+        // Mostrar notificación de los resultados encontrados
+        toast.current?.show({
+          severity: "success",
+          summary: "Búsqueda Exitosa",
+          detail: `Se encontraron ${results.length} producto(s).`,
+          life: 3000,
+        });
+      } else {
+        toast.current?.show({
+          severity: "info",
+          summary: "Sin Resultados",
+          detail: "No se encontraron productos que coincidan con la búsqueda.",
+          life: 3000,
+        });
+        onSearchResults([]); // Restablecer la lista si no hay resultados
+      }
+    } catch (error) {
+      console.error("Error al realizar la búsqueda:", error);
+      toast.current?.show({
+        severity: "error",
+        summary: "Error de Búsqueda",
+        detail: "Ocurrió un error al intentar buscar productos.",
+        life: 3000,
+      });
     } finally {
       setLoading(false);
     }
   }, [searchType, query, status, productService, onSearchResults]);
 
-  // Manejo de limpieza de búsqueda
+  // Limpiar búsqueda
   const handleClearSearch = () => {
     setQuery("");
-    setStatus("ACTIVE");
-    onSearchResults([]);
+    setStatus("");
+    setSearchType(""); // Restablecer el tipo de búsqueda
+    onClearTable(); // Restablecer lista en ProductList
   };
+
+  // Validación para habilitar o deshabilitar el botón Buscar
+  const isSearchDisabled = useMemo(() => {
+    if (loading) return true; // Bloquear mientras está cargando
+    if (searchType === "name" || searchType === "category") {
+      return query.trim() === ""; // Bloquear si no hay texto en el input o categoría seleccionada
+    }
+    if (searchType === "status") {
+      return status === ""; // Bloquear si no se seleccionó un estado
+    }
+    return true; // Bloquear si no hay tipo de búsqueda seleccionado
+  }, [searchType, query, status, loading]);
 
   return (
     <div className="product-search-section">
@@ -87,12 +137,12 @@ const ProductSearch = ({ onSearchResults }) => {
         <Dropdown
           value={searchType}
           options={[
-            { label: "Name", value: "name" },
-            { label: "Status", value: "status" },
-            { label: "Category", value: "category" },
+            { label: "Nombre", value: "name" },
+            { label: "Estado", value: "status" },
+            { label: "Categoría", value: "category" },
           ]}
-          onChange={(e) => setSearchType(e.value)}
-          placeholder="Select Search Type"
+          onChange={handleSearchTypeChange}
+          placeholder="Elige el tipo de búsqueda" // Placeholder para seleccionar tipo
         />
       </div>
 
@@ -102,12 +152,23 @@ const ProductSearch = ({ onSearchResults }) => {
           <Dropdown
             value={status}
             options={[
-              { label: "Active", value: "ACTIVE" },
-              { label: "Discontinued", value: "DISCONTINUED" },
-              { label: "Out of Stock", value: "OUT_OF_STOCK" },
+              { label: "Activo", value: "ACTIVE" },
+              { label: "Descontinuado", value: "DISCONTINUED" },
+              { label: "Sin Stock", value: "OUT_OF_STOCK" },
             ]}
             onChange={(e) => setStatus(e.value)}
-            placeholder="Select Status"
+            placeholder="Seleccione Estado"
+            disabled={!searchType || loading} // Bloquear si no hay tipo seleccionado o está cargando
+          />
+        </div>
+      ) : searchType === "category" ? (
+        <div className="product-input">
+          <Dropdown
+            value={query}
+            options={categories} // Opciones de categorías cargadas
+            onChange={(e) => setQuery(e.value)}
+            placeholder="Seleccione Categoría"
+            disabled={!searchType || loading} // Bloquear si no hay tipo seleccionado o está cargando
           />
         </div>
       ) : (
@@ -115,7 +176,8 @@ const ProductSearch = ({ onSearchResults }) => {
           <InputText
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={`Search by ${searchType}`}
+            placeholder="Buscar por Nombre"
+            disabled={!searchType || loading} // Bloquear si no hay tipo seleccionado o está cargando
           />
         </div>
       )}
@@ -123,14 +185,14 @@ const ProductSearch = ({ onSearchResults }) => {
       {/* Botones de acción */}
       <div className="search-clear-buttons">
         <Button
-          label={loading ? "Searching..." : "Search"} // Texto dinámico dependiendo del estado de carga
+          label={loading ? "Buscando..." : "Buscar"} // Texto dinámico dependiendo del estado de carga
           icon="pi pi-search" // Icono de búsqueda
           onClick={handleSearch} // Evento para búsqueda
-          disabled={loading} // Desactiva el botón durante la carga
+          disabled={isSearchDisabled} // Validación para deshabilitar el botón
           className="search-button" // Clase global para el botón de búsqueda
         />
         <Button
-          label="Clear" // Texto del botón
+          label="Limpiar" // Texto del botón
           icon="pi pi-times" // Icono de limpiar
           onClick={handleClearSearch} // Evento para limpiar búsqueda
           disabled={loading} // Desactiva el botón durante la carga

@@ -4,79 +4,88 @@ import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { Toast } from "primereact/toast";
 import CategoryService from "../../../domain/services/CategoryService";
-import { CategoryDTO } from "../../dto/CategoryDTO";
 import "./CategorySearch.css";
 
-const CategorySearch = ({ onSearchResults }) => {
-  const [searchType, setSearchType] = useState("name");
-  const [query, setQuery] = useState("");
-  const [status, setStatus] = useState("ACTIVE");
-  const [loading, setLoading] = useState(false);
+const CategorySearch = ({ onSearchResults, onClearTable }) => {
+  const [searchType, setSearchType] = useState(""); // Tipo de búsqueda vacío por defecto
+  const [query, setQuery] = useState(""); // Valor del input de búsqueda
+  const [status, setStatus] = useState(""); // Estado seleccionado
+  const [loading, setLoading] = useState(false); // Estado de carga
   const toast = useRef(null); // Referencia para Toast
 
-  // Memorizar la instancia del servicio para evitar recreaciones innecesarias
   const categoryService = useMemo(() => new CategoryService(), []);
 
   // Manejo de búsqueda
   const handleSearch = useCallback(async () => {
+    if (!searchType) {
+      toast.current?.show({
+        severity: "warn",
+        summary: "Tipo de Búsqueda Requerido",
+        detail: "Por favor, seleccione un tipo de búsqueda.",
+        life: 3000,
+      });
+      return;
+    }
+  
     setLoading(true);
     try {
       let response = [];
-
-      // Realizar la búsqueda según el tipo seleccionado
       if (searchType === "name") {
-        response = await categoryService.getAllCategories();
-        response = response.filter((category) =>
-          category.name.toLowerCase().includes(query.toLowerCase())
-        );
+        const result = await categoryService.getCategoryByName(query);
+        response = result.content || []; // Extrae las categorías del campo content
       } else if (searchType === "status") {
-        response = await categoryService.getAllCategories();
-        response = response.filter((category) => category.status === status);
+        const result = await categoryService.getCategoryByStatus(status);
+        response = result.content || []; // Extrae las categorías del campo content
       }
-
-      // Validar y mapear resultados
-      const categories = response
-        .map((categoryData) => {
-          try {
-            const categoryDTO = new CategoryDTO(categoryData);
-            return categoryDTO.toDomain();
-          } catch (err) {
-            return null;
-          }
-        })
-        .filter((category) => category !== null);
-
-      // Enviar resultados al componente padre
-      if (categories.length > 0) {
-        onSearchResults(categories);
-      } else {
-        toast.current.show({
-          severity: "warn",
-          summary: "No Categories Found",
-          detail: "No categories match the search criteria.",
+  
+      if (response.length > 0) {
+        onSearchResults(response); // Actualizar resultados en el padre
+        toast.current?.show({
+          severity: "success",
+          summary: "Búsqueda Exitosa",
+          detail: `Se encontraron ${response.length} categoría(s).`,
           life: 3000,
         });
-        onSearchResults([]);
+      } else {
+        toast.current?.show({
+          severity: "info",
+          summary: "Sin Resultados",
+          detail: "No se encontraron categorías que coincidan con la búsqueda.",
+          life: 3000,
+        });
+        onSearchResults([]); // Envía un array vacío al padre si no hay resultados
       }
-    } catch (err) {
-      toast.current.show({
+    } catch (error) {
+      console.error("Error al realizar la búsqueda:", error);
+      toast.current?.show({
         severity: "error",
-        summary: "Search Error",
-        detail: "Failed to fetch categories. Please try again.",
+        summary: "Error de Búsqueda",
+        detail: "Ocurrió un error al intentar buscar categorías.",
         life: 3000,
       });
-      onSearchResults([]);
+      onSearchResults([]); // Reinicia la tabla en caso de error
     } finally {
       setLoading(false);
     }
   }, [searchType, query, status, categoryService, onSearchResults]);
+  
+  
 
-  // Manejo de limpieza de búsqueda
+  // Limpiar búsqueda
   const handleClearSearch = () => {
     setQuery("");
-    setStatus("ACTIVE");
-    onSearchResults([]);
+    setStatus("");
+    setSearchType(""); // Restablecer el tipo de búsqueda
+    onClearTable(); // Restablecer lista en CategoryList
   };
+
+  // Validación para habilitar el botón Buscar
+  const isSearchDisabled = useMemo(() => {
+    if (loading) return true;
+    if (searchType === "name") return query.trim() === "";
+    if (searchType === "status") return status === "";
+    return true;
+  }, [searchType, query, status, loading]);
 
   return (
     <div className="category-search-section">
@@ -87,11 +96,11 @@ const CategorySearch = ({ onSearchResults }) => {
         <Dropdown
           value={searchType}
           options={[
-            { label: "Name", value: "name" },
-            { label: "Status", value: "status" },
+            { label: "Nombre", value: "name" },
+            { label: "Estado", value: "status" },
           ]}
           onChange={(e) => setSearchType(e.value)}
-          placeholder="Select Search Type"
+          placeholder="Seleccione Tipo de Búsqueda"
         />
       </div>
 
@@ -101,11 +110,12 @@ const CategorySearch = ({ onSearchResults }) => {
           <Dropdown
             value={status}
             options={[
-              { label: "Active", value: "ACTIVE" },
-              { label: "Inactive", value: "INACTIVE" },
+              { label: "Activo", value: "ACTIVE" },
+              { label: "Inactivo", value: "INACTIVE" },
             ]}
             onChange={(e) => setStatus(e.value)}
-            placeholder="Select Status"
+            placeholder="Seleccione Estado"
+            disabled={!searchType || loading} // Bloquear si no hay tipo seleccionado o está cargando
           />
         </div>
       ) : (
@@ -113,7 +123,8 @@ const CategorySearch = ({ onSearchResults }) => {
           <InputText
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={`Search by ${searchType}`}
+            placeholder="Buscar por Nombre"
+            disabled={!searchType || loading} // Bloquear si no hay tipo seleccionado o está cargando
           />
         </div>
       )}
@@ -121,21 +132,20 @@ const CategorySearch = ({ onSearchResults }) => {
       {/* Botones de acción */}
       <div className="search-clear-buttons">
         <Button
-          label={loading ? "Searching..." : "Search"} // Texto dinámico dependiendo del estado de carga
-          icon="pi pi-search" // Icono de búsqueda
-          onClick={handleSearch} // Evento para búsqueda
-          disabled={loading} // Desactiva el botón durante la carga
-          className="search-button" // Clase global para el botón de búsqueda
+          label={loading ? "Buscando..." : "Buscar"}
+          icon="pi pi-search"
+          onClick={handleSearch}
+          disabled={isSearchDisabled}
+          className="search-button"
         />
         <Button
-          label="Clear" // Texto del botón
-          icon="pi pi-times" // Icono de limpiar
-          onClick={handleClearSearch} // Evento para limpiar búsqueda
-          disabled={loading} // Desactiva el botón durante la carga
-          className="clear-button" // Clase global para el botón de limpiar
+          label="Limpiar"
+          icon="pi pi-times"
+          onClick={handleClearSearch}
+          disabled={loading}
+          className="clear-button"
         />
       </div>
-
     </div>
   );
 };

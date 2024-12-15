@@ -13,6 +13,14 @@ class CategoryRepository {
     return new CategoryDTO(response.data).toDomain();
   }
 
+  async getByStatus(status) {
+    const response = await CategoriesHttp.get("/findByStatus", {
+      params: { status },
+    });
+    return response.data.map((category) => new CategoryDTO(category).toDomain());
+  }
+  
+
   async getByName(name) {
     const response = await CategoriesHttp.get(`/findByName?name=${encodeURIComponent(name)}`);
     return new CategoryDTO(response.data).toDomain();

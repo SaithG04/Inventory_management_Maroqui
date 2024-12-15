@@ -13,9 +13,17 @@ class ProductRepository {
     });
     return response.data || []; // Retorna un array vacío si no hay resultados
   }
-  
-  
 
+  async findByStatus(status) {
+    const response = await ProductsHttp.get("/findByStatus", { params: { status } });
+    return response.data || [];
+  }
+
+  async findByCategoryName(categoryName) {
+    const response = await ProductsHttp.get("/findByCategoryName", { params: { categoryName } });
+    return response.data || [];
+  }
+  
   async getById(id) {
     const response = await ProductsHttp.get(`/findProductById/${id}`);
     return new ProductDTO(response.data).toDomain();

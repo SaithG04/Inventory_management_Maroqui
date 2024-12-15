@@ -51,14 +51,12 @@ const CategoryList = ({ categories, onEditCategory, onDeleteCategory }) => {
         label="Editar"
         className="p-button-rounded p-button-success"
         onClick={() => onEditCategory(rowData)}
-        tooltip="Editar esta categoría"
       />
       <Button
         icon="pi pi-trash"
         label="Eliminar"
         className="p-button-rounded p-button-danger"
         onClick={() => confirmDeleteCategory(rowData.id_categoria)}
-        tooltip="Eliminar esta categoría"
       />
     </div>
   );

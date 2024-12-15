@@ -87,15 +87,15 @@ const ParentComponentProduct = () => {
       life: 3000,
     });
   }, []);
-  
+
   const handleDeleteProduct = useCallback(async (product) => {
     try {
       // Ejecuta la eliminación del producto
       await productService.deleteProduct(product.id_producto);
-  
+
       // Refresca la lista de productos
       await fetchAllProducts();
-  
+
       // Muestra la notificación de éxito
       toast.current?.show({
         severity: "success",
@@ -105,7 +105,7 @@ const ParentComponentProduct = () => {
       });
     } catch (error) {
       console.error("Error al eliminar el producto:", error);
-  
+
       // Muestra la notificación de error
       toast.current?.show({
         severity: "error",
@@ -115,8 +115,8 @@ const ParentComponentProduct = () => {
       });
     }
   }, [fetchAllProducts, productService]);
-  
-  
+
+
 
   const handleProductSaved = () => {
     fetchAllProducts(); // Actualizar lista de productos
@@ -142,6 +142,10 @@ const ParentComponentProduct = () => {
     }
   };
 
+  const handleClearTable = () => {
+    fetchAllProducts(); // Restablecer la tabla con todos los productos
+  };
+
   // === CATEGORÍAS ===
   const fetchAllCategories = useCallback(async () => {
     try {
@@ -160,6 +164,24 @@ const ParentComponentProduct = () => {
   useEffect(() => {
     fetchAllCategories();
   }, [fetchAllCategories]);
+
+  const handleCategorySearchResults = (results) => {
+    console.log("Resultados de búsqueda procesados:", results); // Verifica que los resultados estén en el formato esperado
+    setAllCategories(results);
+    if (results.length === 0) {
+      toast.current?.show({
+        severity: "info",
+        summary: "Sin resultados",
+        detail: "No se encontraron categorías que coincidan con la búsqueda.",
+        life: 3000,
+      });
+    }
+  };
+
+
+  const handleClearCategoryTable = () => {
+    fetchAllCategories(); // Llama al método ya existente que obtiene todas las categorías
+  };
 
   const handleCancelForm = () => {
     setIsFormVisible(false);
@@ -353,7 +375,11 @@ const ParentComponentProduct = () => {
       {activeSection === "products" && (
         <section className="products-section">
           {/* Barra de búsqueda para productos */}
-          <ProductSearch onSearchResults={handleSearchResults} />
+          <ProductSearch
+            onSearchResults={handleSearchResults}
+            onClearTable={handleClearTable}
+          />
+
 
           {/* Botón para agregar productos */}
           <div className="button-container">
@@ -389,7 +415,11 @@ const ParentComponentProduct = () => {
       {/* Categorias*/}
       {activeSection === "categories" && (
         <section className="categories-section">
-          <CategorySearch categories={allCategories} onSearchResults={setAllCategories} />
+          <CategorySearch
+            onSearchResults={handleCategorySearchResults}
+            onClearTable={handleClearCategoryTable}
+          />
+
           <div className="button-container">
             <Button
               label="Agregar Categoría"
@@ -407,10 +437,11 @@ const ParentComponentProduct = () => {
             />
           ) : (
             <CategoryList
-              categories={allCategories}      // Lista de categorías desde el estado del padre
+              categories={allCategories} // Lista de categorías desde el estado
               onEditCategory={handleEditCategory}
               onDeleteCategory={handleDeleteCategory}
             />
+
 
           )}
         </section>

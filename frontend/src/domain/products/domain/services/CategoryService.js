@@ -2,14 +2,20 @@ import CategoryRepository from "../../infraestructure/repositories/CategoryRepos
 
 class CategoryService {
   constructor() {
-    this.categoryRepository = new CategoryRepository(); // Ahora funciona porque estás importando la clase
+    this.categoryRepository = new CategoryRepository();
   }
 
   async getAllCategories() {
-    const categories = await this.categoryRepository.getAll();
-    return categories;
+    return await this.categoryRepository.getAll();
   }
-  
+
+  async getCategoryByName(name) {
+    return await this.categoryRepository.getByName(name);
+  }
+
+  async getCategoryByStatus(status) {
+    return await this.categoryRepository.getByStatus(status);
+  }
 
   async getCategoryById(id) {
     return await this.categoryRepository.getById(id);

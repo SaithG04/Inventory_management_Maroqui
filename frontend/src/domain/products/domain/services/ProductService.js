@@ -14,7 +14,19 @@ class ProductService {
     return Array.isArray(products) ? products : []; // Garantizamos que sea un array
   }
 
-  
+  async searchByName(name) {
+    return await this.productRepository.findByName(name); // Llama al método del repositorio
+  }
+
+  // Nuevo método para buscar por nombre y estado
+  async searchByCategory(categoryName) {
+    return await this.productRepository.findByCategoryName(categoryName);
+  }
+
+  async searchByStatus(status) {
+    return await this.productRepository.findByStatus(status);
+  }
+
   async getProductById(id) {
     return await this.productRepository.getById(id);
   }
