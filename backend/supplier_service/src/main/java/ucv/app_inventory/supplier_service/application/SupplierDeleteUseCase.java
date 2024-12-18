@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ucv.app_inventory.supplier_service.domain.model.Supplier;
 import ucv.app_inventory.supplier_service.exception.SupplierNotFoundException;
+import ucv.app_inventory.supplier_service.infrastructure.outbound.database.ProductSupplierMySqlRepository;
 import ucv.app_inventory.supplier_service.infrastructure.outbound.database.SupplierMySqlRepository;
 
 @Service
@@ -12,6 +13,7 @@ import ucv.app_inventory.supplier_service.infrastructure.outbound.database.Suppl
 public class SupplierDeleteUseCase {
 
     private final SupplierMySqlRepository supplierMySqlRepository;
+    private final ProductSupplierMySqlRepository productSupplierMySqlRepository;
 
     @Transactional
     public void deleteSupplier(Supplier supplier) {
@@ -20,5 +22,6 @@ public class SupplierDeleteUseCase {
             throw new SupplierNotFoundException("Supplier with ID " + id + " not found");
         }
         supplierMySqlRepository.deleteById(id);
+        productSupplierMySqlRepository.deleteBySupplierId(id);
     }
 }

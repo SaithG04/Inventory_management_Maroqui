@@ -20,6 +20,4 @@ public interface OrderDetailMySqlRepository extends JpaRepository<OrderDetail, L
      * @return a list of order details associated with the specified order ID.
      */
     List<OrderDetail> findByOrderId(Long orderId);
-
-    // Si necesitas otros métodos para filtrar los detalles, puedes añadirlos aquí
 }

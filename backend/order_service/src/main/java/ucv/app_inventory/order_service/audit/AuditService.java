@@ -8,10 +8,10 @@ public interface AuditService {
     /**
      * Records a new audit event in the database.
      *
-     * @param entity  The affected entity (e.g., Order, User).
+     * @param entity  The affected entity (e.g., Supplier, User).
      * @param action  The action performed (e.g., CREATE, UPDATE, DELETE).
-     * @param user    The user performing the action.
+     * @param user_id The user performing the action.
      * @param details Additional details of the operation.
      */
-    void recordAudit(String entity, String action, String user, String details);
+    void recordAudit(String entity, String action, Long user_id, String details);
 }

@@ -13,8 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ucv.app_inventory.login.adapters.controller.dto.UserDto;
 import ucv.app_inventory.login.adapters.controller.dto.UserRegistration;
-import ucv.app_inventory.login.adapters.persistance.JpaUserRepository;
-import ucv.app_inventory.login.adapters.persistance.RoleRepository;
+import ucv.app_inventory.login.domain.exception.EmailAlreadyExistsException;
+import ucv.app_inventory.login.domain.exception.RoleNotFoundException;
+import ucv.app_inventory.login.adapters.persistence.JpaUserRepository;
+import ucv.app_inventory.login.adapters.persistence.RoleRepository;
 import ucv.app_inventory.login.domain.model.Role;
 import ucv.app_inventory.login.domain.model.Status;
 import ucv.app_inventory.login.domain.model.User;
@@ -37,12 +39,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findByRoles_Name(String name) {
-        return List.of();
+        return jpaUserRepository.findByRoles_Name(name);
     }
 
     @Override
     public long countByStatus(Status status) {
-        return 0;
+        return jpaUserRepository.countByStatus(status);
     }
 
     @Override
@@ -75,10 +77,23 @@ public class UserServiceImpl implements UserService {
     public UserDto registerUser(UserRegistration userRegistration) {
         // Verificar si el email ya existe
         if (jpaUserRepository.findByEmail(userRegistration.getEmail()).isPresent()) {
-            throw new RuntimeException("El email ya está registrado");
+            throw new EmailAlreadyExistsException("El email ya está registrado");
         }
 
-        // Crear UserProfile
+        // Crear User y UserProfile
+        User user = createUserFromRegistration(userRegistration);
+
+        // Asignar rol proporcionado
+        assignRole(user, userRegistration.getRoleName());
+
+        // Guardar usuario (cascadeará al perfil)
+        jpaUserRepository.save(user);
+
+        // Convertir a UserDto
+        return UserMapper.toUserDto(user);
+    }
+
+    private User createUserFromRegistration(UserRegistration userRegistration) {
         UserProfile userProfile = new UserProfile();
         userProfile.setDni(userRegistration.getDni());
         userProfile.setFirstName(userRegistration.getFirstName());
@@ -90,24 +105,20 @@ public class UserServiceImpl implements UserService {
         userProfile.setSex(userRegistration.getSex());
         userProfile.setMaritalStatus(userRegistration.getMaritalStatus());
 
-        // Crear User
         User user = new User();
         user.setEmail(userRegistration.getEmail());
         user.setPassword(passwordEncoder.encode(userRegistration.getPassword()));
         user.setStatus(Status.ACTIVE);
         user.setUserProfile(userProfile);
-        userProfile.setUser(user); // Establecer la relación bidireccional
+        userProfile.setUser(user);
 
-        // Asignar rol por defecto (por ejemplo, "WAREHOUSE CLERK")
-        Role defaultRole = roleRepository.findByName("WAREHOUSE CLERK")
-                .orElseThrow(() -> new RuntimeException("Rol WAREHOUSE CLERK no encontrado"));
-        user.setRoles(Set.of(defaultRole));
+        return user;
+    }
 
-        // Guardar usuario (cascadeará al perfil)
-        jpaUserRepository.save(user);
-
-        // Utilizar UserMapper para convertir a UserDto
-        return UserMapper.toUserDto(user);
+    private void assignRole(User user, String roleName) {
+        Role role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new RoleNotFoundException("Rol " + roleName + " no encontrado"));
+        user.setRoles(Set.of(role));
     }
 
     @Override

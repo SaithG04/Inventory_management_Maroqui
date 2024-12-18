@@ -23,7 +23,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final TokenManagementService tokenManagementService;
     private final TokenRevocationService tokenRevocationService;
-    private final CustomUserDetailsService customUserDetailsService; // Añadir el servicio de UserDetails
+    private final CustomUserDetailsService customUserDetailsService;
 
     @Autowired
     public JwtAuthFilter(TokenManagementService tokenManagementService,
@@ -39,29 +39,23 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String token = tokenRevocationService.extractTokenFromRequest(request);
-
         if (token != null && !tokenRevocationService.isTokenRevoked(token)) {
             try {
-                // Obtener el email del token
                 String email = tokenManagementService.getUsuarioToken(token);
-
                 if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    // Cargar los detalles completos del usuario (UserDetails)
                     UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
 
-                    // Crear el objeto de autenticación con los detalles completos del usuario
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());
 
-                    // Establecer detalles adicionales
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                    // Establecer la autenticación en el contexto de seguridad
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    logger.info("Token autenticado para el usuario: {}");
                 }
-
-            } catch (JwtException | UsernameNotFoundException e) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token");
+            } catch (Exception e) {
+                logger.error("Error en la autenticación con el token: {}");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido o expirado");
                 return;
             }
         }

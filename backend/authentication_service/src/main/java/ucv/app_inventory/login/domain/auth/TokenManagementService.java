@@ -1,12 +1,10 @@
 package ucv.app_inventory.login.domain.auth;
 
 import io.jsonwebtoken.security.SignatureException;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Service;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -46,11 +44,18 @@ public class TokenManagementService {
     }
 
     public String generateToken(User user) {
+        if (user == null || user.getEmail() == null) {
+            logger.error("No se puede generar un token para un usuario con datos incompletos.");
+            throw new IllegalArgumentException("Usuario inválido para generación de token.");
+        }
+
         UserProfile userProfile = user.getUserProfile();
         String fullname = userProfile.getFirstName() + " " + userProfile.getLastName();
         String roles = user.getRoles().stream()
                 .map(Role::getName)
                 .collect(Collectors.joining(","));
+
+        logger.info("Generando token para el usuario: {}", user.getEmail());
 
         return Jwts.builder()
                 .setSubject(user.getEmail())
@@ -63,14 +68,19 @@ public class TokenManagementService {
                 .compact();
     }
     public String generateRefreshToken(User user) {
-        String refreshToken = Jwts.builder()
+        if (user == null || user.getEmail() == null) {
+            logger.error("No se puede generar un refresh token para un usuario con datos incompletos.");
+            throw new IllegalArgumentException("Usuario inválido para generación de refresh token.");
+        }
+
+        logger.info("Generando refresh token para el usuario: {}", user.getEmail());
+
+        return Jwts.builder()
                 .setSubject(user.getEmail())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 30 * 24 * 60 * 60 * 1000))
+                .setExpiration(new Date(System.currentTimeMillis() + 30L * 24 * 60 * 60 * 1000))
                 .signWith(claveSecreta, SignatureAlgorithm.HS512)
                 .compact();
-
-        return refreshToken;
     }
 
     public void validarToken(String token) {
