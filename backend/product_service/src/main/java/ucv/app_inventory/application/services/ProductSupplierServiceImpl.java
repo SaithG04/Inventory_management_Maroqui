@@ -1,12 +1,16 @@
 package ucv.app_inventory.application.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ucv.app_inventory.adapters.outbounds.SupplierClient;
 import ucv.app_inventory.adapters.repositories.ProductSupplierRepository;
 import ucv.app_inventory.application.DTO.SupplierDTO;
 import ucv.app_inventory.domain.entities.ProductSupplier;
+import ucv.app_inventory.exception.InvalidFieldException;
 
+import java.awt.print.Pageable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -88,10 +92,12 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
     @Override
     public ProductSupplier getById(Long id) {
         return productSupplierRepository.findById(id).orElse(null);
+    }
 
+    @Override
+    public List<SupplierDTO> getSuppliersByName(String name) {
+        // Llamada al microservicio de proveedores para buscar por nombre
+        return supplierClient.getSuppliersByName(name);
 
-}
-
-
-
+    }
 }

@@ -20,4 +20,6 @@ public interface ProductRepository extends JpaRepository<Product, Long>{
     @Query("SELECT p.code FROM Product p ORDER BY p.id DESC LIMIT 1")
     String findLastProductCode();
 
+
+
 }

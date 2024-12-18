@@ -1,5 +1,7 @@
 package ucv.app_inventory.application.services;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import ucv.app_inventory.application.DTO.SupplierDTO;
 import ucv.app_inventory.domain.entities.ProductSupplier;
 
@@ -22,6 +24,9 @@ public interface ProductSupplierService {
     ProductSupplier getRelationByProductAndSupplier(Long productId, Long supplierId);
 
     ProductSupplier getById(Long id);
+
+    List<SupplierDTO> getSuppliersByName(String name);
+
 
 
 }

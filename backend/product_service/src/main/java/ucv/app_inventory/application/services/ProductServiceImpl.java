@@ -24,12 +24,15 @@ public class ProductServiceImpl implements ProductService{
     private final SupplierClient supplierClient;
     private final ProductSupplierRepository productSupplierRepository;
 
+
     @Autowired
     public ProductServiceImpl(ProductRepository productRepository, SupplierClient supplierClient, ProductSupplierRepository productSupplierRepository) {
         this.productRepository = productRepository;
         this.supplierClient = supplierClient;
         this.productSupplierRepository = productSupplierRepository;
     }
+
+
 
     @Override
     public Page<Product> listProducts(int page, int size) {

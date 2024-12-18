@@ -1,6 +1,8 @@
 package ucv.app_inventory.adapters.repositories;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import ucv.app_inventory.application.DTO.ProductSupplierDTO;
 import ucv.app_inventory.domain.entities.ProductSupplier;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -19,5 +21,10 @@ public interface ProductSupplierRepository extends JpaRepository<ProductSupplier
 
     // Buscar una relación por ID del producto y proveedor
     ProductSupplier findByProductIdAndSupplierId(Long productId, Long supplierId);
+
+
+
+
+
 
 }

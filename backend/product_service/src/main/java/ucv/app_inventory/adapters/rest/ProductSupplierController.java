@@ -1,6 +1,8 @@
 package ucv.app_inventory.adapters.rest;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ucv.app_inventory.application.DTO.ProductSupplierDTO;
@@ -97,6 +99,12 @@ public class ProductSupplierController {
         return productSupplier == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(productSupplier);
     }
 
+    @GetMapping("/suppliers/search")
+    public ResponseEntity<List<SupplierDTO>> searchSuppliersByName(@RequestParam("name") String name) {
+        List<SupplierDTO> suppliers = productSupplierService.getSuppliersByName(name);
 
+        // Si no se encuentran proveedores, devolver 204 No Content
+        return suppliers.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(suppliers);
+    }
 
 }
