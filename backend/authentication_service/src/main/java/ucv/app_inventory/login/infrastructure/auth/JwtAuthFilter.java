@@ -38,6 +38,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        String path = request.getServletPath();
+
+        if (path.startsWith("/swagger-ui") ||
+                path.equals("/swagger-ui.html") ||
+                path.startsWith("/v2/api-docs") ||
+                path.startsWith("/swagger-resources") ||
+                path.startsWith("/webjars")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String token = tokenRevocationService.extractTokenFromRequest(request);
         if (token != null && !tokenRevocationService.isTokenRevoked(token)) {
             try {
@@ -53,7 +64,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                     logger.info("Token autenticado para el usuario: {}");
                 }
-            } catch (Exception e) {
+            } catch (JwtException | UsernameNotFoundException e) {
                 logger.error("Error en la autenticación con el token: {}");
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido o expirado");
                 return;
