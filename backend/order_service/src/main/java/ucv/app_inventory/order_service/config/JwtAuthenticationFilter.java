@@ -1,5 +1,6 @@
 package ucv.app_inventory.order_service.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -17,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ucv.app_inventory.order_service.exception.ApiResponse;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -39,17 +41,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String authorizationHeader = request.getHeader("Authorization");
-        logger.debug("Authorization Header: " + authorizationHeader);
+        logger.debug("Authorization Header: {}", authorizationHeader);
         SecretKey jwtKey = Keys.hmacShaKeyFor(jwtConfig.getSecret().getBytes(StandardCharsets.UTF_8));
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring(7);
-            logger.debug("Extracted Token: " + token);
+            logger.debug("Extracted Token: {}", token);
 
             try {
                 Claims claims = Jwts.parserBuilder().setSigningKey(jwtKey).build().parseClaimsJws(token).getBody();
                 String username = claims.getSubject();
-                logger.debug("Parsed Username from JWT: " + username);
+                logger.debug("Parsed Username from JWT: {}", username);
 
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
@@ -57,19 +59,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
+
             } catch (io.jsonwebtoken.security.SignatureException e) {
                 logger.error("Invalid JWT signature: {}", e.getMessage());
+                ApiResponse<Object> responseBody = new ApiResponse<>(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT signature");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write(new ObjectMapper().writeValueAsString(responseBody));
                 return;
             } catch (Exception e) {
                 logger.error("Invalid JWT token: {}", e.getMessage());
+                ApiResponse<Object> responseBody = new ApiResponse<>(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write(new ObjectMapper().writeValueAsString(responseBody));
                 return;
             }
 
-        } else {
-            logger.debug("No Authorization header or it does not start with Bearer");
         }
+
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            ApiResponse<Object> responseBody = new ApiResponse<>(HttpServletResponse.SC_FORBIDDEN, "No Authorization header or it does not start with Bearer");
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setContentType("application/json");
+            response.getWriter().write(new ObjectMapper().writeValueAsString(responseBody));
+            return;
+        }
+
         filterChain.doFilter(request, response);
     }
 

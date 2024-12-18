@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;  // Cambiar a LocalDateTime
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,7 +31,7 @@ public class Order {
 
     // Stores the date of the order; only the date part (without time).
     @Column(name = "date", nullable = false)
-    private LocalDate orderDate;  // Cambiado a LocalDate para solo fecha
+    private LocalDate orderDate;
 
     // Stores the status of the order using an enumerated type for predefined states.
     @Enumerated(EnumType.STRING)
@@ -39,11 +41,11 @@ public class Order {
     // List of details for each order item; each detail is cascaded and loaded lazily.
     @JsonManagedReference
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<OrderDetail> orderDetails;
+    private List<OrderDetail> orderDetails = new ArrayList<>();
 
     // Total amount for the order.
     @Column(name = "total", nullable = false)
-    private Double total;
+    private BigDecimal total = BigDecimal.ZERO;
 
     // Additional observations or notes about the order, if any.
     @Column(name = "observations")
@@ -51,7 +53,7 @@ public class Order {
 
     // The date and time when the order was created, automatically set on creation.
     @Column(name = "creation_date", nullable = false)
-    private LocalDateTime creationDate;  // Cambiado a LocalDateTime para incluir hora
+    private LocalDateTime creationDate;
 
     /**
      * Sets the date and creationDate fields to the current date and time when the order is created.
@@ -59,6 +61,21 @@ public class Order {
      */
     @PrePersist
     protected void onCreate() {
-        this.creationDate = LocalDateTime.now();  // Fecha y hora
+        if(creationDate == null) {
+            creationDate = LocalDateTime.now();
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", supplierId=" + supplierId +
+                ", orderDate=" + orderDate +
+                ", status=" + status +
+                ", total=" + total +
+                ", observations='" + observations + '\'' +
+                ", creationDate=" + creationDate +
+                '}';
     }
 }

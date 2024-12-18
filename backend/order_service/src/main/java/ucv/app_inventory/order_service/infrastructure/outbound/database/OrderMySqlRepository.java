@@ -3,6 +3,7 @@ package ucv.app_inventory.order_service.infrastructure.outbound.database;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ucv.app_inventory.order_service.domain.model.Order;
 import ucv.app_inventory.order_service.domain.model.OrderState;
