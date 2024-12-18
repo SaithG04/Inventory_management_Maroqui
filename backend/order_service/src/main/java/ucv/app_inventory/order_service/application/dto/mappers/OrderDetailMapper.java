@@ -72,11 +72,11 @@ public class OrderDetailMapper {
 
         OrderDetail orderDetail = new OrderDetail();
 
-        if (orderDetailDTO.getId() != null) {
+        /*if (orderDetailDTO.getId() != null) {
             orderDetail.setId(orderDetailDTO.getId());
         }else {
             throw new InvalidArgumentException("OrderDetail id is null");
-        }
+        }*/
 
         Order order = orderMySqlRepository.findById(orderDetailDTO.getOrderId()).orElseThrow(() -> new InvalidArgumentException("Order not found"));
         orderDetail.setOrder(order);

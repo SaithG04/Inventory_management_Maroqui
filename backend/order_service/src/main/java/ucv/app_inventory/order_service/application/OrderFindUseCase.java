@@ -17,7 +17,6 @@ import ucv.app_inventory.order_service.infrastructure.outbound.database.OrderMyS
 import ucv.app_inventory.order_service.infrastructure.outbound.external.SupplierAPIClient;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +37,7 @@ public class OrderFindUseCase {
      * @return the found order.
      * @throws OrderNotFoundException if the order with the specified ID is not found.
      */
-    public Order findById(Object id) {
+    public OrderDTO findById(Object id) {
         if(id == null) return null;
         long id_;
         try {
@@ -51,8 +50,8 @@ public class OrderFindUseCase {
             throw new InvalidArgumentException("Invalid ID");
         }
 
-        return orderMySqlRepository.findById(id_)
-                .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + id));
+        return orderMapper.mapToOrderDTO(orderMySqlRepository.findById(id_)
+                .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + id)));
     }
 
     /**
@@ -64,11 +63,7 @@ public class OrderFindUseCase {
     @Cacheable(value = "orders")
     public Page<OrderDTO> listOrdersPaginated(Pageable pageable) {
         Page<Order> orders = orderMySqlRepository.findAll(pageable);
-        try {
-            return orders.map(orderMapper::mapToOrderDTO);
-        } catch (InvalidArgumentException e) {
-            throw new InvalidArgumentException(e.getMessage());
-        }
+        return orders.map(orderMapper::mapToOrderDTO);
     }
 
     /**
@@ -86,11 +81,7 @@ public class OrderFindUseCase {
         validateDateRange(startDate, endDate);  // Validar el rango de fechas antes de consultar la base de datos.
 
         Page<Order> orders = orderMySqlRepository.findByOrderDateBetween(startDate, endDate, pageable);
-        try {
-            return orders.map(orderMapper::mapToOrderDTO);
-        } catch (InvalidArgumentException e) {
-            throw new InvalidArgumentException(e.getMessage());
-        }
+        return orders.map(orderMapper::mapToOrderDTO);
     }
 
     /**
@@ -125,11 +116,7 @@ public class OrderFindUseCase {
     public Page<OrderDTO> findOrdersByStatus(String status, Pageable pageable) {
         OrderState orderState = validateStatus(status);
         Page<Order> orders = orderMySqlRepository.findByStatus(orderState, pageable);
-        try {
-            return orders.map(orderMapper::mapToOrderDTO);
-        } catch (InvalidArgumentException e) {
-            throw new InvalidArgumentException(e.getMessage());
-        }
+        return orders.map(orderMapper::mapToOrderDTO);
     }
 
     /**

@@ -16,9 +16,7 @@ import ucv.app_inventory.order_service.infrastructure.outbound.database.OrderMyS
 import ucv.app_inventory.order_service.infrastructure.outbound.external.SupplierAPIClient;
 import ucv.app_inventory.order_service.infrastructure.outbound.external.ProductAPIClient;
 
-import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;

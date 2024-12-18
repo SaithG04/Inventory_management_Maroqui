@@ -35,6 +35,7 @@ public class OrderDetail {
                 "id=" + id +
                 ", productSupplierId=" + productSupplierId +
                 ", quantity=" + quantity +
+                ", orderId=" + order.getId() +
                 '}';
     }
 

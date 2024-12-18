@@ -4,8 +4,9 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;  // Cambiar a LocalDateTime
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,11 +41,11 @@ public class Order {
     // List of details for each order item; each detail is cascaded and loaded lazily.
     @JsonManagedReference
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<OrderDetail> orderDetails;
+    private List<OrderDetail> orderDetails = new ArrayList<>();
 
     // Total amount for the order.
     @Column(name = "total", nullable = false)
-    private Double total;
+    private BigDecimal total = BigDecimal.ZERO;
 
     // Additional observations or notes about the order, if any.
     @Column(name = "observations")
@@ -60,7 +61,9 @@ public class Order {
      */
     @PrePersist
     protected void onCreate() {
-        this.creationDate = LocalDateTime.now();  // Fecha y hora
+        if(creationDate == null) {
+            creationDate = LocalDateTime.now();
+        }
     }
 
     @Override
@@ -70,16 +73,9 @@ public class Order {
                 ", supplierId=" + supplierId +
                 ", orderDate=" + orderDate +
                 ", status=" + status +
-                ", orderDetailsIDs=" + getOrderDetailIds(orderDetails) +
                 ", total=" + total +
                 ", observations='" + observations + '\'' +
                 ", creationDate=" + creationDate +
                 '}';
-    }
-
-    private String getOrderDetailIds(List<OrderDetail> orderDetails) {
-        List<Long> orderDetailIds = new ArrayList<>();
-        orderDetails.forEach(orderDetail -> orderDetailIds.add(orderDetail.getId()));
-        return orderDetailIds.toString();
     }
 }

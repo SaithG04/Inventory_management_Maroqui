@@ -41,9 +41,6 @@ public interface ProductAPIClient {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size);
 
-    @GetMapping("/api/product-supplier/{productId}/suppliers/{supplierId}/exists")
-    Boolean checkRelationExists(@PathVariable Long productId, @PathVariable Long supplierId);
-
     @GetMapping("/api/product-supplier/{productId}/suppliers/{supplierId}")
     Optional<ProductSupplierDTO> getRelationByProductIdAndSupplierId(
             @PathVariable Long productId, @PathVariable Long supplierId);
