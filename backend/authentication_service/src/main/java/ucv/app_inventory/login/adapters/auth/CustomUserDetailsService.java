@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ucv.app_inventory.login.adapters.persistance.JpaUserRepository;
+import ucv.app_inventory.login.adapters.persistence.JpaUserRepository;
 import ucv.app_inventory.login.domain.model.Status;
 
 import java.util.Set;
