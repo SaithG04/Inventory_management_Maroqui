@@ -24,7 +24,6 @@ public class UserMapper {
         return userDto;
     }
 
-    // Si necesitas mapear de UserDto a User, puedes agregar este método
     public static User toUser(UserDto userDto, User user) {
         if (userDto == null || user == null) {
             return null;
@@ -34,9 +33,7 @@ public class UserMapper {
         if (user.getUserProfile() != null) {
             user.getUserProfile().setFirstName(userDto.getFirstName());
             user.getUserProfile().setLastName(userDto.getLastName());
-            // Actualiza otros campos si es necesario
         }
-        // No actualizamos la contraseña ni los roles aquí por seguridad y consistencia
         return user;
     }
 

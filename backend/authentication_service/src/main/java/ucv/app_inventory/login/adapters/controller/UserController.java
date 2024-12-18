@@ -64,7 +64,6 @@ public class UserController {
     }
 
     // 7. Obtener todos los roles disponibles
-    // Mover a otro controller solo para lo relacionado a roles
     @GetMapping("/roles")
     public ResponseEntity<ApiResponse<List<String>>> getAllRoles() {
         List<String> roles = userService.getAllRoles();
