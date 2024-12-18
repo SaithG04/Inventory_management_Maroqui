@@ -2,6 +2,7 @@ package ucv.app_inventory.application.services;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import ucv.app_inventory.application.DTO.ProductSupplierDTO;
 import ucv.app_inventory.application.DTO.SupplierDTO;
 import ucv.app_inventory.domain.entities.ProductSupplier;
 
@@ -11,9 +12,9 @@ public interface ProductSupplierService {
 
     List<SupplierDTO> getSuppliersByProductId(Long productId);
 
-    ProductSupplier addSupplierToProduct(Long productId, Long supplierId, Double price);
+    ProductSupplier addSupplierToProduct(ProductSupplierDTO productSupplierDTO);
 
-    void removeSupplierFromProduct(Long productId, Long supplierId);
+    void removeSupplierFromProduct(Long productId, String supplierName);
 
     boolean existsByProductAndSupplier(Long productId, Long supplierId);
 
@@ -27,6 +28,6 @@ public interface ProductSupplierService {
 
     List<SupplierDTO> getSuppliersByName(String name);
 
-
+    void removeRelationsById(Long id);
 
 }

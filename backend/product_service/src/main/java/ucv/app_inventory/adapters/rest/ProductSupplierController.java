@@ -31,35 +31,25 @@ public class ProductSupplierController {
     }
 
     // Agregar un proveedor a un producto
-    @PostMapping("/{productId}/suppliers/{supplierId}")
-    public ResponseEntity<Void> addSupplierToProduct(@PathVariable Long productId, @PathVariable Long supplierId,
-                                                     @RequestBody ProductSupplierDTO request) {
-        // Llamada al microservicio de proveedores a través del cliente Feign para obtener el proveedor por ID
-        SupplierDTO supplier = supplierClient.getSupplierById(supplierId); // Esto usa Feign para llamar al microservicio de proveedores
-
-        // Si no se encuentra el proveedor, devolver 404 Not Found
-        if (supplier == null) {
-            return ResponseEntity.notFound().build();
-        }
-
+    @PostMapping("/addSupplierToProduct")
+    public ResponseEntity<ProductSupplier> addSupplierToProduct(@RequestBody ProductSupplierDTO request) {
         // Aquí añadimos la lógica para agregar la relación en la base de datos, usando ProductSupplierService
-        productSupplierService.addSupplierToProduct(productId, supplierId, request.getPrice());
-        return ResponseEntity.ok().build();
+        ProductSupplier productSupplier = productSupplierService.addSupplierToProduct(request);
+        return ResponseEntity.ok().body(productSupplier);
+    }
+
+    @DeleteMapping("/deleteRelationById/{id}")
+    public ResponseEntity<Void> deleteRelationById(@PathVariable Long id) {
+        productSupplierService.removeRelationsById(id);
+        return ResponseEntity.noContent().build();
     }
 
     // Eliminar un proveedor de un producto
-    @DeleteMapping("/{productId}/suppliers/{supplierId}")
-    public ResponseEntity<Void> removeSupplierFromProduct(@PathVariable Long productId, @PathVariable Long supplierId) {
-        // Llamada al microservicio de proveedores a través del cliente Feign para verificar si el proveedor existe
-        SupplierDTO supplier = supplierClient.getSupplierById(supplierId);
-
-        // Si no se encuentra el proveedor, devolver 404 Not Found
-        if (supplier == null) {
-            return ResponseEntity.notFound().build();
-        }
+    @DeleteMapping("/{productId}/supplier")
+    public ResponseEntity<Void> removeSupplierFromProduct(@PathVariable Long productId, @RequestParam String supplierName) {
 
         // Lógica para eliminar la relación entre el proveedor y el producto
-        productSupplierService.removeSupplierFromProduct(productId, supplierId);
+        productSupplierService.removeSupplierFromProduct(productId, supplierName);
         return ResponseEntity.noContent().build();
     }
 
