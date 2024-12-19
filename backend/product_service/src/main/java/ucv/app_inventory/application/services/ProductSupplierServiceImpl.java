@@ -47,7 +47,7 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
     // Agregar un proveedor a un producto
     public ProductSupplier addSupplierToProduct(ProductSupplierDTO productSupplierDTO) {
 
-        Long supplierId = getSupplierId(productSupplierDTO);
+        Long supplierId = getSupplierId(productSupplierDTO.getSupplierName());
 
         Long productId = productRepository.findProductByNameEquals(productSupplierDTO.getProductName())
                 .orElseThrow(() -> new ProductNotFoundException("Product not found")).getId();
@@ -73,7 +73,7 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
 
         ProductSupplierDTO productSupplierDTO = new ProductSupplierDTO();
         productSupplierDTO.setSupplierName(supplierName);
-        Long supplierId = getSupplierId(productSupplierDTO);
+        Long supplierId = getSupplierId(productSupplierDTO.getSupplierName());
 
         // Buscar la relación entre el producto y el proveedor
         ProductSupplier productSupplier = productSupplierRepository.findByProductIdAndSupplierId(productId, supplierId);
@@ -97,7 +97,8 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
     }
 
     @Override
-    public List<ProductSupplier> getRelationsBySupplierId(Long supplierId) {
+    public List<ProductSupplier> getRelationsBySupplierName(String supplierName) {
+        Long supplierId = getSupplierId(supplierName);
         return productSupplierRepository.findBySupplierId(supplierId);
     }
 
@@ -112,20 +113,14 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
     }
 
     @Override
-    public List<SupplierDTO> getSuppliersByName(String name) {
-        return supplierClient.getSuppliersByName(name, PageRequest.of(0, 15)).getContent();
-
-    }
-
-    @Override
     public void removeRelationsById(Long id){
         productSupplierRepository.findById(id).orElseThrow(() -> new InvalidFieldException("Relation not found"));
         productSupplierRepository.deleteById(id);
     }
 
-    private Long getSupplierId(ProductSupplierDTO productSupplierDTO) {
+    private Long getSupplierId(String supplierName) {
         Pageable pageable = PageRequest.of(0, 1);
-        Page<SupplierDTO> page = supplierClient.getSuppliersByName(productSupplierDTO.getSupplierName(), pageable);
+        Page<SupplierDTO> page = supplierClient.getSuppliersByName(supplierName, pageable);
 
         if(page == null || page.getTotalElements() == 0) {
             throw new InvalidFieldException("Supplier not found");

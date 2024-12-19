@@ -20,13 +20,11 @@ public interface ProductSupplierService {
 
     List<ProductSupplier> getRelationsByProductId(Long productId);
 
-    List<ProductSupplier> getRelationsBySupplierId(Long supplierId);
+    List<ProductSupplier> getRelationsBySupplierName(String supplierName);
 
     ProductSupplier getRelationByProductAndSupplier(Long productId, Long supplierId);
 
     ProductSupplier getById(Long id);
-
-    List<SupplierDTO> getSuppliersByName(String name);
 
     void removeRelationsById(Long id);
 
