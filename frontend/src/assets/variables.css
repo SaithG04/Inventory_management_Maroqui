@@ -9,4 +9,8 @@
     --color-rojo: #9b6a67;
     --color-rojo-oscuro: #7f3736;
     --color-borde-focus: #9fceff;
+    --color-azul: #5a9bd4; /* Nuevo color azul */
+    --color-azul-oscuro: #2c75ac; /* Nuevo color azul oscuro */
+    --color-naranja: #f4a261; /* Nuevo color naranja */
+    --color-naranja-oscuro: #e76f51; /* Nuevo color naranja oscuro */
 }

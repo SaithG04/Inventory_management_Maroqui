@@ -1,26 +1,27 @@
-import Cookies from 'js-cookie'; // Manejo de cookies para el token
+import jwtDecode from 'jwt-decode';
+import Cookies from 'js-cookie';
 
-// Obtiene el token desde las cookies
 export const getToken = () => {
-    return Cookies.get('jwtToken'); // Cambia 'jwtToken' si usas otra clave en tus cookies
+  const token = Cookies.get('jwtToken');
+  console.log('Token guardado:', token);
+  return token;
 };
 
-// Obtiene roles desde el token
 export const getRolesFromToken = () => {
-    const token = getToken();
-    if (token) {
-        try {
-            const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decodificar el payload del JWT
-            return decodedToken.roles || [];
-        } catch (error) {
-            console.error('Error al decodificar el token:', error);
-            return [];
-        }
+  const token = getToken();
+  if (token) {
+    try {
+      const decodedToken = jwtDecode(token); // Decodifica el token de forma segura
+      return decodedToken.roles || [];
+    } catch (error) {
+      console.error('Error al decodificar el token:', error);
+      return [];
     }
-    return [];
+  }
+  return [];
 };
 
-// Elimina el token (para cierre de sesión)
 export const removeToken = () => {
-    Cookies.remove('jwtToken');
+  Cookies.remove('jwtToken');
+  console.log('Token eliminado');
 };

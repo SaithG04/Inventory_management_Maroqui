@@ -1,0 +1,138 @@
+/* ============================
+Estilos para el Formulario Crear Producto
+============================ */
+.add-product-form {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    margin: 0 auto; /* Centra horizontalmente sin márgenes adicionales */
+    max-width: 800px;
+    font-family: Arial, sans-serif;
+    position: relative; /* Evita problemas con elementos flotantes */
+}
+
+/* Elimina márgenes adicionales en el contenedor principal */
+.add-product-form:last-child {
+    margin-bottom: 0;
+}
+
+/* Contenedor de columnas para los campos */
+.form-columns {
+    display: flex;
+    gap: 20px; /* Espaciado entre columnas */
+    justify-content: space-between;
+    flex-wrap: wrap; /* Permite adaptarse en pantallas pequeñas */
+}
+
+/* Estilo para las columnas */
+.form-column {
+    flex: 1;
+    min-width: 300px; /* Tamaño mínimo de la columna */
+    max-width: 400px; /* Tamaño máximo de la columna */
+}
+
+/* Filas dentro de las columnas */
+.form-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px; /* Espaciado entre filas */
+}
+
+/* Etiquetas */
+.form-row label {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 5px; /* Separación entre la etiqueta y el campo */
+}
+
+/* ============================
+Campos de entrada
+============================ */
+.form-row input {
+    padding: 10px;
+    border: 1px solid var(--color-borde, #ddd); /* Usa color global para el borde */
+    border-radius: 5px;
+    font-size: 14px;
+    line-height: 1.5; /* Asegura consistencia en la altura */
+    height: 42px; /* Tamaño fijo para asegurar uniformidad */
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transiciones suaves */
+}
+
+/* Hover en los campos de entrada */
+.form-row input:hover {
+    border-color: var(--color-borde-focus, #007bff); /* Color del borde al pasar el mouse */
+    box-shadow: 0px 0px 4px var(--color-borde-focus, #9fceff); /* Sombra para resaltar */
+}
+
+/* Foco en los campos de entrada */
+.form-row input:focus {
+    border-color: var(--color-borde-focus, #007bff); /* Color del borde al enfocar */
+    outline: none;
+    box-shadow: 0px 0px 6px var(--color-borde-focus, #9fceff); /* Sombra más intensa */
+}
+
+/* ============================
+Estilos para los Dropdown
+============================ */
+.form-row .p-dropdown {
+    display: flex;
+    align-items: center; /* Centra verticalmente los elementos */
+    justify-content: center; /* Centra horizontalmente el texto */
+    padding: 8px 10px; /* Ajusta el padding para un diseño más compacto */
+    border: 1px solid var(--color-borde, #ddd); /* Usa color global para el borde */
+    border-radius: 5px; /* Bordes suaves */
+    font-size: 14px; /* Tamaño de fuente consistente */
+    line-height: 1.5; /* Asegura consistencia en la altura */
+    height: 42px; /* Tamaño fijo para igualar con los input */
+    width: 100%;
+    box-sizing: border-box; /* Incluye bordes y padding en el tamaño */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transiciones suaves */
+}
+
+/* Hover en los Dropdown */
+.form-row .p-dropdown:hover {
+    border-color: var(--color-borde-focus, #007bff); /* Color del borde al pasar el mouse */
+    box-shadow: 0px 0px 4px var(--color-borde-focus, #9fceff); /* Sombra para resaltar */
+}
+
+/* Foco en los Dropdown */
+.form-row .p-dropdown:focus {
+    border-color: var(--color-borde-focus, #007bff); /* Color del borde al enfocar */
+    outline: none;
+    box-shadow: 0px 0px 6px var(--color-borde-focus, #9fceff); /* Sombra más intensa */
+}
+
+.form-row .p-dropdown-panel {
+    max-height: 200px; /* Limita la altura máxima del panel desplegable */
+    overflow-y: auto; /* Activa el scroll si hay demasiadas opciones */
+    border: 1px solid var(--color-borde, #ddd); /* Bordes consistentes */
+    border-radius: 5px; /* Bordes suaves */
+    font-size: 14px;
+}
+
+.form-row .p-dropdown-item {
+    padding: 10px; /* Ajusta el padding de las opciones */
+    font-size: 14px; /* Tamaño de texto uniforme */
+    color: #333; /* Color del texto */
+}
+
+/* ============================
+Botones del formulario
+============================ */
+
+/* ============================
+Responsive - Ajustes para Pantallas Pequeñas
+============================ */
+@media (max-width: 768px) {
+    .form-columns {
+        flex-direction: column; /* Cambia a disposición en columna */
+        gap: 0; /* Reduce el espacio entre columnas */
+    }
+
+    .form-column {
+        max-width: 100%; /* Asegura que las columnas ocupen todo el ancho */
+    }
+}

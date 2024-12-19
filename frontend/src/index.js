@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router } from 'react-router-dom';
 import App from './App';
 import { ToastContainer } from 'react-toastify';
+import 'primereact/resources/themes/saga-blue/theme.css';  // Tema opcional
+import 'primereact/resources/primereact.min.css';         // Estilos de PrimeReact
+import 'primeicons/primeicons.css';                      // Íconos de PrimeReact
 import 'react-toastify/dist/ReactToastify.css'; // Estilos de las notificaciones
 
 // Importación de estilos de PrimeReact

@@ -1,0 +1,114 @@
+/* ============================
+Formulario de Empleados
+============================ */
+.employee-form {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #f9f9f9;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================
+Estructura del Formulario
+============================ */
+.employee-form form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Dos columnas */
+    gap: 20px; /* Espaciado entre columnas y filas */
+}
+
+.p-field {
+    display: flex;
+    flex-direction: column;
+    position: relative; /* Para estilos adicionales si es necesario */
+}
+
+/* ============================
+Estilo para los campos de texto y dropdowns
+============================ */
+.p-field input,
+.p-field select,
+.p-field .p-dropdown {
+    padding: 14px; /* Ajuste del padding */
+    font-size: 16px; /* Tamaño de texto más legible */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box; /* Incluye el padding en el tamaño total */
+    height: 44px; /* Altura uniforme para todos los elementos */
+}
+
+.p-field .p-dropdown {
+    display: flex;
+    align-items: center; /* Centrar texto verticalmente */
+}
+
+.p-field input:focus,
+.p-field select:focus,
+.p-field .p-dropdown:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+}
+
+/* Etiquetas dentro de los campos */
+.p-field label {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.p-button.add-employee-button {
+    background-color: var(--color-verde);
+    color: white; /* Color del texto */
+    padding: 10px 15px; /* Espaciado interno */
+    border: none; /* Sin borde */
+    border-radius: 4px; /* Bordes redondeados */
+    font-size: 16px; /* Tamaño de la fuente */
+    cursor: pointer; /* Cambiar el cursor al pasar el mouse */
+    display: flex; /* Alinear ícono y texto */
+    align-items: center;
+    gap: 8px; /* Espaciado entre ícono y texto */
+    transition: background-color 0.3s ease; /* Efecto de transición */
+}
+
+.p-button.add-employee-button:hover {
+    background-color: var(--color-verde-oscuro);
+    transform: scale(1.05);
+}
+
+
+/* ============================
+Mensajes de error
+============================ */
+.error-message {
+    grid-column: span 2; /* Ocupa todo el ancho del formulario */
+    color: red;
+    font-size: 14px;
+}
+
+/* ============================
+Estilo responsive
+============================ */
+@media (max-width: 768px) {
+    .employee-form form {
+        grid-template-columns: 1fr; /* Cambiar a una columna */
+    }
+
+    .form-buttons {
+        flex-direction: column;
+        align-items: stretch; /* Estirar botones al ancho completo */
+    }
+
+    .form-buttons .p-button {
+        width: 100%; /* Botones ocupan todo el ancho */
+        margin-bottom: 10px; /* Espaciado entre botones */
+    }
+
+    .form-buttons .p-button:last-child {
+        margin-bottom: 0; /* Elimina el margen inferior del último botón */
+    }
+}

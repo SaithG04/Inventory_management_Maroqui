@@ -1,0 +1,120 @@
+/* General Styles */
+.surface-ground {
+  background-color: #f8f9fa; /* Fondo claro para el contenedor principal */
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.col-12 {
+  flex: 1 1 100%;
+}
+
+.md\:col-6 {
+  flex: 1 1 50%;
+}
+
+.lg\:col-3 {
+  flex: 1 1 25%;
+}
+
+/* Card Styles (Rectangular) */
+.surface-card {
+  background-color: #ffffff;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  transition: box-shadow 0.2s ease-in-out;
+  height: 120px; /* Altura fija para tarjetas */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 4px; /* Redondeado leve para un diseño moderno */
+}
+
+.surface-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Metric Text */
+.text-500 {
+  color: #6c757d;
+}
+
+.text-900 {
+  color: #212529;
+}
+
+/* Metric Titles */
+.text-xl {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+/* Icon Containers */
+.flex {
+  display: flex;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.justify-content-center {
+  justify-content: center;
+}
+
+.bg-blue-100 {
+  background-color: #e3f2fd;
+}
+
+.bg-orange-100 {
+  background-color: #ffe0b2;
+}
+
+.bg-cyan-100 {
+  background-color: #b2ebf2;
+}
+
+.bg-purple-100 {
+  background-color: #e1bee7;
+}
+
+/* Icon Styles */
+.text-blue-500 {
+  color: #1e88e5;
+}
+
+.text-orange-500 {
+  color: #f57c00;
+}
+
+.text-cyan-500 {
+  color: #00acc1;
+}
+
+.text-purple-500 {
+  color: #8e24aa;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .md\:col-6 {
+      flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 1024px) {
+  .lg\:col-3 {
+      flex: 1 1 50%;
+  }
+}

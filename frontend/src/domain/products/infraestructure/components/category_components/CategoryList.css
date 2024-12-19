@@ -1,0 +1,91 @@
+/* Estilo General del Contenedor */
+.category-list .p-datatable {
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    width: 80%; /* Ajusta el ancho al 80% del contenedor padre */
+    margin: 0 auto; /* Centra horizontalmente */
+    max-width: 1200px; /* Ancho máximo */
+    padding: 20px; /* Espaciado interno */
+}
+
+
+
+
+/* ============================
+   Estilos de Botones de Acción
+============================ */
+.category-list .actions {
+    display: flex;
+    justify-content: center; /* Centra los botones horizontalmente */
+    align-items: center;     /* Alinea verticalmente */
+    gap: 10px;               /* Espacio entre botones */
+}
+
+/* Botones de acción: Editar y Eliminar */
+.category-list .p-button-success {
+    background-color: var(--color-verde);
+    border: none;
+    color: #fff;
+    border-radius: 5px;
+    padding: 0.7rem 1.2rem; /* Tamaño ajustado */
+    font-size: 16px; /* Tamaño ajustado */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 120px; /* Anchura fija */
+}
+
+.category-list .p-button-success:hover {
+    background-color: var(--color-verde-oscuro);
+    transform: scale(1.05);
+}
+
+.category-list .p-button-danger {
+    background-color: var(--color-rojo);
+    border: none;
+    color: #fff;
+    border-radius: 5px;
+    padding: 0.7rem 1.2rem; /* Tamaño ajustado */
+    font-size: 16px; /* Tamaño ajustado */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 120px; /* Anchura fija */
+}
+
+.category-list .p-button-danger:hover {
+    background-color: var(--color-rojo-oscuro);
+    transform: scale(1.05);
+}
+
+/* ============================
+   Estilo para Descripciones Largas
+============================ */
+.category-list .description-wrapper {
+    position: relative;
+    display: inline-block;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.category-list .description-wrapper:hover {
+    white-space: normal; /* Expande la descripción al hacer hover */
+    background-color: rgba(240, 240, 240, 0.8);
+    padding: 4px;
+    border-radius: 4px;
+}
+
+/* ============================
+   Responsive Design
+============================ */
+@media (max-width: 768px) {
+    .category-list .actions {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .category-list .p-datatable {
+        overflow-x: scroll;
+    }
+}

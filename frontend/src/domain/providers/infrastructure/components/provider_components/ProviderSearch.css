@@ -1,0 +1,79 @@
+/* ============================
+Sección de Búsqueda de Proveedores
+=========================== */
+
+/* Contenedor general de la sección de búsqueda de proveedores */
+.provider-search-section {
+    display: flex; /* Alinear los elementos horizontalmente */
+    flex-wrap: nowrap; /* Evitar que los elementos salten a la siguiente línea */
+    justify-content: space-between; /* Espaciado uniforme entre elementos */
+    align-items: center; /* Centrar verticalmente los elementos */
+    gap: 10px; /* Separación entre los elementos */
+    padding: 20px; /* Espaciado interno */
+    background-color: #f0f4f8; /* Fondo suave */
+    border-radius: 8px; /* Bordes redondeados */
+    margin-bottom: 20px; /* Espaciado inferior */
+    box-sizing: border-box; /* Incluir padding en el tamaño total */
+    border: 1px solid #ddd; /* Bordes suaves */
+    width: 100%; /* Asegura que ocupe todo el ancho disponible */
+    transition: width 0.3s ease-in-out; /* Transición suave en el cambio de ancho */
+}
+
+/* Mantener el tamaño fijo cuando el sidebar cambia */
+body.sidebar-hidden .provider-search-section {
+    width: calc(100% - 30px); /* Ajusta el ancho si el sidebar está oculto */
+}
+
+body.sidebar-expanded .provider-search-section {
+    width: calc(100% - 250px); /* Ajusta el ancho si el sidebar está expandido */
+}
+
+/* ============================
+Criterio de Búsqueda (Dropdown de tipo)
+=========================== */
+.provider-search-dropdown {
+    min-width: 300px;
+    max-width: 400px;
+    padding: 5px;
+    font-size: 14px;
+}
+
+.provider-search-dropdown .p-dropdown {
+    width: 100%; /* Asegura que el dropdown ocupe el 100% del contenedor */
+}
+
+/* ============================
+Entrada de Búsqueda o Selección de Estado (Input o Dropdown)
+=========================== */
+.provider-input {
+    flex-grow: 1; /* Permitir que el input crezca dentro del contenedor flexible */
+    min-width: 300px;
+    max-width: 800px;
+    padding: 5px;
+    font-size: 14px;
+}
+
+.provider-input .p-dropdown,
+.provider-input .p-inputtext {
+    width: 100%; /* Ocupa todo el ancho del contenedor */
+}
+
+/* ============================
+Responsive - Ajustes para Pantallas Pequeñas
+=========================== */
+@media (max-width: 768px) {
+    .provider-search-section {
+        flex-direction: column; /* Cambiar disposición a columna */
+        align-items: stretch; /* Estirar los elementos */
+        padding: 15px;
+    }
+
+    .provider-search-buttons {
+        justify-content: center; /* Centrar los botones */
+        width: 100%; /* Asegurar que ocupen todo el ancho */
+    }
+
+    .provider-input {
+        width: 100%; /* Asegurar que los inputs ocupen todo el ancho */
+    }
+}

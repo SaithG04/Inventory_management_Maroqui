@@ -1,0 +1,77 @@
+/* ============================
+Sección de Búsqueda de Categorías
+============================ */
+
+/* Contenedor general de la sección de búsqueda de categorías */
+.category-search-section {
+    display: flex; /* Alinear los elementos horizontalmente */
+    flex-wrap: wrap; /* Permitir que los elementos salten a la siguiente línea en pantallas pequeñas */
+    justify-content: space-between; /* Espacio igual entre elementos */
+    align-items: center; /* Centrar los elementos verticalmente */
+    gap: 10px; /* Separación entre los elementos */
+    padding: 20px;
+    background-color: #f0f4f8; /* Fondo suave */
+    border-radius: 8px; /* Bordes redondeados */
+    margin-bottom: 20px;
+    box-sizing: border-box; /* Incluir padding en el tamaño total */
+    border: 1px solid #ddd;
+    width: calc(100% - 30px); /* Calcular el ancho restante al considerar el sidebar */
+    transition: width 0.3s ease-in-out; /* Animación suave para el cambio de ancho */
+}
+
+/* Mantener el tamaño fijo cuando el sidebar está expandido */
+body.sidebar-expanded .category-search-section {
+    width: calc(100% - 250px); /* Ancho ajustado considerando el tamaño del sidebar expandido */
+}
+
+/* Mantener el tamaño fijo cuando el sidebar está oculto */
+body.sidebar-hidden .category-search-section {
+    width: calc(100% - 50px); /* Ancho ajustado considerando el tamaño reducido del sidebar */
+}
+
+/* ============================
+Criterio de Búsqueda (Dropdown de tipo)
+============================ */
+.category-search-dropdown {
+    min-width: 300px;
+    max-width: 300px;
+    padding: 5px;
+    font-size: 14px;
+}
+
+.category-search-dropdown .p-dropdown {
+    width: 100%;
+}
+
+/* ============================
+Entrada de Búsqueda o Selección de Estado (Input o Dropdown)
+============================ */
+.category-input {
+    min-width: 300px; /* Ajuste del ancho mínimo */
+    max-width: 800px; /* Limitar el ancho máximo */
+    flex-grow: 1; /* Permitir que crezca dentro del contenedor flexible */
+    padding: 5px;
+    font-size: 14px;
+}
+
+.category-input .p-dropdown,
+.category-input .p-inputtext {
+    width: 100%; /* Ancho completo */
+}
+
+/* ============================
+Responsive - Ajustes para Pantallas Pequeñas
+============================ */
+@media (max-width: 768px) {
+    .category-search-section {
+        flex-direction: column; /* Cambiar disposición a columna */
+        align-items: stretch; /* Alinear al ancho completo */
+        padding: 15px;
+        width: 100%; /* Asegurar que ocupe todo el ancho en pantallas pequeñas */
+    }
+
+    .category-search-buttons {
+        justify-content: center; /* Centrar los botones en pantallas pequeñas */
+        width: 100%; /* Asegurar que ocupen todo el ancho disponible */
+    }
+}
