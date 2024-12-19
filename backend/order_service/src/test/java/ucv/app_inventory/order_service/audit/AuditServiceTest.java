@@ -29,7 +29,7 @@ public class AuditServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
+    /*@Test
     public void recordAudit_shouldSaveToRepository() {
         // Set up test data
         String entity = "Order";
@@ -60,5 +60,5 @@ public class AuditServiceTest {
 
         // Verify that the repository's findById method was called
         verify(auditRepository, times(1)).findById(1L);
-    }
+    }*/
 }

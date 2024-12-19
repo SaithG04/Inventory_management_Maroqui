@@ -1,5 +1,6 @@
 package ucv.app_inventory.supplier_service.infrastructure.outbound.external;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ public interface ProductAPIClient {
      * @param id The ID of the product to retrieve.
      * @return A ProductDTO containing product details.
      */
-    @GetMapping("/api/products/{id}")
+    @GetMapping("/api/product/findProductById/{id}")
+    @Cacheable("productNames")
     ProductDTO getProductById(@PathVariable("id") Long id);
 }

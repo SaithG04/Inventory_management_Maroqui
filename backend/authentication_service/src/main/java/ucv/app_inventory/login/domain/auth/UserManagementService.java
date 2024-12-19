@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ucv.app_inventory.login.domain.model.Status;
 import ucv.app_inventory.login.domain.model.User;
-import ucv.app_inventory.login.adapters.persistance.JpaUserRepository;
+import ucv.app_inventory.login.adapters.persistence.JpaUserRepository;
 
 import java.util.Optional;
 

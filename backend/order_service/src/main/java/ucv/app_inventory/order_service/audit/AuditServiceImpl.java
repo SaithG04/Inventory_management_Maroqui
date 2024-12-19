@@ -21,14 +21,14 @@ public class AuditServiceImpl implements AuditService {
     /**
      * Records a new audit event in the database.
      *
-     * @param entity  The affected entity (e.g., Order, Customer).
+     * @param entity  The affected entity (e.g., Supplier, Customer).
      * @param action  The action performed (e.g., CREATE, UPDATE, DELETE).
-     * @param user    The name of the user who performed the action.
+     * @param user_id  The ID of the user who performed the action.
      * @param details Additional details of the audit event.
      */
     @Override
-    public void recordAudit(String entity, String action, String user, String details) {
-        Audit audit = new Audit(entity, action, user, details);
+    public void recordAudit(String entity, String action, Long user_id, String details) {
+        Audit audit = new Audit(entity, action, user_id, details);
         auditRepository.save(audit); // Persist the audit event
     }
 

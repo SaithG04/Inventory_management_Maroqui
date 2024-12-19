@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import ucv.app_inventory.domain.entities.Product;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long>{
@@ -20,6 +21,5 @@ public interface ProductRepository extends JpaRepository<Product, Long>{
     @Query("SELECT p.code FROM Product p ORDER BY p.id DESC LIMIT 1")
     String findLastProductCode();
 
-
-
+    Optional<Product> findProductByNameEquals(String name);
 }

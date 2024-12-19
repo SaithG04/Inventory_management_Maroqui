@@ -6,6 +6,7 @@ import ucv.app_inventory.order_service.domain.model.OrderDetail;
 import ucv.app_inventory.order_service.infrastructure.outbound.database.OrderDetailMySqlRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -13,7 +14,7 @@ public class OrderDetailFindUseCase {
 
     private final OrderDetailMySqlRepository orderDetailRepository;
 
-    public List<OrderDetail> findByOrderId(Long orderId) {
-        return orderDetailRepository.findByOrderId(orderId);
+    public Optional<OrderDetail> findById(Long orderId) {
+        return orderDetailRepository.findById(orderId);
     }
 }

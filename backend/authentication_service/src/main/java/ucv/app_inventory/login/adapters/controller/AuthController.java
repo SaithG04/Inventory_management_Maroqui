@@ -6,21 +6,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import ucv.app_inventory.login.adapters.controller.dto.*;
 import ucv.app_inventory.login.application.AuthService;
-import ucv.app_inventory.login.application.UserService;
 import ucv.app_inventory.login.domain.auth.TokenManagementService;
 import ucv.app_inventory.login.domain.auth.TokenRevocationService;
 import ucv.app_inventory.login.domain.exception.InvalidCredentials;
-import ucv.app_inventory.login.domain.model.User;
-
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/api/auth")

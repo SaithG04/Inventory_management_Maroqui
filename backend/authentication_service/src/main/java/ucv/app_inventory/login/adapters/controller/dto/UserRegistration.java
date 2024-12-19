@@ -45,4 +45,8 @@ public class UserRegistration {
 
     @NotNull(message = "El estado civil es obligatorio")
     private MaritalStatus maritalStatus;
+
+    @NotBlank(message = "El rol es obligatorio")
+    @Pattern(regexp = "ADMINISTRATOR|WAREHOUSE CLARK|SELLER", message = "El rol debe ser ADMINISTRATOR, WAREHOUSE CLARK o SELLER")
+    private String roleName;
 }

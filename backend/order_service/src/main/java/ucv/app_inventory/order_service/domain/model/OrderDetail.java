@@ -23,16 +23,21 @@ public class OrderDetail {
     @JsonBackReference
     private Order order;
 
-    @Column(name = "product_id", nullable = false)
-    private Long productId;
+    @Column(name = "product_supplier_id", nullable = false)
+    private Long productSupplierId;
 
     @Column(name = "quantity", nullable = false)
-    private Integer quantity;
+    private Long quantity;
 
-    @Column(name = "unit_price", nullable = false)
-    private Double unitPrice;
-
-    public Double calculateTotal() {
-        return this.quantity * this.unitPrice;
+    @Override
+    public String toString() {
+        return "OrderDetail{" +
+                "id=" + id +
+                ", productSupplierId=" + productSupplierId +
+                ", quantity=" + quantity +
+                ", orderId=" + order.getId() +
+                '}';
     }
+
+
 }

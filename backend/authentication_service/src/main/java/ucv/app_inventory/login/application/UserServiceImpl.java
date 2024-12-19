@@ -13,12 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ucv.app_inventory.login.adapters.controller.dto.UserDto;
 import ucv.app_inventory.login.adapters.controller.dto.UserRegistration;
-import ucv.app_inventory.login.adapters.persistance.JpaUserRepository;
-import ucv.app_inventory.login.adapters.persistance.RoleRepository;
-import ucv.app_inventory.login.domain.model.Role;
-import ucv.app_inventory.login.domain.model.Status;
-import ucv.app_inventory.login.domain.model.User;
-import ucv.app_inventory.login.domain.model.UserProfile;
+import ucv.app_inventory.login.domain.exception.EmailAlreadyExistsException;
+import ucv.app_inventory.login.domain.exception.RoleNotFoundException;
+import ucv.app_inventory.login.adapters.persistence.JpaUserRepository;
+import ucv.app_inventory.login.adapters.persistence.RoleRepository;
+import ucv.app_inventory.login.domain.model.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -37,12 +36,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findByRoles_Name(String name) {
-        return List.of();
+        return jpaUserRepository.findByRoles_Name(name);
     }
 
     @Override
     public long countByStatus(Status status) {
-        return 0;
+        return jpaUserRepository.countByStatus(status);
     }
 
     @Override
@@ -75,10 +74,23 @@ public class UserServiceImpl implements UserService {
     public UserDto registerUser(UserRegistration userRegistration) {
         // Verificar si el email ya existe
         if (jpaUserRepository.findByEmail(userRegistration.getEmail()).isPresent()) {
-            throw new RuntimeException("El email ya está registrado");
+            throw new EmailAlreadyExistsException("El email ya está registrado");
         }
 
-        // Crear UserProfile
+        // Crear User y UserProfile
+        User user = createUserFromRegistration(userRegistration);
+
+        // Asignar rol proporcionado
+        assignRole(user, userRegistration.getRoleName());
+
+        // Guardar usuario (cascadeará al perfil)
+        jpaUserRepository.save(user);
+
+        // Convertir a UserDto
+        return UserMapper.toUserDto(user);
+    }
+
+    private User createUserFromRegistration(UserRegistration userRegistration) {
         UserProfile userProfile = new UserProfile();
         userProfile.setDni(userRegistration.getDni());
         userProfile.setFirstName(userRegistration.getFirstName());
@@ -90,24 +102,20 @@ public class UserServiceImpl implements UserService {
         userProfile.setSex(userRegistration.getSex());
         userProfile.setMaritalStatus(userRegistration.getMaritalStatus());
 
-        // Crear User
         User user = new User();
         user.setEmail(userRegistration.getEmail());
         user.setPassword(passwordEncoder.encode(userRegistration.getPassword()));
         user.setStatus(Status.ACTIVE);
         user.setUserProfile(userProfile);
-        userProfile.setUser(user); // Establecer la relación bidireccional
+        userProfile.setUser(user);
 
-        // Asignar rol por defecto (por ejemplo, "WAREHOUSE CLERK")
-        Role defaultRole = roleRepository.findByName("WAREHOUSE CLERK")
-                .orElseThrow(() -> new RuntimeException("Rol WAREHOUSE CLERK no encontrado"));
-        user.setRoles(Set.of(defaultRole));
+        return user;
+    }
 
-        // Guardar usuario (cascadeará al perfil)
-        jpaUserRepository.save(user);
-
-        // Utilizar UserMapper para convertir a UserDto
-        return UserMapper.toUserDto(user);
+    private void assignRole(User user, String roleName) {
+        Role role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new RoleNotFoundException("Rol " + roleName + " no encontrado"));
+        user.setRoles(Set.of(role));
     }
 
     @Override
@@ -124,36 +132,53 @@ public class UserServiceImpl implements UserService {
         User user = jpaUserRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Actualizar campos
-        if (updatedUser.getEmail() != null) {
-            user.setEmail(updatedUser.getEmail());
-        }
+        updateUserFields(user, updatedUser);
+        updateProfileFields(user.getUserProfile(), updatedUser);
 
-        if(updatedUser.getStatus() != null) {
-            user.setStatus(Status.valueOf(updatedUser.getStatus()));
-        }
-
-        // Actualizar UserProfile
-        UserProfile profile = user.getUserProfile();
-        if (updatedUser.getFirstName() != null) {
-            profile.setFirstName(updatedUser.getFirstName());
-        }
-        if (updatedUser.getLastName() != null) {
-            profile.setLastName(updatedUser.getLastName());
-        }
-
-        // Actualizar roles si es necesario
         if (updatedUser.getRoles() != null && !updatedUser.getRoles().isEmpty()) {
-            Set<Role> roles = updatedUser.getRoles().stream()
-                    .map(roleName -> roleRepository.findByName(roleName)
-                            .orElseThrow(() -> new RuntimeException("Rol " + roleName + " no encontrado")))
-                    .collect(Collectors.toSet());
-            user.setRoles(roles);
+            user.setRoles(getRolesFromNames(updatedUser.getRoles()));
         }
 
         jpaUserRepository.save(user);
         return UserMapper.toUserDto(user);
     }
+
+    @Override
+    @Transactional
+    public UserDto updateUserProfile(String email, UserDto updatedProfile) {
+        User user = jpaUserRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        updateProfileFields(user.getUserProfile(), updatedProfile);
+
+        jpaUserRepository.save(user);
+        return UserMapper.toUserDto(user);
+    }
+
+    private void updateUserFields(User user, UserDto dto) {
+        if (dto.getEmail() != null) user.setEmail(dto.getEmail());
+        if (dto.getStatus() != null) user.setStatus(Status.valueOf(dto.getStatus()));
+    }
+
+    private void updateProfileFields(UserProfile profile, UserDto dto) {
+        if (dto.getDni() != null) profile.setDni(dto.getDni());
+        if (dto.getFirstName() != null) profile.setFirstName(dto.getFirstName());
+        if (dto.getLastName() != null) profile.setLastName(dto.getLastName());
+        if (dto.getAge() != null) profile.setAge(dto.getAge());
+        if (dto.getBirthDate() != null) profile.setBirthDate(dto.getBirthDate());
+        if (dto.getAddress() != null) profile.setAddress(dto.getAddress());
+        if (dto.getPhone() != null) profile.setPhone(dto.getPhone());
+        if (dto.getSex() != null) profile.setSex(Sex.valueOf(dto.getSex()));
+        if (dto.getMaritalStatus() != null) profile.setMaritalStatus(MaritalStatus.valueOf(dto.getMaritalStatus()));
+    }
+
+    private Set<Role> getRolesFromNames(Set<String> roleNames) {
+        return roleNames.stream()
+                .map(roleName -> roleRepository.findByName(roleName)
+                        .orElseThrow(() -> new RuntimeException("Rol no encontrado: " + roleName)))
+                .collect(Collectors.toSet());
+    }
+
 
     @Override
     @Transactional
@@ -169,37 +194,20 @@ public class UserServiceImpl implements UserService {
     public UserDto assignRoleToUser(Long id, String roleName) {
         User user = jpaUserRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
         Role role = roleRepository.findByName(roleName)
                 .orElseThrow(() -> new RuntimeException("Rol " + roleName + " no encontrado"));
-
-        user.getRoles().add(role);
+        user.setRoles(Set.of(role));
         jpaUserRepository.save(user);
+
         return UserMapper.toUserDto(user);
     }
+
 
     @Override
     public UserDto getUserProfile(String email) {
         User user = jpaUserRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        return UserMapper.toUserDto(user);
-    }
-
-    @Override
-    @Transactional
-    public UserDto updateUserProfile(String email, UserDto updatedProfile) {
-        User user = jpaUserRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        // Actualizar UserProfile
-        UserProfile profile = user.getUserProfile();
-        if (updatedProfile.getFirstName() != null) {
-            profile.setFirstName(updatedProfile.getFirstName());
-        }
-        if (updatedProfile.getLastName() != null) {
-            profile.setLastName(updatedProfile.getLastName());
-        }
-
-        jpaUserRepository.save(user);
         return UserMapper.toUserDto(user);
     }
 

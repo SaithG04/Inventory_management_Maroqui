@@ -2,15 +2,18 @@ package ucv.app_inventory.application.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ucv.app_inventory.adapters.outbounds.SupplierClient;
+import ucv.app_inventory.adapters.repositories.ProductRepository;
 import ucv.app_inventory.adapters.repositories.ProductSupplierRepository;
+import ucv.app_inventory.application.DTO.ProductSupplierDTO;
 import ucv.app_inventory.application.DTO.SupplierDTO;
 import ucv.app_inventory.domain.entities.ProductSupplier;
 import ucv.app_inventory.exception.InvalidFieldException;
+import ucv.app_inventory.exception.ProductNotFoundException;
 
-import java.awt.print.Pageable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +23,7 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
 
     private final ProductSupplierRepository productSupplierRepository;
     private final SupplierClient supplierClient;
+    private final ProductRepository productRepository;
 
     // Obtener los proveedores asociados a un producto
     public List<SupplierDTO> getSuppliersByProductId(Long productId) {
@@ -41,31 +45,44 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
     }
 
     // Agregar un proveedor a un producto
-    public ProductSupplier addSupplierToProduct(Long productId, Long supplierId, Double price) {
+    public ProductSupplier addSupplierToProduct(ProductSupplierDTO productSupplierDTO) {
+
+        Long supplierId = getSupplierId(productSupplierDTO.getSupplierName());
+
+        Long productId = productRepository.findProductByNameEquals(productSupplierDTO.getProductName())
+                .orElseThrow(() -> new ProductNotFoundException("Product not found")).getId();
+
         // Verificar si la relación ya existe
         boolean exists = productSupplierRepository.existsByProductIdAndSupplierId(productId, supplierId);
         if (exists) {
-            // Si ya existe, no hacer nada
-            return null;
+            throw new InvalidFieldException("Supplier \"" + productSupplierDTO.getSupplierName()
+                    + "\" is already associated with product \"" + productSupplierDTO.getProductName() + "\"");
         }
 
         // Crear la relación product-supplier con el precio
         ProductSupplier productSupplier = new ProductSupplier();
         productSupplier.setProductId(productId);
         productSupplier.setSupplierId(supplierId);
-        productSupplier.setPrice(price);
+        productSupplier.setPrice(productSupplierDTO.getPrice());
         productSupplierRepository.save(productSupplier);
         return productSupplier;
     }
 
     // Eliminar un proveedor de un producto
-    public void removeSupplierFromProduct(Long productId, Long supplierId) {
+    public void removeSupplierFromProduct(Long productId, String supplierName) {
+
+        ProductSupplierDTO productSupplierDTO = new ProductSupplierDTO();
+        productSupplierDTO.setSupplierName(supplierName);
+        Long supplierId = getSupplierId(productSupplierDTO.getSupplierName());
+
         // Buscar la relación entre el producto y el proveedor
         ProductSupplier productSupplier = productSupplierRepository.findByProductIdAndSupplierId(productId, supplierId);
 
         // Si la relación existe, eliminarla
         if (productSupplier != null) {
             productSupplierRepository.delete(productSupplier);
+        }else {
+            throw new InvalidFieldException("This product is not associated with supplier \"" + productSupplierDTO.getSupplierName() + "\"");
         }
     }
 
@@ -80,7 +97,8 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
     }
 
     @Override
-    public List<ProductSupplier> getRelationsBySupplierId(Long supplierId) {
+    public List<ProductSupplier> getRelationsBySupplierName(String supplierName) {
+        Long supplierId = getSupplierId(supplierName);
         return productSupplierRepository.findBySupplierId(supplierId);
     }
 
@@ -95,9 +113,21 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
     }
 
     @Override
-    public List<SupplierDTO> getSuppliersByName(String name) {
-        // Llamada al microservicio de proveedores para buscar por nombre
-        return supplierClient.getSuppliersByName(name);
+    public void removeRelationsById(Long id){
+        productSupplierRepository.findById(id).orElseThrow(() -> new InvalidFieldException("Relation not found"));
+        productSupplierRepository.deleteById(id);
+    }
 
+    private Long getSupplierId(String supplierName) {
+        Pageable pageable = PageRequest.of(0, 1);
+        Page<SupplierDTO> page = supplierClient.getSuppliersByName(supplierName, pageable);
+
+        if(page == null || page.getTotalElements() == 0) {
+            throw new InvalidFieldException("Supplier not found");
+        }
+
+        List<SupplierDTO> list = page.getContent();
+
+        return list.getFirst().getId();
     }
 }
