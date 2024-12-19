@@ -85,7 +85,7 @@ const CategoryList = ({ categories, onEditCategory, onDeleteCategory }) => {
         }}
         onConfirm={handleDeleteCategory}
         title="Confirmación de Eliminación"
-        message="¿Estás seguro de que deseas eliminar esta categoría? Esta acción no se puede deshacer."
+        message="¿Estás seguro de que deseas eliminar esta categoría, se eliminará tambien los productos relacionados a ella? Esta acción no se puede deshacer."
         cancelButtonProps={{
           label: "Cancelar",
           className: "p-button-secondary",

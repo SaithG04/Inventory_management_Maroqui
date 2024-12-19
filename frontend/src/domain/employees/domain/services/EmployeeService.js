@@ -6,14 +6,36 @@ class EmployeeService {
     this.employeeRepository = new EmployeeRepository();
   }
 
+
+  // Búsqueda por email
+async findByEmail(email) {
+  console.log('Buscando empleados con los siguientes parámetros:', { email });
+
+  try {
+    // Llamada al repositorio para obtener los empleados
+    const response = await this.employeeRepository.findByEmail(email);
+
+    // Revisamos la respuesta completa
+    console.log('Respuesta de la búsqueda:', response);
+
+    // Verificamos si la respuesta contiene un objeto con los datos esperados
+    if (response && response.data) {
+      // Si la respuesta contiene datos, los devolvemos como un array (aunque sea un solo empleado)
+      return [response.data]; // Colocamos los datos dentro de un array
+    }
+
+    // Si la respuesta no contiene datos válidos, retornamos un arreglo vacío
+    return [];
+  } catch (error) {
+    console.error('Error al buscar empleados:', error);
+    throw error; // Lanzamos el error para que el componente que llama pueda manejarlo
+  }
+}
+
+
   // Obtener todos los empleados con paginación
   async getAllEmployees(page, size) {
     return await this.employeeRepository.getAll(page, size);
-  }
-
-  // Obtener un empleado por su ID
-  async getEmployeeById(id) {
-    return await this.employeeRepository.getById(id);
   }
 
   // Crear un nuevo empleado
@@ -32,9 +54,16 @@ class EmployeeService {
   }
 
   // Actualizar el estado de un empleado (activo/inactivo)
-  async updateEmployeeStatus(id, status) {
-    return await this.employeeRepository.updateStatus(id, status);
+  async updateEmployeeStatus(id, isActive) {
+    return await this.employeeRepository.updateStatus(id, isActive);
   }
+
+
+  // **Asignar un rol a un empleado**
+  async assignRole(id, roleName) {
+    return await this.employeeRepository.assignRole(id, roleName);
+  }
+
 }
 
 export default EmployeeService;

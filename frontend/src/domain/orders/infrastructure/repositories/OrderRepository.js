@@ -2,6 +2,13 @@ import { OrdersHttp } from "../../../../utils/ConHttp";
 import { OrderDTO } from "../dto/OrderDTO";
 
 class OrderRepository {
+  
+  async getAllOrders() {
+    const response = await OrdersHttp.get(`/listAll`);
+    console.log("Respuesta del endpoint /listAll:", response.data);
+    return Array.isArray(response.data?.data?.content) ? response.data.data.content : [];
+  }
+  
   // Get all orders by date
   async getAllOrdersByDate(date) {
     const response = await OrdersHttp.get(`/findByDate`, { params: { date } });

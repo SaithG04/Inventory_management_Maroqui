@@ -49,11 +49,11 @@ const ProductAutocomplete = ({ onAddProduct }) => {
       <InputText
         value={query}
         onChange={(e) => handleSearch(e.target.value)}
-        placeholder="Search or add a product"
+        placeholder="Buscar o agregar un producto"
         className="product-input"
       />
 
-      {loading && <div className="loading">Loading...</div>}
+      {loading && <div className="loading">Cargando...</div>}
 
       {query && !loading && (
         <ul className="suggestions-list">
@@ -72,7 +72,7 @@ const ProductAutocomplete = ({ onAddProduct }) => {
           {isNewProduct && (
             <li className="new-product">
               <Button
-                label={`Add new product: "${query}"`}
+                label={`Agregar nuevo producto: "${query}"`}
                 onClick={() =>
                   handleSelectProduct({ name: query, quantity: 1, id: null })
                 }

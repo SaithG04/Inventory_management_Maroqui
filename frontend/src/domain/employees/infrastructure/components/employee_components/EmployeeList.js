@@ -1,170 +1,168 @@
-import React, { useEffect, useState, useRef } from "react";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { Button } from "primereact/button";
-import { Toast } from "primereact/toast";
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
-import { EmployeeDTO } from "../../dto/EmployeeDTO";
-import './EmployeeList.css';
+import React, { useRef, useState } from "react"; // Importa React junto con los hooks `useRef` y `useState`.
+import { DataTable } from "primereact/datatable"; // Componente de tabla interactiva de PrimeReact.
+import { Column } from "primereact/column"; // Componente de columna para `DataTable`.
+import { Button } from "primereact/button"; // Componente de botón de PrimeReact.
+import { Toast } from "primereact/toast"; // Componente para mostrar notificaciones tipo toast.
+import Modal from "../../../../../infrastructure/shared/modal/Modal"; // Componente de modal personalizado.
+import "./EmployeeList.css"; // Estilos específicos para este componente.
 
-const EmployeeList = ({ employees, onEditEmployee, onDeleteEmployee, onPageChange, onToggleStatus }) => {
-  const [allEmployees, setAllEmployees] = useState([]); // Sólo usamos 'allEmployees'
-  const toast = useRef(null);
 
-  // Efecto para manejar el listado de empleados
-  useEffect(() => {
-    console.log("employees prop received:", employees); // Verificamos si estamos recibiendo los empleados correctamente
+const EmployeeList = ({ employees, onEditEmployee, onResetPassword, onToggleStatus }) => {
+  const toast = useRef(null); // Referencia para mostrar notificaciones (Toast).
+  const [isModalVisible, setIsModalVisible] = useState(false); // Controla la visibilidad del modal.
+  const [currentEmployee, setCurrentEmployee] = useState(null); // Almacena el empleado seleccionado para confirmar acciones.
 
-    if (employees && employees.length > 0) {
-      const validEmployees = employees
-        .map((employeeData) => {
-          try {
-            const employeeDTO = new EmployeeDTO(employeeData);
-            return employeeDTO.toDomain();
-          } catch (err) {
-            console.error("Error converting employee to domain:", employeeData, err);
-            return null;
-          }
-        })
-        .filter((employee) => employee !== null);
 
-      console.log("Valid employees:", validEmployees); // Verificamos la lista filtrada de empleados
-
-      setAllEmployees(validEmployees); // Actualiza la lista de empleados
-    } else {
-      console.log("No employees found or employees array is empty.");
-      setAllEmployees([]); // Si no hay empleados, setea una lista vacía
-    }
-  }, [employees]);
-
-  // Función para eliminar un empleado
-  const handleDeleteEmployee = async (employeeId) => {
-    console.log("Deleting employee with ID:", employeeId); // Verificamos el ID que estamos tratando de eliminar
-    try {
-      await onDeleteEmployee(employeeId); // Llamamos a la función de eliminación pasada como prop
-      toast.current.show({
-        severity: "success",
-        summary: "Deleted",
-        detail: `Employee with ID: ${employeeId} deleted successfully!`,
-        life: 3000,
-      });
-    } catch (error) {
-      console.error("Error deleting employee:", error);
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: `Failed to delete employee with ID: ${employeeId}.`,
-        life: 3000,
-      });
-    }
-  };
-
-  // Función para cambiar el estado de un empleado (activo/inactivo)
   const handleToggleStatus = async (employeeId, currentStatus) => {
-    const newStatus = currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE";
-    console.log(`Toggling status for employee ${employeeId}, current status: ${currentStatus}, new status: ${newStatus}`); // Verificamos el cambio de estado
+    const newStatus = currentStatus === "ACTIVE" ? false : true; // Convertir estado a booleano.
     try {
-      await onToggleStatus(employeeId, newStatus); // Llamamos a la función de actualización de estado pasada como prop
+      await onToggleStatus(employeeId, newStatus); // Llama la función para cambiar el estado.
       toast.current.show({
         severity: "success",
-        summary: "Status Updated",
-        detail: `Employee status updated to ${newStatus}.`,
+        summary: "Estado Actualizado",
+        detail: `El estado del empleado se cambió a ${newStatus ? "Activo" : "Bloqueado"}.`,
         life: 3000,
       });
     } catch (error) {
-      console.error("Error updating employee status:", error);
+      console.error("Error al cambiar el estado del empleado:", error);
       toast.current.show({
         severity: "error",
         summary: "Error",
-        detail: "Failed to update employee status.",
+        detail: "No se pudo cambiar el estado del empleado.",
         life: 3000,
       });
     }
   };
 
-  // Confirmación de eliminación
-  const confirmDelete = (employeeId) => {
-    confirmDialog({
-      message: "Are you sure you want to delete this employee?",
-      header: "Confirmation",
-      icon: "pi pi-exclamation-triangle",
-      accept: () => handleDeleteEmployee(employeeId),
-    });
+  const confirmToggleStatus = (employee) => {
+    setCurrentEmployee(employee); // Establece el empleado actual seleccionado.
+    setIsModalVisible(true); // Muestra el modal para confirmar la acción.
+  };
+
+  const handleConfirmToggleStatus = () => {
+    if (currentEmployee) {
+      handleToggleStatus(currentEmployee.idUser, currentEmployee.status); // Cambia el estado del empleado.
+      setIsModalVisible(false); // Oculta el modal tras la acción.
+    }
   };
 
   return (
     <section className="employee-list-section">
+      {/* Toast para mostrar notificaciones al usuario (éxito o error) */}
       <Toast ref={toast} />
-      <ConfirmDialog />
+
       <div className="employee-list">
+        {/* Componente DataTable para mostrar la lista de empleados */}
         <DataTable
-          value={allEmployees} // Usamos 'allEmployees' para mostrar los datos
-          paginator
-          rows={10}
-          totalRecords={employees.length} // Asegúrate de que el número total de registros se pase como prop
-          onPage={(e) => onPageChange(e.page, e.rows)} // Llamamos la función 'onPageChange' recibida como prop
-          responsiveLayout="scroll"
-          emptyMessage="No employees found."
+          value={employees} // Propiedad que contiene la lista de empleados a renderizar en la tabla.
+          paginator // Habilita la paginación en la tabla.
+          rows={10} // Configura la cantidad de filas mostradas por página.
+          responsiveLayout="scroll" // Permite que la tabla sea desplazable en dispositivos pequeños.
+          emptyMessage="No se encontraron empleados." // Mensaje que aparece cuando no hay empleados en la lista.
         >
-          <Column field="firstName" header="First Name" sortable />
-          <Column field="lastName" header="Last Name" sortable />
-          <Column field="email" header="Email" sortable />
+          {/* Columnas definidas para cada campo de los empleados */}
+
+          {/* Columna para el nombre del empleado */}
+          <Column field="firstName" header="Nombre" sortable />
+
+          {/* Columna para el apellido del empleado */}
+          <Column field="lastName" header="Apellido" sortable />
+
+          {/* Columna para el correo electrónico del empleado */}
+          <Column field="email" header="Correo Electrónico" sortable />
+
+          {/* Columna para el DNI del empleado */}
           <Column field="dni" header="DNI" sortable />
-          <Column field="age" header="Age" sortable />
+
+          {/* Columna para la edad del empleado */}
+          <Column field="age" header="Edad" sortable />
+
+          {/* Columna para la fecha de nacimiento */}
           <Column
             field="birthDate"
-            header="Birth Date"
-            sortable
-            body={(rowData) => new Date(rowData.birthDate).toLocaleDateString()}
+            header="Fecha de Nacimiento"
+            body={(rowData) => rowData.birthDate || "N/A"} // Si no hay fecha de nacimiento, muestra "N/A".
           />
-          <Column field="address" header="Address" />
-          <Column field="phone" header="Phone" sortable />
-          <Column field="sex" header="Sex" sortable />
-          <Column field="maritalStatus" header="Marital Status" sortable />
-          <Column field="roleName" header="Role" sortable />
+
+          {/* Columna para la dirección del empleado */}
+          <Column field="address" header="Dirección" sortable />
+
+          {/* Columna para el teléfono del empleado */}
+          <Column field="phone" header="Teléfono" sortable />
+
+          {/* Columna para el sexo del empleado */}
+          <Column field="sex" header="Sexo" sortable />
+
+          {/* Columna para el estado civil del empleado */}
+          <Column field="maritalStatus" header="Estado Civil" sortable />
+
+          {/* Columna para el rol del empleado */}
           <Column
-            field="status"
-            header="Status"
-            sortable
+            field="roles"
+            header="Rol"
+            body={(rowData) =>
+              Array.isArray(rowData.roles)
+                ? rowData.roles.join(", ") // Si el campo "roles" es un array, une los elementos con una coma.
+                : "N/A" // Si no hay roles, muestra "N/A".
+            }
+          />
+
+          <Column
+            // Define una columna en la tabla para mostrar el estado del empleado (Activo o Inactivo)
+            field="status" // Campo que se mapea desde los datos del empleado
+            header="Estado" // Encabezado de la columna
             body={(rowData) => (
-              <span className={`status-pill ${rowData.status.toLowerCase()}`}>
+              // Renderiza un span con una clase dinámica para mostrar visualmente el estado
+              <span className={`status-pill ${rowData.status?.toLowerCase()}`}>
+                {/* Traduce el estado al idioma del sistema */}
                 {rowData.status === "ACTIVE" ? "Activo" : "Inactivo"}
               </span>
             )}
+            sortable // Permite ordenar la tabla por este campo
           />
           <Column
+            // Define una columna para las acciones disponibles por cada empleado
+            header="Acciones" // Encabezado de la columna
             body={(rowData) => (
+              // Contenedor que incluye botones de acción
               <div className="employee-button-container">
+                {/* Botón para editar los datos del empleado */}
                 <Button
-                  icon="pi pi-pencil"
-                  label="Editar"
-                  className="p-button employee-button-edit"
-                  onClick={() => onEditEmployee(rowData.id)}
+                  icon="pi pi-pencil" // Icono de lápiz
+                  label="Editar" // Etiqueta del botón
+                  className="employee-button-edit" // Clase CSS para estilo personalizado
+                  onClick={() => onEditEmployee(rowData)} // Llama a la función para editar el empleado
                 />
+                {/* Botón para cambiar el estado del empleado (bloquear/activar) */}
                 <Button
-                  icon="pi pi-user-edit"
-                  label={rowData.status === "ACTIVE" ? "Desactivar" : "Activar"}
-                  className="p-button employee-button-toggle-status"
-                  onClick={() => handleToggleStatus(rowData.id, rowData.status)}
+                  icon={rowData.status === "ACTIVE" ? "pi pi-lock" : "pi pi-unlock"} // Icono dinámico: candado cerrado o abierto
+                  label={rowData.status === "ACTIVE" ? "Bloquear" : "Activar"} // Etiqueta dinámica según el estado
+                  className="employee-button-toggle-status" // Clase CSS para estilo personalizado
+                  onClick={() => confirmToggleStatus(rowData)} // Llama a la función para confirmar el cambio de estado
                 />
+                {/* Botón para restablecer la contraseña del empleado */}
                 <Button
-                  icon="pi pi-refresh"
-                  label="Restablecer"
-                  className="p-button employee-button-reset-password"
-                  onClick={() => console.log("Reset password")}
-                />
-                <Button
-                  icon="pi pi-trash"
-                  label="Eliminar"
-                  className="p-button p-button-danger"
-                  onClick={() => confirmDelete(rowData.id)}
+                  icon="pi pi-refresh" // Icono de refresco
+                  label="Restablecer" // Etiqueta del botón
+                  className="employee-button-reset-password" // Clase CSS para estilo personalizado
+                  onClick={() => onResetPassword(rowData.idUser)} // Llama a la función para restablecer la contraseña
                 />
               </div>
             )}
-            header="Actions"
           />
         </DataTable>
       </div>
+      {/* Modal que aparece para confirmar acciones críticas */}
+      <Modal
+        show={isModalVisible} // Controla la visibilidad del modal basado en el estado
+        onClose={() => setIsModalVisible(false)} // Función para cerrar el modal
+        onConfirm={handleConfirmToggleStatus} // Función para confirmar la acción
+        title="Confirmar Acción" // Título del modal
+        message={`
+    ¿Estás seguro de que deseas ${currentEmployee?.status === "ACTIVE" ? "bloquear" : "activar"
+          } al empleado ${currentEmployee?.firstName} ${currentEmployee?.lastName}?
+  `} // Mensaje dinámico según la acción y el empleado seleccionado
+      />
     </section>
   );
 };

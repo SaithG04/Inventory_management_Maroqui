@@ -1,0 +1,120 @@
+/* ============================
+   Estilo General para EmployeeList
+============================ */
+.employee-list .p-datatable .p-datatable-tbody>tr>td {
+    text-align: center;
+}
+
+/* Botones de Acción */
+/* Botones de Acción */
+.employee-list .employee-button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px; /* Espaciado uniforme entre botones */
+    padding: 10px 0;
+}
+
+.employee-list .employee-button-edit,
+.employee-list .employee-button-toggle-status,
+.employee-list .employee-button-reset-password,
+.employee-list .employee-button-delete {
+    width: 150px; /* Define un ancho uniforme */
+    height: 40px; /* Define una altura uniforme */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px; /* Bordes suaves */
+    font-size: 14px; /* Ajusta el tamaño del texto */
+    cursor: pointer;
+    color: #fff;
+    border: none;
+    transition: background-color 0.3s, opacity 0.3s;
+}
+
+/* Botón Editar */
+.employee-list .employee-button-edit {
+    background-color: var(--color-verde);
+}
+
+.employee-list .employee-button-edit:hover {
+    background-color: var(--color-verde-oscuro);
+}
+
+/* Botón Cambiar Estado */
+.employee-list .employee-button-toggle-status {
+    background-color: var(--color-naranja);
+}
+
+.employee-list .employee-button-toggle-status:hover {
+    background-color: var(--color-naranja-oscuro);
+}
+
+/* Botón Restablecer Contraseña */
+.employee-list .employee-button-reset-password {
+    background-color: var(--color-azul);
+}
+
+.employee-list .employee-button-reset-password:hover {
+    background-color: var(--color-azul-oscuro);
+}
+
+/* Botón Eliminar */
+.employee-list .employee-button-delete {
+    background-color: var(--color-rojo);
+}
+
+.employee-list .employee-button-delete:hover {
+    background-color: var(--color-rojo-oscuro);
+}
+
+
+/* Tooltip para Descripción */
+.employee-list .description-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.employee-list .description-cell {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.employee-list .custom-tooltip {
+    visibility: hidden;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.employee-list .custom-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+}
+
+.employee-list .description-wrapper:hover .custom-tooltip {
+    visibility: visible;
+    opacity: 1;
+}

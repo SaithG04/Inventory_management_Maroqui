@@ -8,9 +8,9 @@ import { OrderDTO } from '../../dto/OrderDTO';
 import './OrderSearch.css';
 
 const OrderSearch = ({ onSearchResults }) => {
-    const [searchType, setSearchType] = useState('supplier'); // Tipo de búsqueda: 'supplier' por defecto
+    const [searchType, setSearchType] = useState(null); // Estado inicial sin selección
     const [query, setQuery] = useState('');
-    const [status, setStatus] = useState('');
+    const [status, setStatus] = useState('PENDING');
     const [loading, setLoading] = useState(false);
     const toast = useRef(null);
 
@@ -21,14 +21,12 @@ const OrderSearch = ({ onSearchResults }) => {
         try {
             let response = [];
 
-            // Realizar búsqueda según el tipo seleccionado
-            if (searchType === 'supplier') {
+            if (searchType === 'supplier' && query) {
                 response = await orderService.getOrdersBySupplier(query);
-            } else if (searchType === 'status') {
+            } else if (searchType === 'status' && status) {
                 response = await orderService.getOrdersByStatus(status);
             }
 
-            // Verificar y validar la respuesta
             if (response && Array.isArray(response)) {
                 const orders = response
                     .map((orderData) => {
@@ -45,9 +43,9 @@ const OrderSearch = ({ onSearchResults }) => {
                 onSearchResults(orders);
             } else {
                 toast.current.show({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'No orders found or invalid response structure.',
+                    severity: 'warn',
+                    summary: 'Sin resultados',
+                    detail: 'No se encontraron pedidos.',
                     life: 3000,
                 });
                 onSearchResults([]);
@@ -57,7 +55,7 @@ const OrderSearch = ({ onSearchResults }) => {
             toast.current.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'Error fetching results.',
+                detail: 'Ocurrió un error al obtener los resultados.',
                 life: 3000,
             });
             onSearchResults([]);
@@ -68,53 +66,65 @@ const OrderSearch = ({ onSearchResults }) => {
 
     const handleClearSearch = () => {
         setQuery('');
-        setStatus('');
+        setStatus('PENDING');
+        setSearchType(null);
         onSearchResults([]);
     };
 
     return (
         <div className="order-search-section">
-            <Toast ref={toast} /> {/* Agregamos el Toast aquí */}
+            <Toast ref={toast} />
             <div className="order-search-dropdown">
                 <Dropdown
                     value={searchType}
                     options={[
-                        { label: 'Supplier', value: 'supplier' },
-                        { label: 'Status', value: 'status' },
+                        { label: 'Proveedor', value: 'supplier', dataTestId: 'search-type-supplier' },
+                        { label: 'Estado', value: 'status', dataTestId: 'search-type-status' },
                     ]}
                     onChange={(e) => setSearchType(e.value)}
-                    placeholder="Select Search Type"
+                    placeholder="Seleccione tipo de búsqueda"
+                    data-testid="search-type-dropdown"
+                    itemTemplate={(option) => (
+                        <span data-testid={option.dataTestId}>{option.label}</span>
+                    )}
                 />
             </div>
             <div className="order-input">
-                {searchType === 'status' ? (
+                {searchType === 'status' && (
                     <Dropdown
                         value={status}
                         options={[
-                            { label: 'Pending', value: 'PENDING' },
-                            { label: 'Processed', value: 'PROCESSED' },
-                            { label: 'Canceled', value: 'CANCELED' },
+                            { label: 'Pendiente', value: 'PENDING' },
+                            { label: 'Procesado', value: 'PROCESSED' },
+                            { label: 'Cancelado', value: 'CANCELED' },
                         ]}
                         onChange={(e) => setStatus(e.value)}
-                        placeholder="Select Status"
+                        placeholder="Seleccione estado"
+                        data-testid="status-dropdown"
+                        optionLabel="label"
+                        aria-label="Status Dropdown"
                     />
-                ) : (
+                )}
+                {(!searchType || searchType === 'supplier') && (
                     <InputText
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Search by Supplier"
+                        placeholder="Ingrese nombre del proveedor"
+                        aria-label="Search by Supplier"
+                        className="name-input"
+                        disabled={!searchType}
                     />
                 )}
             </div>
             <div className="search-clear-buttons">
                 <Button
-                    label={loading ? 'Searching...' : 'Search'}
+                    label={loading ? 'Buscando...' : 'Buscar'}
                     onClick={handleSearch}
-                    disabled={loading}
+                    disabled={loading || !searchType || (searchType === 'supplier' && !query.trim())}
                     className="search-button"
                 />
                 <Button
-                    label="Clear"
+                    label="Limpiar"
                     onClick={handleClearSearch}
                     disabled={loading}
                     className="clear-button"

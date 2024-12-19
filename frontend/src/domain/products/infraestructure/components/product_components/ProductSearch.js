@@ -1,66 +1,67 @@
-import React, { useState, useRef, useCallback, useMemo } from "react";
-import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
-import { Dropdown } from "primereact/dropdown";
-import { Toast } from "primereact/toast";
-import ProductService from "../../../domain/services/ProductService";
-import CategoryService from "../../../domain/services/CategoryService";
-import "./ProductSearch.css";
+import React, { useState, useRef, useCallback, useMemo } from "react"; // Importación de hooks de React
+import { Button } from "primereact/button"; // Importación del botón de PrimeReact
+import { InputText } from "primereact/inputtext"; // Importación del campo de texto de PrimeReact
+import { Dropdown } from "primereact/dropdown"; // Importación del dropdown de PrimeReact
+import { Toast } from "primereact/toast"; // Importación de notificaciones de PrimeReact
+import ProductService from "../../../domain/services/ProductService"; // Servicio para manejar productos
+import CategoryService from "../../../domain/services/CategoryService"; // Servicio para manejar categorías
+import "./ProductSearch.css"; // Importación de estilos CSS
 
+// Componente ProductSearch
 const ProductSearch = ({ onSearchResults, onClearTable }) => {
-  const [searchType, setSearchType] = useState(""); // Tipo de búsqueda: vacío por defecto
-  const [query, setQuery] = useState(""); // Valor del input de búsqueda o categoría seleccionada
-  const [status, setStatus] = useState(""); // Estado seleccionado
-  const [categories, setCategories] = useState([]); // Lista de categorías
-  const [loading, setLoading] = useState(false); // Estado de carga
-  const toast = useRef(null); // Referencia para Toast
+  // Definición de los estados del componente
+  const [searchType, setSearchType] = useState(""); // Tipo de búsqueda: nombre, estado o categoría
+  const [query, setQuery] = useState(""); // Valor de búsqueda (nombre, código o categoría)
+  const [status, setStatus] = useState(""); // Estado seleccionado (activo, sin stock, etc.)
+  const [categories, setCategories] = useState([]); // Lista de categorías disponibles
+  const [loading, setLoading] = useState(false); // Indicador de carga mientras se busca
+  const toast = useRef(null); // Referencia al componente Toast para mostrar notificaciones
 
-  // Memorizar las instancias de servicio para evitar recreaciones innecesarias
-  const productService = useMemo(() => new ProductService(), []);
-  const categoryService = useMemo(() => new CategoryService(), []);
+  // Memorizar las instancias de los servicios para optimizar la renderización
+  const productService = useMemo(() => new ProductService(), []); // Instancia del servicio de productos
+  const categoryService = useMemo(() => new CategoryService(), []); // Instancia del servicio de categorías
 
-  // Cargar categorías desde el backend
+  // Función para cargar las categorías disponibles
   const fetchCategories = useCallback(async () => {
     try {
-      console.log("Fetching categories..."); // Debug
-      const response = await categoryService.getAllCategories();
+      console.log("Fetching categories..."); // Debug para verificar el proceso
+      const response = await categoryService.getAllCategories(); // Solicita todas las categorías al backend
       const categoryOptions = response.map((category) => ({
-        label: category.nombre,
-        value: category.nombre,
+        label: category.nombre, // Etiqueta para cada opción en el dropdown
+        value: category.nombre, // Valor de la opción, utilizado para filtrar por categoría
       }));
-      console.log("Fetched categories:", categoryOptions); // Debug
-      setCategories(categoryOptions);
+      console.log("Fetched categories:", categoryOptions); // Debug para verificar las categorías cargadas
+      setCategories(categoryOptions); // Actualiza el estado con las categorías obtenidas
     } catch (error) {
-      console.error("Error al cargar categorías:", error);
+      console.error("Error al cargar categorías:", error); // Manejo de error si la carga de categorías falla
       toast.current?.show({
         severity: "error",
         summary: "Error",
-        detail: "No se pudieron cargar las categorías.",
+        detail: "No se pudieron cargar las categorías.", // Muestra un mensaje de error
         life: 3000,
       });
     }
-  }, [categoryService]);
+  }, [categoryService]); // Depende del servicio de categorías
 
-
-  // Manejo de cambio en tipo de búsqueda
+  // Función para manejar el cambio en el tipo de búsqueda seleccionado
   const handleSearchTypeChange = useCallback(
     (e) => {
       const type = e.value;
-      setSearchType(type);
-      setQuery(""); // Reinicia el valor del input o categoría seleccionada
-      setStatus(""); // Reinicia el estado seleccionado
+      setSearchType(type); // Actualiza el tipo de búsqueda
+      setQuery(""); // Limpia el valor de la búsqueda
+      setStatus(""); // Resetea el estado de búsqueda
       if (type === "category") {
-        fetchCategories(); // Cargar categorías si el tipo de búsqueda es "categoría"
+        fetchCategories(); // Si el tipo de búsqueda es "categoría", carga las categorías
       }
     },
-    [fetchCategories]
+    [fetchCategories] // Dependencia de la función fetchCategories
   );
 
-  // Manejo de búsqueda
+  // Función para realizar la búsqueda en función del tipo de búsqueda seleccionado
   const handleSearch = useCallback(async () => {
     if (!searchType) {
       toast.current?.show({
-        severity: "warn",
+        severity: "warn", // Muestra una advertencia si no se ha seleccionado un tipo de búsqueda
         summary: "Tipo de Búsqueda Requerido",
         detail: "Por favor, seleccione un tipo de búsqueda.",
         life: 3000,
@@ -68,21 +69,21 @@ const ProductSearch = ({ onSearchResults, onClearTable }) => {
       return;
     }
 
-    setLoading(true);
+    setLoading(true); // Activa el estado de carga
     try {
-      let results = [];
+      let results = []; // Variable para almacenar los resultados de la búsqueda
       if (searchType === "name") {
-        results = await productService.searchByName(query);
+        results = await productService.searchByName(query); // Búsqueda por nombre de producto
       } else if (searchType === "status") {
-        results = await productService.searchByStatus(status);
+        results = await productService.searchByStatus(status); // Búsqueda por estado de producto
       } else if (searchType === "category") {
-        results = await productService.searchByCategory(query);
+        results = await productService.searchByCategory(query); // Búsqueda por categoría
       }
 
       if (results.length > 0) {
-        onSearchResults(results); // Actualizar resultados en el padre
+        onSearchResults(results); // Pasa los resultados al componente padre
 
-        // Mostrar notificación de los resultados encontrados
+        // Muestra una notificación de éxito con el número de productos encontrados
         toast.current?.show({
           severity: "success",
           summary: "Búsqueda Exitosa",
@@ -91,25 +92,26 @@ const ProductSearch = ({ onSearchResults, onClearTable }) => {
         });
       } else {
         toast.current?.show({
-          severity: "info",
+          severity: "info", // Muestra una notificación si no se encuentran productos
           summary: "Sin Resultados",
           detail: "No se encontraron productos que coincidan con la búsqueda.",
           life: 3000,
         });
-        onSearchResults([]); // Restablecer la lista si no hay resultados
+        onSearchResults([]); // Restablece la lista de productos si no se encuentran resultados
       }
     } catch (error) {
-      console.error("Error al realizar la búsqueda:", error);
+      console.error("Error al realizar la búsqueda:", error); // Manejo de errores durante la búsqueda
       toast.current?.show({
-        severity: "error",
+        severity: "error", // Muestra un mensaje de error si ocurre algún problema en la búsqueda
         summary: "Error de Búsqueda",
         detail: "Ocurrió un error al intentar buscar productos.",
         life: 3000,
       });
     } finally {
-      setLoading(false);
+      setLoading(false); // Desactiva el estado de carga después de completar la búsqueda
     }
-  }, [searchType, query, status, productService, onSearchResults]);
+  }, [searchType, query, status, productService, onSearchResults]); // Dependencias de la búsqueda
+
 
   // Limpiar búsqueda
   const handleClearSearch = () => {

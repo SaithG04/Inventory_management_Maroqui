@@ -3,7 +3,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import {confirmDialog } from "primereact/confirmdialog";
 import OrderService from "../../../domain/services/OrderService";
 import "./OrderList.css";
 
@@ -20,28 +20,30 @@ const OrderList = ({ onEditOrder, onViewOrder }) => {
       setLoading(true);
       try {
         const fetchedOrders = await orderService.getAllOrders();
-        setOrders(fetchedOrders);
-      } catch (err) {
-        console.error("Error fetching orders:", err);
+        // Asegurarse de que siempre sea un array
+        setOrders(Array.isArray(fetchedOrders) ? fetchedOrders : fetchedOrders.data || []);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
         toast.current.show({
           severity: "error",
           summary: "Error",
-          detail: "Failed to load orders.",
+          detail: "No se pudieron cargar los pedidos.",
           life: 3000,
         });
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchOrders();
   }, [orderService]);
+  
 
   // Handle order deletion
   const handleDelete = (orderId) => {
     confirmDialog({
-      message: "Are you sure you want to delete this order?",
-      header: "Confirmation",
+      message: "¿Está seguro de que desea eliminar este pedido?",
+      header: "Confirmación",
       icon: "pi pi-exclamation-triangle",
       accept: async () => {
         try {
@@ -49,8 +51,8 @@ const OrderList = ({ onEditOrder, onViewOrder }) => {
           setOrders((prevOrders) => prevOrders.filter((order) => order.id !== orderId));
           toast.current.show({
             severity: "success",
-            summary: "Success",
-            detail: "Order deleted successfully.",
+            summary: "Éxito",
+            detail: "Pedido eliminado correctamente.",
             life: 3000,
           });
         } catch (err) {
@@ -58,7 +60,7 @@ const OrderList = ({ onEditOrder, onViewOrder }) => {
           toast.current.show({
             severity: "error",
             summary: "Error",
-            detail: "Failed to delete order.",
+            detail: "No se pudo eliminar el pedido.",
             life: 3000,
           });
         }
@@ -69,37 +71,37 @@ const OrderList = ({ onEditOrder, onViewOrder }) => {
   return (
     <div className="order-list-container">
       <Toast ref={toast} />
-      <h2>Order List</h2>
+      <h2>Lista de Pedidos</h2>
       <DataTable
         value={orders}
         paginator
         rows={10}
         loading={loading}
-        emptyMessage="No orders found."
+        emptyMessage="No se encontraron pedidos."
         responsiveLayout="scroll"
         className="order-list-table"
       >
-        <Column field="supplier" header="Supplier" sortable></Column>
-        <Column field="date" header="Date" sortable></Column>
-        <Column field="status" header="Status" sortable></Column>
+        <Column field="supplier_name" header="Proveedor" sortable></Column>
+        <Column field="orderDate" header="Fecha" sortable></Column>
+        <Column field="status" header="Estado" sortable></Column>
         <Column
-          header="Actions"
+          header="Acciones"
           body={(rowData) => (
             <div className="order-actions">
               <Button
-                label="View"
+                label="Ver"
                 icon="pi pi-eye"
                 className="p-button-info"
                 onClick={() => onViewOrder(rowData)}
               />
               <Button
-                label="Edit"
+                label="Editar"
                 icon="pi pi-pencil"
                 className="p-button-warning"
                 onClick={() => onEditOrder(rowData)}
               />
               <Button
-                label="Delete"
+                label="Eliminar"
                 icon="pi pi-trash"
                 className="p-button-danger"
                 onClick={() => handleDelete(rowData.id)}

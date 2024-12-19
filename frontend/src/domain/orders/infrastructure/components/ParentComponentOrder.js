@@ -13,7 +13,6 @@ const ParentComponentOrder = () => {
   const [isModalVisible, setIsModalVisible] = useState(false); // Controla la visibilidad del modal de confirmación para eliminar
   const [isCancelModalVisible, setIsCancelModalVisible] = useState(false); // Controla el modal de cancelación del formulario
   const [orderToDelete, setOrderToDelete] = useState(null); // Almacena la orden a eliminar
-  const [unsavedOrderData, setUnsavedOrderData] = useState(false); // Verifica si hay datos sin guardar en el formulario
 
   const orderService = useMemo(() => new OrderService(), []);
 
@@ -35,14 +34,12 @@ const ParentComponentOrder = () => {
   // Función para mostrar el formulario de agregar
   const handleAddOrder = () => {
     setSelectedOrderId(null); // No hay una orden seleccionada
-    setUnsavedOrderData(false); // Reinicia el estado de datos sin guardar
     setIsFormVisible(true); // Muestra el formulario
   };
 
   // Función para mostrar el formulario de edición
   const handleEditOrder = (orderId) => {
     setSelectedOrderId(orderId); // Almacena el ID de la orden seleccionada
-    setUnsavedOrderData(false); // Reinicia el estado de datos sin guardar
     setIsFormVisible(true); // Muestra el formulario
   };
 
@@ -72,22 +69,7 @@ const ParentComponentOrder = () => {
 
   // Manejar cancelación del formulario
   const handleCancelForm = () => {
-    if (unsavedOrderData) {
-      setIsCancelModalVisible(true); // Mostrar modal si hay datos sin guardar
-    } else {
-      setIsFormVisible(false); // Cierra directamente si no hay datos
-    }
-  };
-
-  // Confirmar cancelación del formulario
-  const handleConfirmCancelForm = () => {
-    setIsFormVisible(false); // Ocultar el formulario
-    setIsCancelModalVisible(false); // Cierra el modal de cancelación
-  };
-
-  // Cancelar acción de cerrar el formulario
-  const handleCancelFormClose = () => {
-    setIsCancelModalVisible(false); // Cierra el modal de cancelación
+    setIsFormVisible(false); // Cierra directamente
   };
 
   useEffect(() => {
@@ -96,14 +78,14 @@ const ParentComponentOrder = () => {
 
   return (
     <div className="orders-container">
-      <h2>Order Management</h2>
+      <h2>Gestión de Pedidos</h2>
 
       {/* Componente de búsqueda */}
-      <OrderSearch orders={allOrders} onSearchResults={handleSearchResults} />
+      <OrderSearch onSearchResults={handleSearchResults} />
 
       <div className="button-container">
         <button className="p-button add-order-button" onClick={handleAddOrder}>
-          <i className="pi pi-plus" /> Add Order
+          <i className="pi pi-plus" /> Agregar Pedido
         </button>
       </div>
 
@@ -135,17 +117,17 @@ const ParentComponentOrder = () => {
         show={isModalVisible}
         onClose={handleCancelDelete}
         onConfirm={handleConfirmDelete}
-        title="Delete Confirmation"
-        message="Are you sure you want to delete this order?"
+        title="Confirmación de Eliminación"
+        message="¿Está seguro de que desea eliminar este pedido?"
       />
 
       {/* Modal de confirmación de cancelación del formulario */}
       <Modal
         show={isCancelModalVisible}
-        onClose={handleCancelFormClose}
-        onConfirm={handleConfirmCancelForm}
-        title="Cancel Confirmation"
-        message="Are you sure you want to cancel? Unsaved changes will be lost."
+        onClose={() => setIsCancelModalVisible(false)}
+        onConfirm={() => setIsFormVisible(false)}
+        title="Confirmación de Cancelación"
+        message="¿Está seguro de que desea cancelar? Los cambios no guardados se perderán."
       />
     </div>
   );

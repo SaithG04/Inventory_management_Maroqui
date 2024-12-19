@@ -1,57 +1,61 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import ProductForm from "./product_components/ProductForm";
-import ProductList from "./product_components/ProductList";
-import ProductSearch from "./product_components/ProductSearch";
-import CategoryForm from "./category_components/CategoryForm";
-import CategoryList from "./category_components/CategoryList";
+import ProductForm from "./product_components/ProductForm"; // Componente para el formulario de productos
+import ProductList from "./product_components/ProductList"; // Componente para mostrar la lista de productos
+import ProductSearch from "./product_components/ProductSearch"; // Componente para la búsqueda de productos
+import CategoryForm from "./category_components/CategoryForm"; // Componente para el formulario de categorías
+import CategoryList from "./category_components/CategoryList"; // Componente para mostrar la lista de categorías
 
-// Componentes relacionados a relaciones producto-proveedor
-import ProductProviderList from "./product_provider_components/ProductProviderList";
-import ProductProviderForm from "./product_provider_components/ProductProviderForm";
-import ProductProviderSearch from "./product_provider_components/ProductProviderSearch";
+// Componentes relacionados con la relación producto-proveedor
+import ProductProviderList from "./product_provider_components/ProductProviderList"; // Lista de relaciones producto-proveedor
+import ProductProviderForm from "./product_provider_components/ProductProviderForm"; // Formulario para relaciones producto-proveedor
+import ProductProviderSearch from "./product_provider_components/ProductProviderSearch"; // Búsqueda de relaciones producto-proveedor
 
-import ProductProviderService from "../../domain/services/ProductProviderService";
-import ProviderService from "../../../providers/domain/services/ProviderService"; // Nuevo servicio para proveedores
-import CategorySearch from "./category_components/CategorySearch";
-import ProductService from "../../domain/services/ProductService";
-import CategoryService from "../../domain/services/CategoryService";
-import { Button } from "primereact/button";
-import { Toast } from "primereact/toast";
-import "./ParentComponentProduct.css";
+import ProductProviderService from "../../domain/services/ProductProviderService"; // Servicio para gestionar relaciones producto-proveedor
+import ProviderService from "../../../providers/domain/services/ProviderService"; // Servicio para gestionar proveedores
+import CategorySearch from "./category_components/CategorySearch"; // Búsqueda de categorías
+import ProductService from "../../domain/services/ProductService"; // Servicio para gestionar productos
+import CategoryService from "../../domain/services/CategoryService"; // Servicio para gestionar categorías
+import { Button } from "primereact/button"; // Componente Button de PrimeReact
+import { Toast } from "primereact/toast"; // Componente Toast de PrimeReact para notificaciones
+import "./ParentComponentProduct.css"; // Estilos del componente
 
 const ParentComponentProduct = () => {
+  // Estado para manejar la sección activa (productos, categorías, relaciones producto-proveedor)
   const [activeSection, setActiveSection] = useState("products");
-  const [selectedProductId, setSelectedProductId] = useState(null);
-  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
-  const [selectedCategoryData, setSelectedCategoryData] = useState(null);
 
-  // Estados para relaciones producto-proveedor
-  const [productProviders, setProductProviders] = useState([]); // Relaciones producto-proveedor
+  // Estados para manejar el producto o categoría seleccionado
+  const [selectedProductId, setSelectedProductId] = useState(null); // ID del producto seleccionado
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null); // ID de la categoría seleccionada
+  const [selectedCategoryData, setSelectedCategoryData] = useState(null); // Datos de la categoría seleccionada
+
+  // Estados para manejar las relaciones producto-proveedor
+  const [productProviders, setProductProviders] = useState([]); // Lista de relaciones producto-proveedor
   const [providers, setProviders] = useState([]); // Lista de proveedores
   const [selectedProvider, setSelectedProvider] = useState(null); // Proveedor seleccionado
-  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(false); // Estado para controlar la visibilidad del formulario
 
-  // Estados para productos y categorías
-  const [allProducts, setAllProducts] = useState([]);
-  const [allCategories, setAllCategories] = useState([]);
+  // Estados para manejar productos y categorías
+  const [allProducts, setAllProducts] = useState([]); // Lista de todos los productos
+  const [allCategories, setAllCategories] = useState([]); // Lista de todas las categorías
 
+  // Referencia para las notificaciones Toast
   const toast = useRef(null);
 
-  // Servicios
+  // Servicios memoizados para evitar recreación innecesaria
   const productProviderService = useMemo(() => new ProductProviderService(), []);
   const providerService = useMemo(() => new ProviderService(), []);
   const productService = useMemo(() => new ProductService(), []);
   const categoryService = useMemo(() => new CategoryService(), []);
 
-
   // === PRODUCTOS ===
+  // Función para cargar todos los productos desde el backend
   const fetchAllProducts = useCallback(async () => {
     try {
-      const fetchedProducts = await productService.getAllProducts();
-      setAllProducts(fetchedProducts);
+      const fetchedProducts = await productService.getAllProducts(); // Obtención de productos
+      setAllProducts(fetchedProducts); // Actualizar el estado con los productos obtenidos
     } catch (error) {
       console.error("Error al obtener productos:", error);
-      toast.current?.show({
+      toast.current?.show({ // Mostrar mensaje de error si ocurre un fallo
         severity: "error",
         summary: "Error",
         detail: "Hubo un error al obtener los productos.",
@@ -60,14 +64,16 @@ const ParentComponentProduct = () => {
     }
   }, [productService]);
 
+  // Ejecutar la función fetchAllProducts cuando el componente se monte
   useEffect(() => {
     fetchAllProducts();
   }, [fetchAllProducts]);
 
+  // Función para manejar la adición de un nuevo producto
   const handleAddProduct = () => {
-    setSelectedProductId(null);
-    setIsFormVisible(true);
-    toast.current?.show({
+    setSelectedProductId(null); // Limpiar la selección de producto
+    setIsFormVisible(true); // Mostrar el formulario
+    toast.current?.show({ // Mostrar notificación indicando que se está abriendo el formulario
       severity: "info",
       summary: "Agregar Producto",
       detail: "Abriendo formulario para agregar producto.",
@@ -75,115 +81,121 @@ const ParentComponentProduct = () => {
     });
   };
 
-  const handleEditProduct = useCallback((product) => {
-    const productId = product.id_producto;
-    const productName = product.nombre; // Obtiene el nombre del producto
-    setSelectedProductId(productId);
-    setIsFormVisible(true);
-    toast.current?.show({
-      severity: "info",
-      summary: "Editar Producto",
-      detail: `Editando producto con Nombre: ${productName}.`, // Usa el nombre del producto
-      life: 3000,
-    });
-  }, []);
 
-  const handleDeleteProduct = useCallback(async (product) => {
+  const handleEditProduct = useCallback((product) => {
+    const productId = product.id_producto; // Obtiene el ID del producto
+    const productName = product.nombre; // Obtiene el nombre del producto
+    setSelectedProductId(productId); // Establece el ID del producto seleccionado
+    setIsFormVisible(true); // Muestra el formulario para editar el producto
+    toast.current?.show({
+      severity: "info", // Tipo de notificación (información)
+      summary: "Editar Producto", // Título de la notificación
+      detail: `Editando producto con Nombre: ${productName}.`, // Detalle de la notificación (nombre del producto)
+      life: 3000, // Duración de la notificación en milisegundos
+    });
+  }, []); // useCallback asegura que la función no se recree a menos que sus dependencias cambien
+
+const handleDeleteProduct = useCallback(async (product) => {
     try {
-      // Ejecuta la eliminación del producto
+      // Ejecuta la eliminación del producto en el backend
       await productService.deleteProduct(product.id_producto);
 
-      // Refresca la lista de productos
+      // Refresca la lista de productos después de la eliminación
       await fetchAllProducts();
 
       // Muestra la notificación de éxito
       toast.current?.show({
-        severity: "success",
-        summary: "Producto Eliminado",
-        detail: `El producto "${product.nombre}" fue eliminado correctamente.`,
-        life: 3000,
+        severity: "success", // Tipo de notificación (éxito)
+        summary: "Producto Eliminado", // Título de la notificación
+        detail: `El producto "${product.nombre}" fue eliminado correctamente.`, // Detalle con el nombre del producto
+        life: 3000, // Duración de la notificación en milisegundos
       });
     } catch (error) {
       console.error("Error al eliminar el producto:", error);
 
-      // Muestra la notificación de error
+      // Muestra la notificación de error si falla la eliminación
       toast.current?.show({
-        severity: "error",
-        summary: "Error",
-        detail: "No se pudo eliminar el producto.",
-        life: 3000,
+        severity: "error", // Tipo de notificación (error)
+        summary: "Error", // Título de la notificación
+        detail: "No se pudo eliminar el producto.", // Detalle del error
+        life: 3000, // Duración de la notificación en milisegundos
       });
     }
-  }, [fetchAllProducts, productService]);
+  }, [fetchAllProducts, productService]); // Dependencias: fetchAllProducts y productService
 
-
-
-  const handleProductSaved = () => {
-    fetchAllProducts(); // Actualizar lista de productos
-    setIsFormVisible(false);
+// Función llamada cuando un producto es guardado correctamente
+const handleProductSaved = () => {
+    fetchAllProducts(); // Actualiza la lista de productos
+    setIsFormVisible(false); // Cierra el formulario de producto
     toast.current?.show({
-      severity: "success",
-      summary: "Producto Guardado",
-      detail: "El producto fue guardado correctamente.",
-      life: 3000,
+      severity: "success", // Tipo de notificación (éxito)
+      summary: "Producto Guardado", // Título de la notificación
+      detail: "El producto fue guardado correctamente.", // Detalle de la notificación
+      life: 3000, // Duración de la notificación en milisegundos
     });
   };
 
-  // === BÚSQUEDA ===
-  const handleSearchResults = (results) => {
-    setAllProducts(results); // Actualiza el estado con los resultados de la búsqueda
+// === BÚSQUEDA ===
+
+// Función llamada cuando se obtienen los resultados de búsqueda
+const handleSearchResults = (results) => {
+    setAllProducts(results); // Actualiza el estado con los productos encontrados
     if (results.length === 0) {
       toast.current?.show({
-        severity: "info",
-        summary: "Sin resultados",
-        detail: "No se encontraron productos que coincidan con la búsqueda.",
-        life: 3000,
+        severity: "info", // Tipo de notificación (información)
+        summary: "Sin resultados", // Título de la notificación
+        detail: "No se encontraron productos que coincidan con la búsqueda.", // Detalle si no hay productos
+        life: 3000, // Duración de la notificación en milisegundos
       });
     }
   };
 
-  const handleClearTable = () => {
-    fetchAllProducts(); // Restablecer la tabla con todos los productos
-  };
+// Función para restablecer la tabla de productos mostrando todos
+const handleClearTable = () => {
+    fetchAllProducts(); // Vuelve a cargar todos los productos
+};
 
-  // === CATEGORÍAS ===
-  const fetchAllCategories = useCallback(async () => {
+// === CATEGORÍAS ===
+
+// Función para cargar todas las categorías
+const fetchAllCategories = useCallback(async () => {
     try {
-      const categories = await categoryService.getAllCategories();
-      setAllCategories(categories || []);
+      const categories = await categoryService.getAllCategories(); // Obtiene todas las categorías desde el backend
+      setAllCategories(categories || []); // Establece las categorías obtenidas o un array vacío si no hay datos
     } catch (error) {
       toast.current?.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Error al obtener las categorías.",
-        life: 3000,
+        severity: "error", // Tipo de notificación (error)
+        summary: "Error", // Título de la notificación
+        detail: "Error al obtener las categorías.", // Detalle del error
+        life: 3000, // Duración de la notificación en milisegundos
       });
     }
-  }, [categoryService]);
+  }, [categoryService]); // Dependencia: categoryService
 
-  useEffect(() => {
-    fetchAllCategories();
-  }, [fetchAllCategories]);
+// Se ejecuta cada vez que se actualiza fetchAllCategories
+useEffect(() => {
+    fetchAllCategories(); // Llama a la función para obtener las categorías
+  }, [fetchAllCategories]); // Dependencia: fetchAllCategories
 
-  const handleCategorySearchResults = (results) => {
-    console.log("Resultados de búsqueda procesados:", results); // Verifica que los resultados estén en el formato esperado
-    setAllCategories(results);
+// Función llamada cuando se obtienen los resultados de búsqueda de categorías
+const handleCategorySearchResults = (results) => {
+    console.log("Resultados de búsqueda procesados:", results); // Muestra los resultados en la consola para depuración
+    setAllCategories(results); // Actualiza el estado con los resultados de la búsqueda
     if (results.length === 0) {
       toast.current?.show({
-        severity: "info",
-        summary: "Sin resultados",
-        detail: "No se encontraron categorías que coincidan con la búsqueda.",
-        life: 3000,
+        severity: "info", // Tipo de notificación (información)
+        summary: "Sin resultados", // Título de la notificación
+        detail: "No se encontraron categorías que coincidan con la búsqueda.", // Detalle si no hay categorías
+        life: 3000, // Duración de la notificación en milisegundos
       });
     }
   };
 
-
-  const handleClearCategoryTable = () => {
+  const handleClearCategoryTable = useCallback(() => {
     fetchAllCategories(); // Llama al método ya existente que obtiene todas las categorías
-  };
-
-  const handleCancelForm = () => {
+  }, [fetchAllCategories]);
+  
+  const handleCancelForm = useCallback(() => {
     setIsFormVisible(false);
     toast.current?.show({
       severity: "info",
@@ -191,9 +203,9 @@ const ParentComponentProduct = () => {
       detail: "El formulario se cerró sin guardar cambios.",
       life: 3000,
     });
-  };
-
-  const handleAddCategory = () => {
+  }, []);
+  
+  const handleAddCategory = useCallback(() => {
     setSelectedCategoryId(null);
     setSelectedCategoryData(null);
     setIsFormVisible(true);
@@ -202,9 +214,9 @@ const ParentComponentProduct = () => {
       summary: "Formulario de Categorías",
       detail: "Formulario de agregar categoría abierto.",
     });
-  };
-
-  const handleEditCategory = (category) => {
+  }, []);
+  
+  const handleEditCategory = useCallback((category) => {
     setSelectedCategoryId(category.id_categoria);
     setSelectedCategoryData({
       name: category.nombre,
@@ -217,9 +229,9 @@ const ParentComponentProduct = () => {
       summary: "Editar Categoría",
       detail: `Editando la categoría "${category.nombre}".`,
     });
-  };
-
-  const handleCategorySaved = () => {
+  }, []);
+  
+  const handleCategorySaved = useCallback(() => {
     fetchAllCategories();
     setIsFormVisible(false);
     toast.current.show({
@@ -227,10 +239,10 @@ const ParentComponentProduct = () => {
       summary: "Categoría Guardada",
       detail: "La categoría fue guardada correctamente.",
     });
-  };
-
+  }, [fetchAllCategories]);
+  
   // Función para eliminar una categoría
-  const handleDeleteCategory = async (categoryId) => {
+  const handleDeleteCategory = useCallback(async (categoryId) => {
     try {
       await categoryService.deleteCategory(categoryId);
       toast.current.show({
@@ -238,7 +250,7 @@ const ParentComponentProduct = () => {
         summary: "Categoría Eliminada",
         detail: "La categoría fue eliminada correctamente.",
       });
-
+  
       fetchAllCategories(); // Refresca la lista de categorías
     } catch (error) {
       toast.current.show({
@@ -248,8 +260,8 @@ const ParentComponentProduct = () => {
       });
       console.error("Error deleting category:", error);
     }
-  };
-
+  }, [categoryService, fetchAllCategories]);
+  
   // === RELACIÓN PRODUCTO-PROVEEDOR ===
   // Obtener todos los proveedores al montar el componente
   useEffect(() => {
@@ -266,10 +278,10 @@ const ParentComponentProduct = () => {
         });
       }
     };
-
+  
     fetchProviders();
   }, [providerService]);
-
+  
   // Obtener relaciones producto-proveedor para un proveedor específico
   const fetchProductProviders = useCallback(async (supplierId) => {
     console.log("Fetching product providers for supplier:", supplierId);
@@ -290,8 +302,7 @@ const ParentComponentProduct = () => {
       });
     }
   }, [productProviderService, allProducts, providers]);
-
-
+  
   // Manejar la selección de un proveedor
   const handleProviderSelection = (provider) => {
     setSelectedProvider(provider);
@@ -301,14 +312,14 @@ const ParentComponentProduct = () => {
       setProductProviders([]);
     }
   };
-
+  
   // Agregar una nueva relación producto-proveedor
-  const handleAddRelation = () => {
+  const handleAddRelation = useCallback(() => {
     setIsFormVisible(true);
-  };
-
+  }, []);
+  
   // Guardar una relación producto-proveedor
-  const handleRelationSaved = () => {
+  const handleRelationSaved = useCallback(() => {
     if (selectedProvider) {
       fetchProductProviders(selectedProvider.id); // Actualizar relaciones
     }
@@ -318,13 +329,13 @@ const ParentComponentProduct = () => {
       summary: "Relación Guardada",
       detail: "La relación Producto-Proveedor fue guardada correctamente.",
     });
-  };
-
+  }, [fetchProductProviders, selectedProvider]);
+  
   // Cambiar sección activa
-  const handleSwitchSection = (section) => {
+  const handleSwitchSection = useCallback((section) => {
     setActiveSection(section);
     setIsFormVisible(false);
-
+  
     toast.current.show({
       severity: "info",
       summary: "Cambio de Sección",
@@ -335,8 +346,8 @@ const ParentComponentProduct = () => {
           : "Productos y Proveedores"
         }.`,
     });
-  };
-
+  }, []);
+  
 
   return (
     <div className="productos-container">

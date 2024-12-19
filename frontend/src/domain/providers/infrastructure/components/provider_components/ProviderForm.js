@@ -1,39 +1,47 @@
+// Importación de dependencias de React y componentes de la librería PrimeReact, 
+// además de otros servicios y componentes que serán utilizados dentro del formulario.
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { InputText } from "primereact/inputtext";
-import { Dropdown } from "primereact/dropdown";
-import { Button } from "primereact/button";
-import Modal from "../../../../../infrastructure/shared/modal/Modal";
-import ProviderService from "../../../domain/services/ProviderService";
-import { ProviderDTO } from "../../dto/ProviderDTO";
-import "./ProviderForm.css";
+import { InputText } from "primereact/inputtext";  // Componente de entrada de texto
+import { Dropdown } from "primereact/dropdown";    // Componente de lista desplegable
+import { Button } from "primereact/button";        // Componente de botón
+import Modal from "../../../../../infrastructure/shared/modal/Modal"; // Modal reutilizable
+import ProviderService from "../../../domain/services/ProviderService"; // Servicio para manejar la API de proveedores
+import { ProviderDTO } from "../../dto/ProviderDTO"; // DTO para los datos del proveedor
+import "./ProviderForm.css"; // Estilos personalizados para el formulario
 
+// Definición del componente ProviderForm. Recibe props que incluyen providerId, onProviderSaved, onCancel y toast.
 const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
+    // Estado que almacena los datos del proveedor.
     const [providerData, setProviderData] = useState({
         name: "",
         contact: "",
         phone: "",
         email: "",
         address: "",
-        state: "ACTIVE",
+        state: "ACTIVE", // Estado por defecto
         conditions: "",
     });
-    const [isEditMode, setIsEditMode] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [isCanceling, setIsCanceling] = useState(false); // Agregar estado para manejar el cancelado
-    const [showCancelModal, setShowCancelModal] = useState(false);
 
+    // Estado que determina si estamos en modo edición o no.
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [loading, setLoading] = useState(false); // Estado para manejar el cargado de datos
+    const [isCanceling, setIsCanceling] = useState(false); // Estado que maneja el proceso de cancelación
+    const [showCancelModal, setShowCancelModal] = useState(false); // Estado para mostrar el modal de cancelación
+
+    // Instancia de ProviderService para realizar peticiones relacionadas con los proveedores
     const providerService = useMemo(() => new ProviderService(), []);
 
+    // Función para obtener los detalles del proveedor desde la API.
     const fetchProvider = useCallback(async () => {
-        if (!providerId) return;
-        setLoading(true);
+        if (!providerId) return; // Si no existe un providerId, no se hace nada.
+        setLoading(true); // Comienza el proceso de carga
         try {
-            const response = await providerService.getProviderById(providerId);
+            const response = await providerService.getProviderById(providerId); // Llamada al servicio para obtener el proveedor
             if (response && response.data) {
-                setProviderData(response.data);
+                setProviderData(response.data); // Si la respuesta es válida, actualiza el estado de providerData
             } else {
                 toast.current.show({
-                    severity: "warn",
+                    severity: "warn", // Muestra una advertencia si no se encuentra el proveedor
                     summary: "Warning",
                     detail: "No provider found for editing.",
                     life: 3000,
@@ -41,22 +49,23 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
             }
         } catch (err) {
             toast.current.show({
-                severity: "error",
+                severity: "error", // Muestra un error si falla la llamada a la API
                 summary: "Error",
                 detail: "Failed to fetch provider details.",
                 life: 3000,
             });
         } finally {
-            setLoading(false);
+            setLoading(false); // Finaliza el proceso de carga independientemente del resultado
         }
     }, [providerId, providerService, toast]);
 
+    // Hook useEffect que se ejecuta cuando cambia el providerId.
     useEffect(() => {
         if (providerId) {
-            setIsEditMode(true);
-            fetchProvider();
+            setIsEditMode(true); // Activa el modo de edición si existe providerId
+            fetchProvider(); // Obtiene los datos del proveedor
         } else {
-            setIsEditMode(false);
+            setIsEditMode(false); // Si no hay providerId, desactiva el modo de edición
             setProviderData({
                 name: "",
                 contact: "",
@@ -65,23 +74,27 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
                 address: "",
                 state: "ACTIVE",
                 conditions: "",
-            });
+            }); // Resetea los datos del proveedor
         }
     }, [providerId, fetchProvider]);
 
+    // Función que maneja el envío del formulario
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Previene el comportamiento por defecto del formulario
 
-        if (loading || isCanceling || showCancelModal) return; // Evitar múltiples envíos
+        // Evita que se envíe el formulario si está en proceso de carga, cancelación o en la pantalla de cancelación.
+        if (loading || isCanceling || showCancelModal) return;
 
-        setLoading(true); // Bloquear el botón inmediatamente
+        setLoading(true); // Bloquea el botón de envío para evitar envíos múltiples
 
+        // Mensajes para los campos del formulario
         const fieldMessages = {
             name: "Nombre",
             contact: "Contacto",
             email: "Correo",
         };
 
+        // Validación para comprobar si faltan campos obligatorios
         const missingFields = Object.keys(fieldMessages).filter(
             (field) => !providerData[field] || providerData[field].trim() === ""
         );
@@ -89,124 +102,132 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
         if (missingFields.length > 0) {
             const missingFieldNames = missingFields.map((field) => fieldMessages[field]).join(", ");
             toast.current.show({
-                severity: "warn",
+                severity: "warn", // Muestra una advertencia si faltan campos
                 summary: "Validation Error",
                 detail: `Por favor, rellene los siguientes campos: ${missingFieldNames}.`,
                 life: 3000,
             });
-            setLoading(false);
+            setLoading(false); // Finaliza el proceso de carga
             return;
         }
 
-        // Validación de correo electrónico
+        // Validación del correo electrónico utilizando una expresión regular
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         if (!emailRegex.test(providerData.email)) {
             toast.current.show({
-                severity: "warn",
+                severity: "warn", // Muestra una advertencia si el correo no es válido
                 summary: "Validation Error",
                 detail: "Por favor, introduce una dirección de correo electrónico válida.",
                 life: 3000,
             });
-            setLoading(false);
+            setLoading(false); // Finaliza el proceso de carga
             return;
         }
 
-        // Validación de número de teléfono
-        const cleanedPhone = providerData.phone.replace(/\s+/g, ""); // Eliminar espacios
+        // Validación del número de teléfono
+        const cleanedPhone = providerData.phone.replace(/\s+/g, ""); // Elimina cualquier espacio en blanco del número de teléfono
 
-        // Móviles: 9 dígitos que comienzan con 9
+        // Validación para móviles: El número debe tener 9 dígitos y empezar con 9
         const isMobile = /^9\d{8}$/.test(cleanedPhone);
 
-        // Fijos: Comienzan con + seguido de dos dígitos y de 6 a 7 dígitos
+        // Validación para teléfonos fijos: Debe comenzar con "+" seguido de dos dígitos y entre 6 a 7 dígitos adicionales
         const isLandline = /^\+\d{2}\d{6,7}$/.test(cleanedPhone);
-
+        // Si el número de teléfono no es móvil ni fijo, muestra un mensaje de advertencia
         if (!isMobile && !isLandline) {
             toast.current.show({
-                severity: "warn",
+                severity: "warn", // Muestra advertencia
                 summary: "Validation Error",
                 detail: "El número debe ser un móvil (9 dígitos, ejemplo: 912345678) o fijo (+XX seguido del número, ejemplo: +011234567).",
-                life: 3000,
+                life: 3000, // Duración del mensaje
             });
-            setLoading(false);
-            return;
+            setLoading(false); // Finaliza la carga para que se pueda hacer otra acción
+            return; // Detiene la ejecución si la validación falla
         }
-
-
 
         // Limpieza y ajustes de datos
         const updatedProviderData = {
-            ...providerData,
-            phone: cleanedPhone,
-            conditions: providerData.conditions.trim() || "Sin condiciones", // Asegurar "Sin condiciones"
+            ...providerData, // Mantiene los datos existentes del proveedor
+            phone: cleanedPhone, // Actualiza el número de teléfono limpio
+            conditions: providerData.conditions.trim() || "Sin condiciones", // Si no hay condiciones, asigna "Sin condiciones"
         };
 
+        // Crea una nueva instancia del DTO con los datos actualizados
         const providerDTO = new ProviderDTO(updatedProviderData);
 
         try {
             let savedProvider;
 
+            // Si estamos en modo edición, actualizamos el proveedor existente
             if (isEditMode) {
                 savedProvider = await providerService.updateProvider(providerId, providerDTO.toDomain());
                 if (!savedProvider || !savedProvider.data) {
                     throw new Error("Update failed. No data returned.");
                 }
             } else {
+                // Si no estamos en modo edición, creamos un nuevo proveedor
                 savedProvider = await providerService.createProvider(providerDTO.toDomain());
                 if (!savedProvider || !savedProvider.data) {
                     throw new Error("Creation failed. No data returned.");
                 }
             }
 
-            onProviderSaved(savedProvider.data); // Notifica al componente padre
+            onProviderSaved(savedProvider.data); // Llama a la función onProviderSaved para notificar al componente padre
         } catch (err) {
+            // Si ocurre un error durante la operación, muestra un mensaje de error
             toast.current.show({
-                severity: "error",
+                severity: "error", // Muestra un mensaje de error
                 summary: "Error",
                 detail: `An error occurred while saving the provider: ${err.message}`,
                 life: 3000,
             });
         } finally {
-            setLoading(false); // Permitir nuevamente clics después de completar la operación
-        }
+            setLoading(false); // Permite que el formulario sea interactivo de nuevo una vez que la operación esté completa
+        };
     };
 
-
-
+    // Función para manejar la cancelación del formulario
     const handleCancel = () => {
-        // Verificar si los campos obligatorios están vacíos
+        // Verifica si los campos obligatorios están vacíos
         const { name, contact, email, phone } = providerData;
 
-        // Si los campos obligatorios están vacíos, cancelamos directamente sin mostrar el modal
+        // Si los campos obligatorios están vacíos, simplemente cancela y cierra el formulario sin mostrar el modal
         if (!name && !contact && !email && !phone) {
-            onCancel(); // Cierra el formulario sin mostrar el modal
+            onCancel(); // Ejecuta la lógica de cancelación (cierra el formulario)
             return;
         }
 
-        // Si hay datos en los campos obligatorios, mostramos el modal de confirmación
+        // Si hay datos en los campos obligatorios, muestra el modal de confirmación
         setShowCancelModal(true);
     };
 
+    // Función para confirmar la cancelación
     const handleConfirmCancel = () => {
-        setIsCanceling(true); // Marcamos que estamos en el proceso de cancelación
-        setShowCancelModal(false); // Cerrar el modal de confirmación
+        setIsCanceling(true); // Marca el proceso como de cancelación
+        setShowCancelModal(false); // Cierra el modal de confirmación
         setProviderData({
             name: "",
             contact: "",
             phone: "",
             email: "",
             address: "",
-            state: "ACTIVE",
+            state: "ACTIVE", // Restaura el estado a 'ACTIVE'
             conditions: "",
-        }); // Limpiar los campos del formulario
-        onCancel(); // Ejecuta la lógica de cancelación (ocultar formulario)
+        }); // Limpia los campos del formulario
+        onCancel(); // Ejecuta la lógica de cancelación (oculta el formulario)
     };
 
     return (
         <div className="add-provider-form">
+            {/* Título: Agregar o Editar Proveedor */}
             <h1>{isEditMode ? "Editar Proveedor" : "Agregar Proveedor"}</h1>
+            
+            {/* Formulario de Proveedor */}
             <form onSubmit={handleSubmit}>
                 <div className="form-columns">
+                    {/* Columna 1: Información básica del Proveedor */}
                     <div className="form-column">
+    
+                        {/* Fila: Nombre del Proveedor */}
                         <div className="form-row">
                             <InputText
                                 placeholder="Nombre Proveedor *"
@@ -220,7 +241,8 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
                                 }}
                             />
                         </div>
-
+    
+                        {/* Fila: Contacto del Proveedor */}
                         <div className="form-row">
                             <InputText
                                 placeholder="Contacto *"
@@ -234,7 +256,8 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
                                 }}
                             />
                         </div>
-
+    
+                        {/* Fila: Teléfono del Proveedor */}
                         <div className="form-row">
                             <InputText
                                 placeholder="Teléfono *"
@@ -248,7 +271,8 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
                                 }}
                             />
                         </div>
-
+    
+                        {/* Fila: Correo Electrónico del Proveedor */}
                         <div className="form-row">
                             <InputText
                                 type="email"
@@ -266,10 +290,13 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
                                 }}
                             />
                         </div>
-
-
+    
                     </div>
+    
+                    {/* Columna 2: Información adicional del Proveedor */}
                     <div className="form-column">
+    
+                        {/* Fila: Dirección del Proveedor */}
                         <div className="form-row">
                             <InputText
                                 placeholder="Dirección"
@@ -279,6 +306,8 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
                                 }
                             />
                         </div>
+    
+                        {/* Fila: Condición del Proveedor (opcional) */}
                         <div className="form-row">
                             <InputText
                                 placeholder="Condición (opcional)"
@@ -291,6 +320,8 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
                                 }
                             />
                         </div>
+    
+                        {/* Fila: Estado del Proveedor */}
                         <div className="form-row">
                             <Dropdown
                                 value={providerData.state}
@@ -306,6 +337,7 @@ const ProviderForm = ({ providerId, onProviderSaved, onCancel, toast }) => {
                         </div>
                     </div>
                 </div>
+ 
                 {/* Botón de Guardar */}
                 <div className="form-buttons">
                     <Button

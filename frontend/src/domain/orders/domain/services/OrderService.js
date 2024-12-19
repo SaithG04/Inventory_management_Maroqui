@@ -5,6 +5,11 @@ class OrderService {
     this.orderRepository = new OrderRepository();
   }
 
+  // Obtener todas las órdenes
+  async getAllOrders() {
+    return await this.orderRepository.getAllOrders(); // Llama al repositorio
+  }
+
   async getAllOrdersByDate(date) {
     return await this.orderRepository.getAllOrdersByDate(date);
   }

@@ -24,7 +24,7 @@ const OrderDetails = () => {
         toast.current?.show({
           severity: "error",
           summary: "Error",
-          detail: "Unable to fetch order details.",
+          detail: "No se pudieron obtener los detalles del pedido.",
           life: 3000,
         });
       } finally {
@@ -38,24 +38,24 @@ const OrderDetails = () => {
   }, [id, orderService]);
 
   if (loading) {
-    return <div className="order-details-loading">Loading order details...</div>;
+    return <div className="order-details-loading">Cargando detalles del pedido...</div>;
   }
 
   if (!order) {
-    return <div className="order-details-error">Order not found.</div>;
+    return <div className="order-details-error">Pedido no encontrado.</div>;
   }
 
   return (
     <div className="order-details-container">
       <Toast ref={toast} />
-      <h1>Order Details</h1>
+      <h1>Detalles del Pedido</h1>
 
       {/* Información general del pedido */}
       <div className="order-details-info">
-        <p><strong>Supplier:</strong> {order.supplier}</p>
-        <p><strong>Date:</strong> {order.date}</p>
-        <p><strong>Status:</strong> {order.status}</p>
-        <p><strong>Products:</strong> {order.products.length}</p>
+        <p><strong>Proveedor:</strong> {order.supplier}</p>
+        <p><strong>Fecha:</strong> {order.date}</p>
+        <p><strong>Estado:</strong> {order.status}</p>
+        <p><strong>Productos:</strong> {order.products.length}</p>
       </div>
 
       {/* Tabla de productos en el pedido */}
@@ -64,13 +64,13 @@ const OrderDetails = () => {
         responsiveLayout="scroll"
         className="order-details-table"
       >
-        <Column field="name" header="Product Name" />
-        <Column field="quantity" header="Quantity" />
+        <Column field="name" header="Nombre del Producto" />
+        <Column field="quantity" header="Cantidad" />
       </DataTable>
 
       <div className="order-details-buttons">
         <Button
-          label="Back to Orders"
+          label="Volver a Pedidos"
           icon="pi pi-arrow-left"
           onClick={() => window.history.back()}
           className="p-button-secondary"

@@ -37,6 +37,12 @@ Estilo para los campos de texto y dropdowns
     border-radius: 4px;
     width: 100%;
     box-sizing: border-box; /* Incluye el padding en el tamaño total */
+    height: 44px; /* Altura uniforme para todos los elementos */
+}
+
+.p-field .p-dropdown {
+    display: flex;
+    align-items: center; /* Centrar texto verticalmente */
 }
 
 .p-field input:focus,
@@ -54,6 +60,26 @@ Estilo para los campos de texto y dropdowns
     margin-bottom: 8px;
     font-weight: 500;
 }
+
+.p-button.add-employee-button {
+    background-color: var(--color-verde);
+    color: white; /* Color del texto */
+    padding: 10px 15px; /* Espaciado interno */
+    border: none; /* Sin borde */
+    border-radius: 4px; /* Bordes redondeados */
+    font-size: 16px; /* Tamaño de la fuente */
+    cursor: pointer; /* Cambiar el cursor al pasar el mouse */
+    display: flex; /* Alinear ícono y texto */
+    align-items: center;
+    gap: 8px; /* Espaciado entre ícono y texto */
+    transition: background-color 0.3s ease; /* Efecto de transición */
+}
+
+.p-button.add-employee-button:hover {
+    background-color: var(--color-verde-oscuro);
+    transform: scale(1.05);
+}
+
 
 /* ============================
 Mensajes de error

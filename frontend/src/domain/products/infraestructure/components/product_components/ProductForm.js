@@ -10,7 +10,8 @@ import { ProductDTO } from "../../dto/ProductDTO";
 import Product from '../../../domain/models/Product';
 import "./ProductForm.css";
 
-const ProductForm = ({ productId, onProductSaved, onCancel,toastRef  }) => {
+const ProductForm = ({ productId, onProductSaved, onCancel, toastRef }) => {
+  // Estado para manejar los datos del producto en el formulario
   const [productData, setProductData] = useState({
     nombre: "",
     descripcion: "",
@@ -21,72 +22,106 @@ const ProductForm = ({ productId, onProductSaved, onCancel,toastRef  }) => {
     precio_venta: ""
   });
 
+  // Estado para manejar las categorías disponibles para seleccionar
   const [categories, setCategories] = useState([]);
+
+  // Estado para controlar el modo de edición (para saber si estamos creando o editando un producto)
   const [isEditMode, setIsEditMode] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // Estado para bloquear el botón Guardar
-  const [isFetching, setIsFetching] = useState(false); // Estado para indicar carga de datos al editar
+
+  // Estado para bloquear el botón de guardar mientras se está guardando o cargando información
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Estado para indicar si estamos cargando los datos de un producto (solo cuando estamos editando)
+  const [isFetching, setIsFetching] = useState(false);
+
+  // Estado para mostrar o no el modal de cancelación cuando el usuario intenta salir sin guardar
   const [showCancelModal, setShowCancelModal] = useState(false);
 
+  // Inicialización de servicios con useMemo para evitar recrearlos en cada renderizado
   const productService = useMemo(() => new ProductService(), []);
   const categoryService = useMemo(() => new CategoryService(), []);
-  const internalToast = useRef(null); // Siempre inicializa el ref interno
-  const toast = toastRef || internalToast; // Usa el ref pasado como prop o el interno por defecto
+
+  // Ref para el Toast (notificaciones) interno, para mostrar mensajes de éxito o error
+  const internalToast = useRef(null);
+  const toast = toastRef || internalToast; // Usamos el toast pasado como prop o el ref interno
+
+  // Función que obtiene las categorías desde el backend
   const fetchCategories = useCallback(async () => {
     try {
       const response = await categoryService.getAllCategories();
+      // Formateamos las categorías para que se ajusten a los requisitos del componente Dropdown
       const categoryOptions = response.map((category) => ({
-        label: category.nombre,
-        value: category.nombre, // Mantener el nombre de la categoría en español
+        label: category.nombre, // Nombre visible de la categoría
+        value: category.nombre, // Valor que se selecciona
       }));
-      setCategories(categoryOptions);
+      setCategories(categoryOptions); // Actualizamos el estado con las categorías obtenidas
     } catch (err) {
+      // Mostramos un mensaje de error si la carga de categorías falla
       toast.current?.show({
         severity: "error",
         summary: "Error",
         detail: "No se pudieron cargar las categorías.",
       });
     }
-  }, [categoryService, toast]); // Agregamos 'toast' como dependencia
-  
+  }, [categoryService, toast]); // Se agrega 'toast' como dependencia para asegurar que siempre se actualice
+
+  // Función que obtiene los detalles de un producto para editarlo
   const fetchProduct = useCallback(async () => {
-    if (!productId) return;
-    setIsFetching(true); // Activar estado de carga
+    if (!productId) return; // Si no hay productId, no se hace nada
+    setIsFetching(true); // Activamos el estado de carga
     try {
       const response = await productService.getProductById(productId);
+      // Actualizamos el estado con los datos del producto obtenido
       setProductData({
-        nombre: response.nombre || "", // Asegúrate de que aquí llega un valor válido
+        nombre: response.nombre || "", // Si no hay nombre, usamos un valor vacío
         descripcion: response.descripcion || "",
         unidad_medida: response.unidad_medida || "",
-        stock: response.stock ?? 0,
+        stock: response.stock ?? 0, // Si no hay stock, usamos 0
         nombre_categoria: response.nombre_categoria || "",
-        estado: response.estado || "OUT_OF_STOCK",
+        estado: response.estado || "OUT_OF_STOCK", // Si no hay estado, usamos OUT_OF_STOCK
         precio_venta:
           response.precio_venta != null
-            ? response.precio_venta.toString()
+            ? response.precio_venta.toString() // Aseguramos que el precio se convierta a string
             : "",
       });
     } catch (error) {
+      // Si ocurre un error al obtener el producto, mostramos un mensaje de error
       toast.current?.show({
         severity: "error",
         summary: "Error",
         detail: "No se pudieron obtener los detalles del producto.",
-        life: 3000,
+        life: 3000, // Duración del mensaje de error
       });
     } finally {
-      setIsFetching(false); // Desactivar estado de carga
+      setIsFetching(false); // Desactivamos el estado de carga después de intentar obtener el producto
     }
-  }, [productId, productService, toast]); // Agregamos 'toast' como dependencia
-  
+  }, [productId, productService, toast]); // Se agrega 'toast' como dependencia para siempre tener acceso al ref del Toast
+
+  // useEffect o un useCallback adicional puede ser usado aquí si necesitamos disparar fetchCategories o fetchProduct al montar el componente
+  useEffect(() => {
+    // Llamar fetchCategories cuando el componente se monta
+    fetchCategories();
+    // Si hay un productId, intentar obtener el producto para editarlo
+    if (productId) {
+      fetchProduct();
+    }
+  }, [fetchCategories, fetchProduct, productId]);
 
 
   useEffect(() => {
+    // useEffect se ejecuta cuando el componente se monta o cuando 'productId' cambia.
     (async () => {
+      // Llamamos a la función fetchCategories para cargar las categorías disponibles
       await fetchCategories();
+  
+      // Si productId está definido, significa que estamos editando un producto existente
       if (productId) {
-        setIsEditMode(true);
-        await fetchProduct();
+        setIsEditMode(true); // Activamos el modo de edición
+        await fetchProduct(); // Cargamos los detalles del producto para editarlo
       } else {
-        setIsEditMode(false);
+        // Si no hay productId, estamos en modo de creación de un nuevo producto
+        setIsEditMode(false); // Desactivamos el modo de edición
+        // Inicializamos los datos del producto a valores vacíos para el formulario
         setProductData({
           nombre: "",
           descripcion: "",
@@ -97,106 +132,137 @@ const ProductForm = ({ productId, onProductSaved, onCancel,toastRef  }) => {
           precio_venta: ""
         });
       }
-    })();
-  }, [productId, fetchProduct, fetchCategories]);
-
-  const validateUniqueName = async () => {
-    const productsWithSameName = await productService.isProductNameUnique(productData.nombre);
-    console.log("Productos con el mismo nombre:", productsWithSameName); // Log temporal
+    })(); // Llamamos la función asíncrona de inmediato
+  }, [productId, fetchProduct, fetchCategories]); // Dependencias: se vuelve a ejecutar si productId, fetchProduct o fetchCategories cambian
   
+  // Función de validación que asegura que el nombre del producto sea único
+  const validateUniqueName = async () => {
+    // Llamamos a la función isProductNameUnique para verificar si ya existe un producto con el mismo nombre
+    const productsWithSameName = await productService.isProductNameUnique(productData.nombre);
+    console.log("Productos con el mismo nombre:", productsWithSameName); // Log temporal para depuración
+    
+    // Si estamos en modo de edición (editando un producto existente)
     if (isEditMode) {
+      // Verificamos si hay otro producto con el mismo nombre, pero que no sea el producto actual
       const isNameUsedByAnotherProduct = productsWithSameName.some(
-        (product) => product.id_producto !== productId
+        (product) => product.id_producto !== productId // Comparamos el ID del producto actual
       );
       if (isNameUsedByAnotherProduct) {
-        console.log("Lanzando error en modo edición"); // Log temporal
-        throw new Error("Ya existe otro producto con este nombre.");
+        console.log("Lanzando error en modo edición"); // Log temporal para depuración
+        throw new Error("Ya existe otro producto con este nombre."); // Lanzamos un error si el nombre está en uso
       }
     } else {
+      // Si no estamos en modo de edición (creando un producto nuevo)
       if (productsWithSameName.length > 0) {
-        console.log("Lanzando error en modo creación"); // Log temporal
-        throw new Error("Ya existe un producto con este nombre.");
+        console.log("Lanzando error en modo creación"); // Log temporal para depuración
+        throw new Error("Ya existe un producto con este nombre."); // Lanzamos un error si el nombre ya está en uso
       }
     }
   };
-
+  
 
   const handleSubmit = async (e) => {
+    // Prevenimos el comportamiento por defecto del formulario (enviar datos)
     e.preventDefault();
-    setIsLoading(true); // Activar estado de carga
-
+    
+    // Activamos el estado de carga para deshabilitar el botón y mostrar una indicación de proceso
+    setIsLoading(true);
+  
     try {
+      // Imprime un log indicando que la validación ha comenzado
       console.log("Validación iniciada");
+  
+      // Validación de campos obligatorios del producto
       if (!productData.nombre.trim()) {
-          console.log("Validación fallida: Nombre vacío");
-          throw new Error("El nombre del producto es obligatorio.");
+        console.log("Validación fallida: Nombre vacío");
+        // Si el nombre del producto está vacío, lanzamos un error
+        throw new Error("El nombre del producto es obligatorio.");
       }
+  
       if (!productData.unidad_medida) {
-          console.log("Validación fallida: Unidad de medida vacía");
-          throw new Error("La unidad de medida es obligatoria.");
+        console.log("Validación fallida: Unidad de medida vacía");
+        // Si la unidad de medida está vacía, lanzamos un error
+        throw new Error("La unidad de medida es obligatoria.");
       }
+  
       if (!productData.nombre_categoria) {
-          console.log("Validación fallida: Categoría vacía");
-          throw new Error("La categoría es obligatoria.");
+        console.log("Validación fallida: Categoría vacía");
+        // Si la categoría está vacía, lanzamos un error
+        throw new Error("La categoría es obligatoria.");
       }
+  
+      // Si todas las validaciones han pasado, se indica que la validación fue exitosa
       console.log("Validación pasada");
-
-        // Validar que el nombre del producto sea único
-        await validateUniqueName();
-
-        // Asegurar que la descripción tenga un valor predeterminado
-        const updatedProductData = {
-            ...productData,
-            descripcion: productData.descripcion.trim() || "Sin descripción", // Si está vacío, asigna "Sin descripción"
-        };
-
-        const productDTO = new ProductDTO(updatedProductData);
-        const product = new Product(productDTO.toDomain());
-        product.validate(); // Validar datos
-
-        if (isEditMode) {
-            await productService.updateProduct(productId, productDTO.toDomain());
-            toast.current?.show({
-                severity: "success",
-                summary: "Producto Actualizado",
-                detail: "El producto fue actualizado correctamente.",
-            });
-        } else {
-            await productService.createProduct(productDTO.toDomain());
-            toast.current?.show({
-                severity: "success",
-                summary: "Producto Creado",
-                detail: "El producto fue creado correctamente.",
-            });
-        }
-
-        onProductSaved(); // Notificar al padre que se guardó
-    } catch (err) {
+  
+      // Llamamos a la función para validar que el nombre del producto sea único
+      await validateUniqueName();
+  
+      // Aseguramos que la descripción tenga un valor predeterminado (si está vacía, asignamos "Sin descripción")
+      const updatedProductData = {
+        ...productData,
+        descripcion: productData.descripcion.trim() || "Sin descripción",
+      };
+  
+      // Creamos un objeto ProductDTO con los datos actualizados
+      const productDTO = new ProductDTO(updatedProductData);
+      // Creamos un objeto Product con los datos del DTO convertido al dominio
+      const product = new Product(productDTO.toDomain());
+      // Validamos los datos del producto (esto podría ser parte de la lógica de negocio)
+      product.validate();
+  
+      // Si estamos en modo de edición (editando un producto existente)
+      if (isEditMode) {
+        // Llamamos a la función de actualización del producto
+        await productService.updateProduct(productId, productDTO.toDomain());
+        // Mostramos una notificación de éxito
         toast.current?.show({
-            severity: "error",
-            summary: "Error de Validación",
-            detail: err.message,
+          severity: "success",
+          summary: "Producto Actualizado",
+          detail: "El producto fue actualizado correctamente.",
         });
+      } else {
+        // Si no estamos en modo de edición (creando un producto nuevo)
+        await productService.createProduct(productDTO.toDomain());
+        // Mostramos una notificación de éxito
+        toast.current?.show({
+          severity: "success",
+          summary: "Producto Creado",
+          detail: "El producto fue creado correctamente.",
+        });
+      }
+    } catch (error) {
+      // Si ocurre un error en cualquier parte del proceso, mostramos el error en un toast
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: error.message,
+      });
     } finally {
-        setIsLoading(false); // Desactivar estado de carga
+      // Finalmente, independientemente de si el proceso fue exitoso o no, desactivamos el estado de carga
+      setIsLoading(false);
     }
-};
+  };
+  
 
 
   const handleCancel = () => {
+    // Verifica si alguno de los campos del producto tiene algún valor distinto de vacío o predeterminado
     if (
-      productData.nombre ||
-      productData.nombre_categoria ||
-      productData.unidad_medida ||
-      productData.descripcion ||
-      productData.stock !== 0 ||
-      productData.precio_venta
+      productData.nombre ||               // Nombre del producto
+      productData.nombre_categoria ||     // Categoría del producto
+      productData.unidad_medida ||        // Unidad de medida
+      productData.descripcion ||          // Descripción
+      productData.stock !== 0 ||          // Stock (diferente de 0)
+      productData.precio_venta           // Precio de venta
     ) {
+      // Si alguno de los campos tiene valores modificados, muestra el modal de cancelación
       setShowCancelModal(true);
     } else {
+      // Si no se han realizado cambios, ejecuta la función de cancelación directamente
       onCancel();
     }
   };
+  
 
   return (
     <div className="add-product-form">

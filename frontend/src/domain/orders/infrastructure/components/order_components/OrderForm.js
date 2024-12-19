@@ -15,6 +15,7 @@ const OrderForm = ({ orderId, onOrderSaved, onCancel }) => {
   const [orderData, setOrderData] = useState({
     supplier: "",
     status: "PENDING",
+    date: "",
     products: [],
   });
   const [suppliers, setSuppliers] = useState([]);
@@ -36,13 +37,21 @@ const OrderForm = ({ orderId, onOrderSaved, onCancel }) => {
       setLoading(true);
       try {
         const response = await orderService.getOrderById(orderId);
-        setOrderData(response);
+        console.log("Pedido recuperado:", response); // Debug para verificar los datos
+
+        setOrderData({
+          supplier: response.supplier_name || "", // Usar supplier_name
+          status: response.status || "PENDING",
+          date: response.orderDate || "",
+          products: response.products || [],
+        });
         setIsEditMode(true);
       } catch (error) {
+        console.error("Error al obtener el pedido:", error);
         toast.current.show({
           severity: "error",
           summary: "Error",
-          detail: "Failed to fetch order details.",
+          detail: "No se pudo obtener los detalles del pedido.",
           life: 3000,
         });
       } finally {
@@ -50,13 +59,15 @@ const OrderForm = ({ orderId, onOrderSaved, onCancel }) => {
       }
     };
 
+
+
     const fetchSuppliersAndProducts = async () => {
       try {
         const supplierResponse = await providerService.getAllProviders();
         setSuppliers(
           supplierResponse.map((supplier) => ({
-            label: supplier.name,
-            value: supplier.name,
+            label: supplier.name, // Etiqueta para mostrar
+            value: supplier.name, // Valor real
           }))
         );
 
@@ -66,7 +77,7 @@ const OrderForm = ({ orderId, onOrderSaved, onCancel }) => {
         toast.current.show({
           severity: "error",
           summary: "Error",
-          detail: "Failed to fetch suppliers or products.",
+          detail: "No se pudieron obtener los proveedores o productos.",
           life: 3000,
         });
       }
@@ -88,8 +99,8 @@ const OrderForm = ({ orderId, onOrderSaved, onCancel }) => {
     if (!selectedProduct.name || selectedProduct.quantity <= 0) {
       toast.current.show({
         severity: "warn",
-        summary: "Validation Error",
-        detail: "Product name and valid quantity are required.",
+        summary: "Error de Validación",
+        detail: "El nombre del producto y una cantidad válida son obligatorios.",
         life: 3000,
       });
       return;
@@ -121,16 +132,16 @@ const OrderForm = ({ orderId, onOrderSaved, onCancel }) => {
         await orderService.updateOrder(orderId, order);
         toast.current.show({
           severity: "success",
-          summary: "Order Updated",
-          detail: "Order has been updated successfully.",
+          summary: "Pedido Actualizado",
+          detail: "El pedido se ha actualizado con éxito.",
           life: 3000,
         });
       } else {
         await orderService.createOrder(order);
         toast.current.show({
           severity: "success",
-          summary: "Order Created",
-          detail: "Order has been created successfully.",
+          summary: "Pedido Creado",
+          detail: "El pedido se ha creado con éxito.",
           life: 3000,
         });
       }
@@ -140,7 +151,7 @@ const OrderForm = ({ orderId, onOrderSaved, onCancel }) => {
       toast.current.show({
         severity: "error",
         summary: "Error",
-        detail: error.message || "Failed to save the order.",
+        detail: error.message || "No se pudo guardar el pedido.",
         life: 3000,
       });
     } finally {
@@ -168,14 +179,14 @@ const OrderForm = ({ orderId, onOrderSaved, onCancel }) => {
   return (
     <div className="order-form">
       <Toast ref={toast} />
-      <h1>{isEditMode ? "Edit Order" : "Create Order"}</h1>
+      <h1>{isEditMode ? "Editar Pedido" : "Crear Pedido"}</h1>
       <form onSubmit={handleSubmit}>
         <div className="form-row">
           <Dropdown
-            value={orderData.supplier}
+            value={orderData.supplier} // Aquí debe coincidir con supplier_name
             options={suppliers}
             onChange={(e) => setOrderData({ ...orderData, supplier: e.value })}
-            placeholder="Select Supplier"
+            placeholder="Seleccione Proveedor"
             className="order-dropdown"
           />
         </div>
@@ -184,13 +195,22 @@ const OrderForm = ({ orderId, onOrderSaved, onCancel }) => {
           <Dropdown
             value={orderData.status}
             options={[
-              { label: "Pending", value: "PENDING" },
-              { label: "Processed", value: "PROCESSED" },
-              { label: "Canceled", value: "CANCELED" },
+              { label: "Pendiente", value: "PENDING" },
+              { label: "Procesado", value: "PROCESSED" },
+              { label: "Cancelado", value: "CANCELED" },
             ]}
             onChange={(e) => setOrderData({ ...orderData, status: e.value })}
-            placeholder="Select Status"
+            placeholder="Seleccione Estado"
             className="order-dropdown"
+          />
+        </div>
+
+        <div className="form-row">
+          <InputText
+            value={orderData.date}
+            onChange={(e) => setOrderData({ ...orderData, date: e.target.value })}
+            placeholder="Fecha del Pedido (YYYY-MM-DD)"
+            className="order-input"
           />
         </div>
 
@@ -200,7 +220,7 @@ const OrderForm = ({ orderId, onOrderSaved, onCancel }) => {
             suggestions={filteredProducts}
             completeMethod={searchProducts}
             field="name"
-            placeholder="Search Product"
+            placeholder="Buscar Producto"
             onChange={(e) => setSelectedProduct({ ...selectedProduct, name: e.value })}
             className="order-autocomplete"
           />
@@ -212,11 +232,11 @@ const OrderForm = ({ orderId, onOrderSaved, onCancel }) => {
                 quantity: parseInt(e.target.value, 10) || 1,
               })
             }
-            placeholder="Quantity"
+            placeholder="Cantidad"
             className="order-input"
           />
           <Button
-            label="Add Product"
+            label="Agregar Producto"
             icon="pi pi-plus"
             onClick={handleAddProduct}
             className="add-product-button"
@@ -224,11 +244,11 @@ const OrderForm = ({ orderId, onOrderSaved, onCancel }) => {
         </div>
 
         <div className="product-list">
-          <h1>Products in Order</h1>
+          <h1>Productos en el Pedido</h1>
           {orderData.products.map((product, index) => (
             <div key={index} className="product-item">
               <span>{product.name}</span>
-              <span>Quantity: {product.quantity}</span>
+              <span>Cantidad: {product.quantity}</span>
               <Button
                 icon="pi pi-trash"
                 onClick={() => handleRemoveProduct(index)}
@@ -240,14 +260,14 @@ const OrderForm = ({ orderId, onOrderSaved, onCancel }) => {
 
         <div className="form-buttons">
           <Button
-            label={loading ? "Saving..." : "Save"}
+            label={loading ? "Guardando..." : "Guardar"}
             icon="pi pi-check"
             type="submit"
             className="p-button-success"
             disabled={loading}
           />
           <Button
-            label="Cancel"
+            label="Cancelar"
             icon="pi pi-times"
             onClick={handleCancel}
             className="p-button-secondary"
@@ -260,8 +280,8 @@ const OrderForm = ({ orderId, onOrderSaved, onCancel }) => {
         show={isModalVisible}
         onClose={handleCloseModal}
         onConfirm={handleConfirmCancel}
-        title="Confirm Cancel"
-        message="Are you sure you want to cancel? Unsaved changes will be lost."
+        title="Confirmar Cancelación"
+        message="¿Está seguro de que desea cancelar? Los cambios no guardados se perderán."
       />
     </div>
   );
