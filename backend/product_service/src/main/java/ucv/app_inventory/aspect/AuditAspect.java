@@ -40,7 +40,7 @@ public class AuditAspect {
             return -1L; // Returns a default value if no user is authenticated
         }
         String email = authentication.getName();
-        return userClient.getUserByEmail(email).getIdUser();
+        return userClient.getUserByEmail(email).getData().getIdUser();
     }
 
     /**

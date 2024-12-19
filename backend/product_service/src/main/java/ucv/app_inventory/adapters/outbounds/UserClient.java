@@ -20,5 +20,5 @@ public interface UserClient {
      * @return A UserDTO containing user details.
      */
     @GetMapping("/api/users/findByEmail")
-    UserDTO getUserByEmail(@RequestParam String email);
+    ApiResponse<UserDTO> getUserByEmail(@RequestParam String email);
 }

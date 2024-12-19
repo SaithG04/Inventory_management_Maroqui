@@ -3,6 +3,7 @@ package ucv.app_inventory.supplier_service.infrastructure.outbound.external;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import ucv.app_inventory.supplier_service.application.ApiResponse;
 import ucv.app_inventory.supplier_service.application.dto.UserDTO;
 
 /**
@@ -19,5 +20,5 @@ public interface UserAPIClient {
      * @return A UserDTO containing user details.
      */
     @GetMapping("/api/users/findByEmail")
-    UserDTO getUserByEmail(@RequestParam String email);
+    ApiResponse<UserDTO> getUserByEmail(@RequestParam String email);
 }

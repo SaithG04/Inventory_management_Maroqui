@@ -4,6 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ucv.app_inventory.order_service.application.dto.UserDTO;
+import ucv.app_inventory.order_service.exception.ApiResponseJSON;
 
 /**
  * Feign client for interacting with the external User service.
@@ -19,5 +20,5 @@ public interface UserAPIClient {
      * @return A UserDTO containing user details.
      */
     @GetMapping("/api/users/findByEmail")
-    UserDTO getUserByEmail(@RequestParam String email);
+    ApiResponseJSON<UserDTO> getUserByEmail(@RequestParam String email);
 }
