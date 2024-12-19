@@ -1,42 +1,39 @@
-/* Header.css */
-
 /* Contenedor principal del header con efecto 3D */
 .header-container {
   display: flex;
+  justify-content: space-between; /* Logo a la izquierda, usuario a la derecha */
   align-items: center;
-  padding: 15px 30px; /* Espaciado aumentado para mayor aire */
-  background: linear-gradient(145deg, #e9f1c1, #90c2e7); /* Fondo degradado para agregar volumen */
-  border-bottom: 2px solid rgba(0, 0, 0, 0.1); /* Borde inferior sutil */
-  border-radius: 12px; /* Bordes redondeados para suavizar */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2), inset 2px 2px 5px rgba(255, 255, 255, 0.3); /* Sombra externa e interna para dar volumen */
-  transition: box-shadow 0.3s ease, transform 0.3s ease; /* Transición suave para mejorar el efecto 3D */
+  padding: 15px 30px; /* Espaciado interno */
+  background: linear-gradient(145deg, #e9f1c1, #90c2e7); /* Fondo degradado */
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1); /* Línea inferior */
+  border-radius: 12px; /* Bordes redondeados */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2), inset 2px 2px 5px rgba(255, 255, 255, 0.3); /* Sombra */
+  height: 80px; /* Fija la altura del header */
+  box-sizing: border-box; /* Asegura que padding no afecte la altura */
+  transition: box-shadow 0.3s ease, transform 0.3s ease; /* Transiciones suaves */
 }
 
 .header-container:hover {
   transform: translateY(-3px); /* Elevar ligeramente al pasar el ratón */
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3), inset 2px 2px 8px rgba(255, 255, 255, 0.2); /* Sombras más profundas al pasar el ratón */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3), inset 2px 2px 8px rgba(255, 255, 255, 0.2); /* Sombras más profundas */
 }
 
-.header {
-  width: 100%; /* Asegura que el header se expanda completamente */
-}
-
-/* Estilos para el logo */
+/* Estilos del logo */
 .header-logo {
-  width: 80px; /* Aumentar ligeramente el tamaño del logo */
+  width: 80px;
   height: auto;
   margin-right: 15px;
-  transition: transform 0.5s ease, box-shadow 0.5s ease; /* Añadir una transición suave al logo */
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
   transform-origin: center;
+  animation: walkAndFlip 12s infinite ease-in-out alternate;
 }
 
-/* Efecto interactivo en el logo al pasar el ratón */
 .header-logo:hover {
-  transform: scale(1.1) rotate(5deg); /* Escalar y rotar ligeramente */
-  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2); /* Sombra al pasar el ratón para un efecto "flotante" */
+  transform: scale(1.1) rotate(5deg); /* Escala y rota ligeramente */
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2); /* Sombra para efecto "flotante" */
 }
 
-/* Animación de movimiento del logo */
+/* Animación del logo */
 @keyframes walkAndFlip {
   0%, 100% {
     transform: translateX(0) rotateY(0deg);
@@ -52,7 +49,73 @@
   }
 }
 
-/* Aplicación de la animación mejorada al logo */
-.header-logo {
-  animation: walkAndFlip 12s infinite ease-in-out alternate;
+/* Sección del usuario */
+.header-user-section {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: auto; /* Ajusta el ancho automáticamente al contenido */
+  height: 100%;
+  background-color: transparent; /* Elimina el fondo */
+  box-shadow: none; /* Elimina la sombra */
+  padding: 0; /* Elimina el padding */
+  margin: 0;
+}
+
+/* Detalles del usuario */
+.header-user-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.header-user-box {
+  display: flex;
+  align-items: center;
+  gap: 25px; /* Espaciado entre icono y detalles */
+  overflow: hidden; /* Asegura que el contenido no desborde */
+  transform: translateX(-40px); /* Ajusta el valor según lo que necesites */
+}
+
+/* Avatar del usuario */
+.header-user-avatar {
+  font-size: 40px; /* Tamaño del icono dentro del avatar */
+  background-color: #64A6BD; /* Azul verdoso complementario */
+  color: #FFFFFF; /* Color del icono en blanco */
+  width: 60px; /* Ancho del avatar */
+  height: 60px; /* Altura del avatar */
+  display: flex;
+  justify-content: center; /* Centra horizontalmente el icono */
+  align-items: center; /* Centra verticalmente el icono */
+  border-radius: 50%; /* Mantén el círculo */
+}
+
+/* Detalles del usuario */
+.header-user-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Alinea verticalmente dentro de la altura */
+}
+
+/* Nombre del usuario */
+.header-user-name {
+  font-weight: bold;
+  font-size: 20px; /* Tamaño del texto ajustado */
+  color: #444B6E;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  line-height: 1; /* Evita que el texto agregue altura extra */
+  white-space: nowrap; /* Evita que el texto se desborde a otra línea */
+  overflow: hidden; /* Oculta texto sobrante si es demasiado largo */
+  text-overflow: ellipsis; /* Muestra puntos suspensivos si el texto es muy largo */
+}
+
+/* Rol del usuario */
+.header-user-role {
+  font-size: 18px; /* Tamaño del texto ajustado */
+  color: #444B6E;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  line-height: 1; /* Evita que el texto agregue altura extra */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
