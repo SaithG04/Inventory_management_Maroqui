@@ -32,7 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         // Convertir roles en una colección de GrantedAuthority
         Set<SimpleGrantedAuthority> authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName()))  // Asumiendo que 'getName' devuelve el nombre del rol
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toSet());
 
         // Crear el objeto UserDetails con los roles mapeados a GrantedAuthority

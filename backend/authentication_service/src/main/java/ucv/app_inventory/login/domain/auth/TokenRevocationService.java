@@ -20,7 +20,11 @@ public class TokenRevocationService {
     public TokenRevocationService(TokenRevocationRepository tokenRevocationRepository) {
         this.tokenRevocationRepository = tokenRevocationRepository;
     }
-
+    /**
+     * Verifica si un token ha sido revocado.
+     * @param token Token a verificar.
+     * @return true si el token está revocado, false en caso contrario.
+     */
     public boolean isTokenRevoked(String token) {
         if (token == null || token.isEmpty()) {
             logger.error("Intento de verificar revocación de un token nulo o vacío.");
@@ -28,7 +32,10 @@ public class TokenRevocationService {
         }
         return tokenRevocationRepository.existsByToken(token);
     }
-
+    /**
+     * Revoca un token específico.
+     * @param token Token a revocar.
+     */
     public void revokeToken(String token) {
         if (token == null || token.isEmpty()) {
             logger.error("Intento de revocar un token nulo o vacío.");
@@ -42,7 +49,11 @@ public class TokenRevocationService {
         revokedToken.setRevokedAt(System.currentTimeMillis());
         tokenRevocationRepository.save(revokedToken);
     }
-
+    /**
+     * Extrae el token del encabezado de una solicitud HTTP.
+     * @param request Objeto HttpServletRequest.
+     * @return Token extraído o null si no está presente.
+     */
     public String extractTokenFromRequest(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {

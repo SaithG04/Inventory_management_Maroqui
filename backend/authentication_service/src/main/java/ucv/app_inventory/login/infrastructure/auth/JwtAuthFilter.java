@@ -18,12 +18,25 @@ import ucv.app_inventory.login.adapters.auth.CustomUserDetailsService;
 import ucv.app_inventory.login.domain.auth.TokenManagementService;
 import ucv.app_inventory.login.domain.auth.TokenRevocationService;
 
+/**
+ * JwtAuthFilter es un filtro que intercepta cada solicitud HTTP para verificar
+ * la autenticidad del token JWT y configurar la autenticación en el contexto de seguridad.
+ */
+
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final TokenManagementService tokenManagementService;
     private final TokenRevocationService tokenRevocationService;
     private final CustomUserDetailsService customUserDetailsService;
+
+    /**
+     * Constructor para inicializar los servicios necesarios.
+     *
+     * @param tokenManagementService Servicio para gestionar tokens JWT
+     * @param tokenRevocationService Servicio para verificar revocación de tokens
+     * @param customUserDetailsService Servicio para cargar detalles de usuario
+     */
 
     @Autowired
     public JwtAuthFilter(TokenManagementService tokenManagementService,
@@ -34,6 +47,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         this.customUserDetailsService = customUserDetailsService;
     }
 
+    /**
+     * Método que filtra y autentica solicitudes HTTP mediante tokens JWT.
+     *
+     * @param request Solicitud HTTP
+     * @param response Respuesta HTTP
+     * @param filterChain Cadena de filtros
+     * @throws ServletException en caso de error en el procesamiento
+     * @throws IOException en caso de error de entrada/salida
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -42,9 +64,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (path.startsWith("/swagger-ui") ||
                 path.equals("/swagger-ui.html") ||
-                path.startsWith("/v2/api-docs") ||
-                path.startsWith("/swagger-resources") ||
-                path.startsWith("/webjars")) {
+                path.startsWith("/v3/api-docs")) {
             filterChain.doFilter(request, response);
             return;
         }

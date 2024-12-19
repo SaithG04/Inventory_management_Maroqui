@@ -1,3 +1,6 @@
+/**
+ * Representa una respuesta que contiene tokens JWT para autenticación.
+ */
 package ucv.app_inventory.login.adapters.controller.dto;
 
 import lombok.AllArgsConstructor;
@@ -8,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class JwtResponse {
-    private String accessToken;
-    private String refreshToken;
+    private String accessToken; // Token de acceso JWT.
+    private String refreshToken; // Token de renovación JWT.
 }
-

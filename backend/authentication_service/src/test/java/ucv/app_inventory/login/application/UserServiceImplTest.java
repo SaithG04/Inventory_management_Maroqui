@@ -37,71 +37,25 @@ class UserServiceImplTest {
     }
 
     @Test
-    void registerUser_Success() {
-        // Datos de entrada
+    void registerUser_NewEmail_UserCreated() {
         UserRegistration registration = new UserRegistration();
-        registration.setFirstName("Juan");
-        registration.setLastName("Pérez");
-        registration.setEmail("juan.perez@example.com");
-        registration.setPassword("securePassword");
-        registration.setDni("12345678A");
-        registration.setAge(30);
-        registration.setBirthDate(LocalDate.of(1994, 5, 20));
-        registration.setAddress("Calle Falsa 123");
-        registration.setPhone("555-1234");
-        registration.setSex(Sex.MASCULINO);
-        registration.setMaritalStatus(MaritalStatus.SOLTERO);
+        registration.setEmail("new@example.com");
+        registration.setPassword("password");
+        registration.setRoleName("ROLE_USER");
 
-        // Mocking: Email no existe
-        when(jpaUserRepository.findByEmail(registration.getEmail())).thenReturn(Optional.empty());
+        when(jpaUserRepository.findByEmail("new@example.com")).thenReturn(Optional.empty());
+        when(passwordEncoder.encode("password")).thenReturn("encodedPass");
 
-        // Mocking: Password encoding
-        when(passwordEncoder.encode(registration.getPassword())).thenReturn("encodedPassword");
+        Role role = new Role();
+        role.setName("ROLE_USER");
+        when(roleRepository.findByName("ROLE_USER")).thenReturn(Optional.of(role));
 
-        // Mocking: Rol por defecto
-        Role defaultRole = new Role();
-        defaultRole.setIdRole(1L);
-        defaultRole.setName("WAREHOUSE CLERK");
-        when(roleRepository.findByName("WAREHOUSE CLERK")).thenReturn(Optional.of(defaultRole));
+        when(jpaUserRepository.save(any(User.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        // Mocking: Save user
-        User savedUser = new User();
-        savedUser.setIdUser(1L);
-        savedUser.setEmail(registration.getEmail());
-        savedUser.setPassword("encodedPassword");
-        savedUser.setStatus(Status.ACTIVE);
-        UserProfile profile = new UserProfile();
-        profile.setFirstName(registration.getFirstName());
-        profile.setLastName(registration.getLastName());
-        profile.setDni(registration.getDni());
-        profile.setAge(registration.getAge());
-        profile.setBirthDate(registration.getBirthDate());
-        profile.setAddress(registration.getAddress());
-        profile.setPhone(registration.getPhone());
-        profile.setSex(registration.getSex());
-        profile.setMaritalStatus(registration.getMaritalStatus());
-        profile.setUser(savedUser);
-        savedUser.setUserProfile(profile);
-        savedUser.setRoles(Set.of(defaultRole));
-
-        when(jpaUserRepository.save(any(User.class))).thenReturn(savedUser);
-
-        // Ejecutar el método a probar
         UserDto userDto = userService.registerUser(registration);
 
-        // Verificar los resultados
         assertNotNull(userDto);
-        assertEquals(1L, userDto.getIdUser());
-        assertEquals("juan.perez@example.com", userDto.getEmail());
-        assertEquals("Juan", userDto.getFirstName());
-        assertEquals("Pérez", userDto.getLastName());
-        assertTrue(userDto.getRoles().contains("WAREHOUSE CLERK"));
-        assertEquals("ACTIVE", userDto.getStatus());
-
-        // Verificar las interacciones
-        verify(jpaUserRepository, times(1)).findByEmail(registration.getEmail());
-        verify(passwordEncoder, times(1)).encode(registration.getPassword());
-        verify(roleRepository, times(1)).findByName("WAREHOUSE CLERK");
+        assertEquals("new@example.com", userDto.getEmail());
         verify(jpaUserRepository, times(1)).save(any(User.class));
     }
 

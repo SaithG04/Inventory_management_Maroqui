@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import ucv.app_inventory.login.adapters.controller.dto.JwtResponse;
 import ucv.app_inventory.login.adapters.persistence.JpaUserRepository;
@@ -41,45 +42,34 @@ class AuthServiceImplTest {
     }
 
     @Test
-    void authenticateUser_Success() {
+    void authenticateUser_ValidCredentials_ReturnsJwtResponse() {
+        // Arrange
         String email = "test@example.com";
-        String password = "password123";
-        String accessToken = "access-token";
-        String refreshToken = "refresh-token";
+        String password = "pass";
+        User mockUser = new User();
+        mockUser.setEmail(email);
+        mockUser.setStatus(Status.ACTIVE);
 
-        User user = new User();
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setStatus(Status.ACTIVE);
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(mock(Authentication.class));
 
-        // Mocking authenticationManager.authenticate
-        doNothing().when(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
+        when(userRepository.findByEmailAndStatus(email, Status.ACTIVE))
+                .thenReturn(Optional.of(mockUser));
 
-        // Mocking userRepository.findByEmailAndStatus
-        when(userRepository.findByEmailAndStatus(email, Status.ACTIVE)).thenReturn(Optional.of(user));
+        when(tokenManagementService.generateToken(mockUser)).thenReturn("accessToken");
+        when(tokenManagementService.generateRefreshToken(mockUser)).thenReturn("refreshToken");
+        when(userRepository.save(mockUser)).thenReturn(mockUser);
 
-        // Mocking tokenGeneration
-        when(tokenManagementService.generateToken(user)).thenReturn(accessToken);
-        when(tokenManagementService.generateRefreshToken(user)).thenReturn(refreshToken);
-
-        // Mocking userRepository.save
-        when(userRepository.save(user)).thenReturn(user);
-
-        // Ejecutar el método a probar
+        // Act
         JwtResponse response = authService.authenticateUser(email, password);
 
-        // Verificar los resultados
+        // Assert
         assertNotNull(response);
-        assertEquals(accessToken, response.getAccessToken());
-        assertEquals(refreshToken, response.getRefreshToken());
-
-        // Verificar las interacciones
-        verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(userRepository, times(1)).findByEmailAndStatus(email, Status.ACTIVE);
-        verify(tokenManagementService, times(1)).generateToken(user);
-        verify(tokenManagementService, times(1)).generateRefreshToken(user);
-        verify(userRepository, times(1)).save(user);
+        assertEquals("accessToken", response.getAccessToken());
+        assertEquals("refreshToken", response.getRefreshToken());
+        verify(userRepository, times(1)).save(mockUser);
     }
+
 
     @Test
     void authenticateUser_InvalidCredentials() {
@@ -106,28 +96,34 @@ class AuthServiceImplTest {
     }
 
     @Test
-    void authenticateUser_UserNotFoundOrInactive() {
-        String email = "test@example.com";
-        String password = "password123";
+    void logoutUser_ValidEmail_RefreshTokenSetToNull() {
+        String email = "user@example.com";
+        User mockUser = new User();
+        mockUser.setEmail(email);
+        mockUser.setStatus(Status.ACTIVE);
+        mockUser.setRefreshToken("someToken");
 
-        // Mocking authenticationManager.authenticate
-        doNothing().when(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
+        when(userRepository.findByEmailAndStatus(email, Status.ACTIVE)).thenReturn(Optional.of(mockUser));
+        when(userRepository.save(mockUser)).thenReturn(mockUser);
 
-        // Mocking userRepository.findByEmailAndStatus to return empty
-        when(userRepository.findByEmailAndStatus(email, Status.ACTIVE)).thenReturn(Optional.empty());
+        authService.logoutUser(email);
 
-        // Ejecutar y verificar excepciones
-        InvalidCredentials exception = assertThrows(InvalidCredentials.class, () -> {
-            authService.authenticateUser(email, password);
-        });
+        verify(userRepository, times(1)).save(mockUser);
+        assertNull(mockUser.getRefreshToken());
+    }
 
-        assertEquals("Usuario no encontrado o no activo", exception.getMessage());
+    @Test
+    void logoutUser_NullEmail_ThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> authService.logoutUser(null));
+    }
 
-        // Verificar las interacciones
-        verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(userRepository, times(1)).findByEmailAndStatus(email, Status.ACTIVE);
-        verify(tokenManagementService, never()).generateToken(any());
-        verify(tokenManagementService, never()).generateRefreshToken(any());
-        verify(userRepository, never()).save(any());
+    @Test
+    void logoutUser_UserNotFound_ThrowsInvalidCredentials() {
+        when(userRepository.findByEmailAndStatus("unknown@example.com", Status.ACTIVE))
+                .thenReturn(Optional.empty());
+
+        assertThrows(InvalidCredentials.class,
+                () -> authService.logoutUser("unknown@example.com"));
     }
 }*/

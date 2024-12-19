@@ -12,6 +12,8 @@ import ucv.app_inventory.login.domain.exception.InvalidCredentials;
 import ucv.app_inventory.login.domain.model.Status;
 import ucv.app_inventory.login.domain.model.User;
 
+//Implementación del servicio de autenticación de usuarios.
+
 @Service
 public class AuthServiceImpl implements AuthService {
 

@@ -23,7 +23,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfigurationSource;
 import ucv.app_inventory.login.adapters.auth.CustomUserDetailsService;
 
-
+/**
+ * SecurityConfig configura la seguridad para la aplicación, incluyendo
+ * autenticación, autorización, manejo de sesiones y filtros personalizados.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
@@ -36,6 +39,13 @@ public class SecurityConfig {
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
 
+    /**
+     * Configura la cadena de filtros de seguridad.
+     *
+     * @param http Objeto HttpSecurity para configurar la seguridad
+     * @return La cadena de filtros configurada
+     * @throws Exception en caso de error en la configuración
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -46,13 +56,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login", "/api/auth/refresh-token").permitAll()
 
                         .requestMatchers(
-                                "/v2/api-docs",
                                 "/v3/api-docs/**",
-                                "/swagger-resources/**",
-                                "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/webjars/**",
-                                "/swagger-ui/index.html"
+                                "/swagger-ui/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
@@ -70,6 +76,11 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Configura el proveedor de autenticación utilizando DAO y codificación BCrypt.
+     *
+     * @return Proveedor de autenticación configurado
+     */
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -77,12 +88,22 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
-
+    /**
+     * Proporciona el gestor de autenticación.
+     *
+     * @param authenticationConfiguration Configuración de autenticación
+     * @return Gestor de autenticación
+     * @throws Exception en caso de error
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-
+    /**
+     * Configura el codificador de contraseñas con BCrypt.
+     *
+     * @return Codificador de contraseñas BCrypt
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
