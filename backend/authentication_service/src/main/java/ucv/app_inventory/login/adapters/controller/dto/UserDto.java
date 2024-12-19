@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @ApiModel(description = "Datos de información del usuario")
 public class UserDto {
 
-    @ApiModelProperty(value = "Identificador único del usuario", example = "1", required = true, position = 0)
+    @ApiModelProperty(value = "Identificador único del usuario", example = "1", required = true)
     private Long idUser;
 
     @ApiModelProperty(value = "Correo electrónico del usuario", example = "usuario@example.com", required = true)

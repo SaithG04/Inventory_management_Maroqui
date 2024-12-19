@@ -13,9 +13,11 @@ import ucv.app_inventory.login.adapters.controller.dto.UserDto;
 import ucv.app_inventory.login.adapters.controller.dto.UserRegistration;
 import ucv.app_inventory.login.application.UserService;
 import jakarta.validation.Valid;
+import ucv.app_inventory.login.domain.model.Role;
 import ucv.app_inventory.login.domain.model.User;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
@@ -28,7 +30,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    // 1. Registro de un nuevo usuario
     @PostMapping("/register")
     @ApiOperation(value = "Registrar un nuevo usuario", notes = "Permite registrar un nuevo usuario en el sistema")
     public ResponseEntity<ApiResponse<UserDto>> registerUser(
@@ -39,7 +40,6 @@ public class UserController {
                 .body(new ApiResponse<>("success", "Usuario registrado exitosamente", registeredUser));
     }
 
-    // 2. Obtener todos los usuarios
     @GetMapping
     @ApiOperation(value = "Obtener todos los usuarios", notes = "Requiere rol ADMIN para acceder a esta operación")
     public ResponseEntity<ApiResponse<List<UserDto>>> getAllUsers() {
@@ -47,7 +47,6 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse<>("success", "Usuarios obtenidos exitosamente", users));
     }
 
-    // 4. Actualizar un usuario específico
     @PutMapping("/update/{id}")
     @ApiOperation(value = "Actualizar un usuario", notes = "Actualiza los detalles de un usuario específico")
     public ResponseEntity<ApiResponse<UserDto>> updateUser(
@@ -59,7 +58,6 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse<>("success", "Usuario actualizado exitosamente", user));
     }
 
-    // 5. Eliminar un usuario
     @DeleteMapping("/delete/{id}")
     @ApiOperation(value = "Eliminar un usuario", notes = "Elimina un usuario específico por su ID")
     public ResponseEntity<ApiResponse<Void>> deleteUser(
@@ -69,7 +67,6 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    // 6. Asignar un rol a un usuario
     @PutMapping("/assign-role/{id}")
     @ApiOperation(value = "Asignar rol a un usuario", notes = "Asigna un rol específico a un usuario por su ID")
     public ResponseEntity<ApiResponse<UserDto>> assignRoleToUser(
@@ -81,7 +78,6 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse<>("success", "Rol asignado exitosamente al usuario", updatedUser));
     }
 
-    // 7. Obtener todos los roles disponibles
     @GetMapping("/roles")
     @ApiOperation(value = "Obtener todos los roles", notes = "Obtiene una lista de todos los roles disponibles en el sistema")
     public ResponseEntity<ApiResponse<List<String>>> getAllRoles() {
@@ -89,7 +85,6 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse<>("success", "Roles obtenidos exitosamente", roles));
     }
 
-    // 11. Obtener el perfil del usuario autenticado
     @GetMapping("/profile")
     @ApiOperation(value = "Obtener perfil del usuario", notes = "Obtiene el perfil del usuario actualmente autenticado")
     public ResponseEntity<ApiResponse<UserDto>> getUserProfile(
@@ -99,7 +94,6 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse<>("success", "Perfil del usuario obtenido exitosamente", userDto));
     }
 
-    // 13. Activar o desactivar un usuario
     @PutMapping("/activate/{id}")
     @ApiOperation(value = "Activar o desactivar un usuario", notes = "Permite activar o desactivar un usuario específico por su ID")
     public ResponseEntity<ApiResponse<String>> activateUser(
@@ -112,7 +106,6 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse<>("success", "Usuario " + status + " exitosamente", null));
     }
 
-    // Obtener usuario por email
     @GetMapping("/findByEmail")
     @ApiOperation(value = "Buscar usuario por email", notes = "Obtiene un usuario basado en su dirección de email")
     public ResponseEntity<UserDto> getByEmail(
@@ -122,10 +115,27 @@ public class UserController {
         if (user.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+
         UserDto userDTO = new UserDto();
         userDTO.setIdUser(user.get().getIdUser());
         userDTO.setEmail(user.get().getEmail());
+        userDTO.setFirstName(user.get().getUserProfile().getFirstName());
+        userDTO.setLastName(user.get().getUserProfile().getLastName());
+        userDTO.setDni(user.get().getUserProfile().getDni());
+        userDTO.setAge(user.get().getUserProfile().getAge());
+        userDTO.setBirthDate(user.get().getUserProfile().getBirthDate());
+        userDTO.setAddress(user.get().getUserProfile().getAddress());
+        userDTO.setPhone(user.get().getUserProfile().getPhone());
+        userDTO.setSex(String.valueOf(user.get().getUserProfile().getSex()));
+        userDTO.setMaritalStatus(String.valueOf(user.get().getUserProfile().getMaritalStatus()));
+        userDTO.setRoles(
+                user.get().getRoles().stream()
+                        .map(Role::getName)
+                        .collect(Collectors.toSet())
+        );
+        userDTO.setStatus(String.valueOf(user.get().getStatus()));
 
         return ResponseEntity.ok(userDTO);
     }
+
 }

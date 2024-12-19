@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import ucv.app_inventory.login.domain.exception.EmailAlreadyExistsException;
 import ucv.app_inventory.login.domain.exception.InvalidCredentials;
 import ucv.app_inventory.login.domain.exception.RoleNotFoundException;
