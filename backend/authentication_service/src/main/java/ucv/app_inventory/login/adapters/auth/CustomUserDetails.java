@@ -6,9 +6,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import ucv.app_inventory.login.domain.model.Status;
 import ucv.app_inventory.login.domain.model.User;
-import ucv.app_inventory.login.domain.model.Role;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
@@ -23,10 +23,11 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Convertir los roles del usuario a SimpleGrantedAuthority
-        return user.getRoles().stream()
+        return user.getRoles() != null
+                ? user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+                : List.of();
     }
 
     @Override

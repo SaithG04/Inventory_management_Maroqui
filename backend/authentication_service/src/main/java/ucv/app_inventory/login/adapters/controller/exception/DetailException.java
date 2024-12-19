@@ -1,3 +1,6 @@
+/**
+ * Detalles de una excepción capturada.
+ */
 package ucv.app_inventory.login.adapters.controller.exception;
 
 import lombok.AllArgsConstructor;
@@ -9,6 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DetailException {
 
-    private String mensaje;
-    private String detalles;
+    private String mensaje; // Mensaje de error.
+    private String detalles; // Detalles específicos del error.
 }

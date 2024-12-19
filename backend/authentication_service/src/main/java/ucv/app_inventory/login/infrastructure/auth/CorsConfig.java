@@ -25,7 +25,10 @@ public class CorsConfig {
 
     @Value("${cors.allow.credentials}")
     private boolean allowCredentials;
-
+    /**
+     * Configura las reglas de CORS para la aplicación.
+     * @return Objeto CorsConfigurationSource configurado.
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

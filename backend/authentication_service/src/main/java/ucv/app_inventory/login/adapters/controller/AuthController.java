@@ -29,7 +29,11 @@ public class AuthController {
     @Autowired
     private TokenRevocationService tokenRevocationService;
 
-    // Endpoint de login
+    /**
+     * Autentica un usuario mediante sus credenciales.
+     * @param loginRequest Objeto con email y contraseña del usuario.
+     * @return JWT tokens (access y refresh) en caso de autenticación exitosa.
+     */
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<JwtResponse>> login(@Valid @RequestBody LoginRequest loginRequest) {
         logger.debug("Solicitud de autenticación recibida para el usuario: {}", loginRequest.getEmail());
@@ -46,7 +50,11 @@ public class AuthController {
         }
     }
 
-    // Endpoint para renovar el access token
+    /**
+     * Renueva el access token utilizando un refresh token válido.
+     * @param jwtRequest Objeto con el refresh token.
+     * @return Nuevo access token.
+     */
     @PostMapping("/refresh-token")
     public ResponseEntity<ApiResponse<JwtResponse>> refreshToken(@RequestBody JwtRequest jwtRequest) {
         try {
@@ -59,7 +67,11 @@ public class AuthController {
         }
     }
 
-    // Endpoint de logout
+    /**
+     * Cierra la sesión del usuario mediante la revocación del refresh token.
+     * @param jwtRequest Objeto con el refresh token.
+     * @return Mensaje de confirmación del logout.
+     */
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<String>> logout(@RequestBody JwtRequest jwtRequest) {
         String refreshToken = jwtRequest.getToken();
