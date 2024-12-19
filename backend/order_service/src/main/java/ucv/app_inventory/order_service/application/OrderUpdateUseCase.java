@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ucv.app_inventory.order_service.application.dto.OrderDTO;
 import ucv.app_inventory.order_service.application.dto.OrderDetailDTO;
 import ucv.app_inventory.order_service.application.dto.OrderRequestDTO;
-import ucv.app_inventory.order_service.application.dto.mappers.OrderMapper;
 import ucv.app_inventory.order_service.application.dto.SupplierDTO;
 import ucv.app_inventory.order_service.domain.model.Order;
 import ucv.app_inventory.order_service.domain.model.OrderState;
@@ -18,12 +17,12 @@ import ucv.app_inventory.order_service.exception.*;
 import ucv.app_inventory.order_service.infrastructure.outbound.database.OrderDetailMySqlRepository;
 import ucv.app_inventory.order_service.infrastructure.outbound.database.OrderMySqlRepository;
 import ucv.app_inventory.order_service.infrastructure.outbound.external.SupplierAPIClient;
+import ucv.app_inventory.order_service.application.dto.mappers.OrderMapper;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-import static ucv.app_inventory.order_service.application.OrderCreateUseCase.validateOrderDate;
 
 @Slf4j
 @Service
@@ -56,18 +55,23 @@ public class OrderUpdateUseCase {
             throw new InvalidArgumentException("Order is required");
         }
 
+        if (oldOrder.getSupplierId() == null) {
+            throw new InvalidArgumentException("The order must have a valid supplier ID.");
+        }
+
         SupplierDTO supplierDTO = supplierAPIClient.getSupplierById(oldOrder.getSupplierId())
                 .orElseThrow(() -> new SupplierNotFoundException("The supplier that was associated with this order no longer exists. Please check the supplier table."));
 
         // Update supplier
-        if(newOrderDTO.getSupplierName() != null && !newOrderDTO.getSupplierName().isEmpty()){
+        if (newOrderDTO.getSupplierName() != null && !newOrderDTO.getSupplierName().isEmpty()) {
+            logger.warn("Attempt to change supplier for order ID {}", oldOrder.getId());
             throw new InvalidArgumentException("Supplier cannot change, ignore this parameter.");
         }
 
         // Update order date
         if (newOrderDTO.getOrderDate() != null && !(newOrderDTO.getOrderDate().equals(oldOrderDTO.getOrderDate()))) {
             logger.info("Updating date");
-            LocalDate orderDate = validateOrderDate(newOrderDTO.getOrderDate());
+            LocalDate orderDate = OrderCreateUseCase.validateOrderDate(newOrderDTO.getOrderDate());
             oldOrder.setOrderDate(orderDate);
         }
 

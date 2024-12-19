@@ -1,10 +1,8 @@
 package ucv.app_inventory.order_service.config;
 
-import jakarta.servlet.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -54,7 +52,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 // Allows access to Swagger UI and OpenAPI documentation endpoints without authentication.
-                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
+                                .requestMatchers(
+                                        "/api/swagger-ui/**",
+                                        "/api/v3/api-docs/**",
+                                        "/api/swagger-resources/**",
+                                        "/api/webjars/**"
+                                ).permitAll()
 
                                 // Requires authentication for all other endpoints.
                                 .anyRequest().authenticated()

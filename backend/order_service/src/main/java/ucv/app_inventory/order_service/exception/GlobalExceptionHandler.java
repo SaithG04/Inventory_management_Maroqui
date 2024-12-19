@@ -13,40 +13,40 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ApiResponse<Void>> handleIllegalArgumentException(IllegalArgumentException ex) {
-        ApiResponse<Void> response = new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "Invalid argument: " + ex.getMessage());
+    public ResponseEntity<ApiResponseJSON<Void>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        ApiResponseJSON<Void> response = new ApiResponseJSON<>(HttpStatus.BAD_REQUEST.value(), "Invalid argument: " + ex.getMessage());
         return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(OrderNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<ApiResponse<Void>> handleOrderNotFoundException(OrderNotFoundException ex) {
-        ApiResponse<Void> response = new ApiResponse<>(HttpStatus.NOT_FOUND.value(), "Order not found: " + ex.getMessage());
+    public ResponseEntity<ApiResponseJSON<Void>> handleOrderNotFoundException(OrderNotFoundException ex) {
+        ApiResponseJSON<Void> response = new ApiResponseJSON<>(HttpStatus.NOT_FOUND.value(), "Order not found: " + ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(TotalCannotBeNullException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ApiResponse<Void>> handleTotalCannotBeNullException(TotalCannotBeNullException ex) {
-        ApiResponse<Void> response = new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+    public ResponseEntity<ApiResponseJSON<Void>> handleTotalCannotBeNullException(TotalCannotBeNullException ex) {
+        ApiResponseJSON<Void> response = new ApiResponseJSON<>(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
         return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ApiResponse<Void>> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
-        ApiResponse<Void> response = new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "Data integrity violation: " + ex.getMessage());
+    public ResponseEntity<ApiResponseJSON<Void>> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        ApiResponseJSON<Void> response = new ApiResponseJSON<>(HttpStatus.BAD_REQUEST.value(), "Data integrity violation: " + ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ApiResponse<Void>> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
-        ApiResponse<Void> response = new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+    public ResponseEntity<ApiResponseJSON<Void>> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+        ApiResponseJSON<Void> response = new ApiResponseJSON<>(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleGenericException(Exception e) {
-        ApiResponse<Void> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error: " + e.getMessage());
+    public ResponseEntity<ApiResponseJSON<Void>> handleGenericException(Exception e) {
+        ApiResponseJSON<Void> response = new ApiResponseJSON<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error: " + e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }
